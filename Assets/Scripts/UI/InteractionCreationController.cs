@@ -27,7 +27,8 @@ namespace UI
             Touch,
             Laser,
             Microgesture,
-            Speech
+            Speech,
+            Proximity
         }
 
         public enum CategoryObjectSelected
@@ -119,6 +120,9 @@ namespace UI
 
         //TEST
         /*private Test testScript;*/
+        
+        // Proximity
+        public GameObject proximityCube;
 
 
         private void Start()
@@ -130,7 +134,8 @@ namespace UI
                 == "MRTK RightHand Controller");
             OpenXRLeftHandController = GameObject.FindGameObjectsWithTag("handController").FirstOrDefault(obj => obj.name 
                 == "MRTK LeftHand Controller");
-            _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
+            if(_screenshotCamera != null) 
+                _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
             _ruleManager = this.gameObject.GetComponent<RuleManager>();
             if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
             if(microphone.activeSelf) microphone.SetActive(false);
@@ -163,6 +168,9 @@ namespace UI
                     case Modalities.Speech:
                         ActivateSpeechModality();
                         break;
+                    case Modalities.Proximity:
+                        ActivateProximityModality();
+                        break;
                 }
             /*}*/
             
@@ -191,6 +199,22 @@ namespace UI
             _modalityEvents.Clear();
             _actionEvents.Clear();
             _oppositeActionEvents.Clear();
+        }
+
+        private void ActivateProximityModality()
+        {
+            HideModalitiesBubble("Proximity");
+
+            //Show proximity cube
+            proximityCube.SetActive(true);
+        }
+        
+        private void DeActivateProximityModality()
+        {
+            
+            //Hide proximity cube
+            proximityCube.SetActive(false);
+            
         }
         
         private void ActivateHeadGazeModality()
@@ -235,6 +259,9 @@ namespace UI
                     break;
                 case Modalities.Speech:
                     DeActivateSpeechModality();
+                    break;
+                case Modalities.Proximity:
+                    DeActivateProximityModality();
                     break;
             }
             //Remove the listeners

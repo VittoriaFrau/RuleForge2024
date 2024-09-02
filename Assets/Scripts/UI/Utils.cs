@@ -185,15 +185,7 @@ namespace UI
             Vector3 spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2;
             GameObject go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
 
-            // Exceptions for some prefabs
-            if (go.name.Contains("Cube"))
-            { 
-                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, go.transform.localPosition.z);
-            }
-            else if (go.name.Contains("Bird"))
-            {
-                go.transform.localRotation = Quaternion.Euler(-90.0f, 0.0f, 180.0f);
-            }
+            
 
             /*var transform1 = mainCamera.transform;
             var go = Object.Instantiate(GetPrefabFromString(prefabType, prefabList),
@@ -212,6 +204,21 @@ namespace UI
             }*/
     
             go.transform.parent = interactableTransform;
+            
+            // Exceptions for some prefabs
+            if (go.name.Contains("Cube"))
+            { 
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, go.transform.localPosition.z);
+            }
+            else if (go.name.Contains("Bird"))
+            {
+                go.transform.localRotation = Quaternion.Euler(-0.180f, 0.0f, 180.0f);
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, -5.527433f);
+            }
+            else if (go.name.Contains("Box"))
+            {
+                go.transform.localPosition = new Vector3(0.69f, 0.194f, -5.527433f);
+            }
     
             Rigidbody rigidbody = go.GetComponent<Rigidbody>();
             if(rigidbody == null) rigidbody = go.GetComponentInChildren<Rigidbody>();

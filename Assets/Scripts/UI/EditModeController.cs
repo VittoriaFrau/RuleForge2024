@@ -41,12 +41,14 @@ namespace UI
         {
             EditMode = false;
             canvas = GameObject.FindGameObjectWithTag("Canvas");
-            if(radialMenu==null) radialMenu = canvas.transform.Find("RadialMenu").gameObject;
+            //TODO SCENARIO UNCOMMENT
+            //if(radialMenu==null) radialMenu = canvas.transform.Find("RadialMenu").gameObject;
             /*text = textGo.GetComponent<TextMeshPro>();*/
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             radialMenu.SetActive(true);
             _ruleEngine = RuleEngine.GetInstance();
-            plane = GameObject.FindGameObjectWithTag("Plane").GetComponent<Renderer>();
+            //TODO SCENARIO UNCOMMENT
+            //plane = GameObject.FindGameObjectWithTag("Plane").GetComponent<Renderer>();
         }
 
 
