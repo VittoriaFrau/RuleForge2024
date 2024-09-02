@@ -183,7 +183,7 @@ namespace UI
 
             // instantiate prefab
             Vector3 spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2;
-            GameObject go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            GameObject go= Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
 
             
 
@@ -208,16 +208,17 @@ namespace UI
             // Exceptions for some prefabs
             if (go.name.Contains("Cube"))
             { 
-                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, go.transform.localPosition.z);
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 0.0011f, go.transform.localPosition.z);
             }
             else if (go.name.Contains("Bird"))
             {
-                go.transform.localRotation = Quaternion.Euler(-0.180f, 0.0f, 180.0f);
-                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, -5.527433f);
+                //go.transform.localRotation = Quaternion.Euler(-0.180f, 0.0f, 180.0f);
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 0.0011f, -5.21f);
+                go.transform.Rotate(new Vector3(-90.0f, 0.0f, 180.0f));
             }
             else if (go.name.Contains("Box"))
             {
-                go.transform.localPosition = new Vector3(0.69f, 0.194f, -5.527433f);
+                go.transform.localPosition = new Vector3(0.69f, 0.194f, -5.21f);
             }
     
             Rigidbody rigidbody = go.GetComponent<Rigidbody>();
