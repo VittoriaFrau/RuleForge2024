@@ -172,9 +172,32 @@ namespace UI
 
         public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
         {
-            var transform1 = mainCamera.transform;
+            // obtain prefab
+            GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+
+            if (prefab == null)
+            {
+                Debug.LogError("Prefab not found!");
+                return null;
+            }
+
+            // instantiate prefab
+            Vector3 spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2;
+            GameObject go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+
+            // Exceptions for some prefabs
+            if (go.name.Contains("Cube"))
+            { 
+                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 1.0011f, go.transform.localPosition.z);
+            }
+            else if (go.name.Contains("Bird"))
+            {
+                go.transform.localRotation = Quaternion.Euler(-90.0f, 0.0f, 180.0f);
+            }
+
+            /*var transform1 = mainCamera.transform;
             var go = Object.Instantiate(GetPrefabFromString(prefabType, prefabList),
-                transform1.position + transform1.forward * 3,
+                transform1.position + transform1.forward * 2,
                 Quaternion.identity);
             if (go.name.Contains("Cube"))
             {
@@ -182,6 +205,11 @@ namespace UI
                 localPosition = new Vector3(localPosition.x, 1.0011f, localPosition.z);
                 go.transform.localPosition = localPosition;
             }
+
+            if (go.name.Equals("Bird"))
+            {
+                go.transform.localRotation = new Quaternion.Euler(-90.0f, 0.0f, 180.0f);
+            }*/
     
             go.transform.parent = interactableTransform;
     
