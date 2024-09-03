@@ -145,11 +145,13 @@ namespace UI
 
             // Generate cubes for all events
             float previousZ = 1.41f;
+            int i = 0;
             foreach (var e in allEvents)
             {
                 if(cubeCreatedEvents.Contains(e)) continue;
-                Vector3 position = CalculatePositionInPlate(previousZ, allEvents.IndexOf(e));
-                previousZ = position.z;
+                //Vector3 position = CalculatePositionInPlate(previousZ, allEvents.IndexOf(e));
+                //previousZ = position.z;
+                Vector3 staticLocalPosition = CalculateStaticLocalPosition(i);
                 GameObject cube;
 
                 bool isModality = e.Event != null;
@@ -157,17 +159,32 @@ namespace UI
                 if (isModality)
                 {
                     cube = InstantiateRuleCube(modalityCubePrefab, 1, 
-                        position, cubePlate.transform, new Texture[] { e.Texture });
+                        staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
                 }
                 else cube = InstantiateRuleCube(e.Object == null ? actionCubePrefabVariant : actionCubePrefab, 1, 
-                    position, cubePlate.transform, new Texture[] { e.Texture });
+                    staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
 
-                result.Add(cube, position);
+                result.Add(cube, staticLocalPosition);
                 e.CubeID = cube.GetInstanceID().ToString();
                 FillTextLabelsInCube(e, cube);
+                i++;
             }
 
             return result;
+        }
+
+        private static Vector3 CalculateStaticLocalPosition(int i)
+        {
+            switch (i)
+            {
+               case 0:
+                   return new Vector3(-5.3f, -65.0f, -16.3f);
+               case 1:
+                   return new Vector3(-5.3f, 65.0f, -16.3f);
+               case 2:
+                   return new Vector3(-5.3f, 0.0f, -16.3f);
+            }
+            return new Vector3(-5.3f, 0.0f, -16.3f);
         }
 
         public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
@@ -274,7 +291,7 @@ namespace UI
             GameObject cube = Object.Instantiate(cubePrefab, position, Quaternion.Euler(0f,0f,0f), parent);
             cube.transform.rotation = Quaternion.identity;
             cube.transform.localScale = new Vector3(25, 25, 25);
-            
+            cube.transform.localPosition = position;
             //TEST
             /*
             Test testScript = GameObject.FindGameObjectsWithTag("EventHandler").FirstOrDefault(x => x.name == "EventHandler").GetComponent<Test>();

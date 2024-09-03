@@ -25,7 +25,7 @@ namespace UI.RuleEditor
     {
         private TextMeshProUGUI whenText, thenText;
         private GameObject whenSequentialRow, whenEquivalenceRow;
-        private GameObject thenSequentialRow, thenEquivalenceRow;
+        private GameObject thenSequentialRow;
         public enum ContainerType { Equivalence, Sequential }
         public enum RulePhase { When, Then, None }
         private List<CubeContainerClass> whenContainers;
@@ -55,7 +55,7 @@ namespace UI.RuleEditor
             Transform then = GameObject.FindGameObjectsWithTag("RuleUtils").ToList()
                 .Find(x => x.name == "Then").transform.Find("Frontplate").transform;
             thenSequentialRow = then.Find("SequentialRow").gameObject;
-            thenEquivalenceRow = then.Find("EquivalenceRow").gameObject;
+            
             
             //Adds the default containers
             whenContainers = new List<CubeContainerClass>();

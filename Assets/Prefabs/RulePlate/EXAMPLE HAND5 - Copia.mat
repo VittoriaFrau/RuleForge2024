@@ -16,7 +16,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 5000
   stringTagMap: {}
   disabledShaderPasses: []
   m_LockedProperties: 
@@ -113,7 +113,7 @@ Material:
     - _TransparentEndPoint: 0.96
     - _TransparentStartPoint: 1
     - _UVSec: 0
-    - _WristOpacity: 0.252
+    - _WristOpacity: 0
     - _XRayBias: 0
     - _XRayBias1: 0
     - _XRayIntensity: 1.5

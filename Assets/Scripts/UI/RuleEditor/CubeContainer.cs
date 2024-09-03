@@ -75,8 +75,13 @@ namespace UI.RuleEditor
                 CreateSequenceContainer();
                 ruleManager.AddContainer(rulePhase, this.gameObject);
 
-                CreateEquivalenceContainer();
-                ruleManager.AddContainer(rulePhase, gameObject);
+
+                if (rulePhase != RuleManager.RulePhase.Then)
+                {
+                    CreateEquivalenceContainer();
+                    ruleManager.AddContainer(rulePhase, gameObject);
+                }
+                
 
                 currentCube = collision.gameObject;
 

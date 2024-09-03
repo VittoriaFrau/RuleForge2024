@@ -134,7 +134,7 @@ namespace UI
                 == "MRTK RightHand Controller");
             OpenXRLeftHandController = GameObject.FindGameObjectsWithTag("handController").FirstOrDefault(obj => obj.name 
                 == "MRTK LeftHand Controller");
-            if(_screenshotCamera != null) 
+            if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
             _ruleManager = this.gameObject.GetComponent<RuleManager>();
             if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
@@ -573,7 +573,7 @@ namespace UI
                 _oppositeActionEvents.Add(oppositeAction);
                 _actionEvents.Add(ecaEvent);
                 Debug.Log(ecaEvent);
-                generalUIController.SetDebugText(ecaEvent.ToString());
+                //generalUIController.SetDebugText(ecaEvent.ToString());
                 PrepareForActionScreenShot(selectedObject);
             }
         }
