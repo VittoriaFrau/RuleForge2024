@@ -139,15 +139,17 @@ namespace UI
             Dictionary<GameObject, Vector3> result = new Dictionary<GameObject, Vector3>();
 
             // Combine the two lists
-            List<ECAEvent> allEvents = new List<ECAEvent>();
-            allEvents.AddRange(RemoveDuplicates(_modalityEvents));
-            allEvents.AddRange(RemoveDuplicates(_actionEvents));
+            List<ECAEvent> allEvents = _modalityEvents
+                .Union(_actionEvents)
+                .Distinct()
+                .ToList();
+
 
             // Generate cubes for all events
             float previousZ = 1.41f;
             int i = 0;
             foreach (var e in allEvents)
-            {
+            { 
                 if(cubeCreatedEvents.Contains(e)) continue;
                 //Vector3 position = CalculatePositionInPlate(previousZ, allEvents.IndexOf(e));
                 //previousZ = position.z;
@@ -158,6 +160,10 @@ namespace UI
 
                 if (isModality)
                 {
+                    if (e.Texture == null)
+                    {
+                        e.Texture = LoadTextureFromFile("birdcollision");
+                    }
                     cube = InstantiateRuleCube(modalityCubePrefab, 1, 
                         staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
                 }
@@ -171,6 +177,35 @@ namespace UI
             }
 
             return result;
+        }
+        
+        public static Texture2D LoadTextureFromFile(string filename)
+        {
+            // Verifica se il file esiste
+            if (!System.IO.File.Exists(filename))
+            {
+                Debug.LogError("File not found: " + filename);
+                return null;
+            }
+
+            // Leggi il file in un array di byte
+            byte[] fileData = System.IO.File.ReadAllBytes(filename);
+
+            // Crea una nuova Texture2D
+            Texture2D texture = new Texture2D(2, 2); // Le dimensioni iniziali non sono importanti, saranno ridimensionate automaticamente
+
+            // Carica l'immagine dai byte nella texture
+            if (texture.LoadImage(fileData))
+            {
+                // Se il caricamento ha avuto successo, restituisce la texture
+                return texture;
+            }
+            else
+            {
+                // Se il caricamento fallisce, restituisce null
+                Debug.LogError("Failed to load texture from file: " + filename);
+                return null;
+            }
         }
 
         private static Vector3 CalculateStaticLocalPosition(int i)

@@ -32,7 +32,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4204398553410018896}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -164,8 +163,8 @@ GameObject:
   - component: {fileID: 4204398553410018901}
   - component: {fileID: 4204398553410018902}
   - component: {fileID: 4204398553410018903}
-  - component: {fileID: 4204398553410018900}
   - component: {fileID: 4204398553410018907}
+  - component: {fileID: 6068743343741443068}
   m_Layer: 5
   m_Name: CubeContainer
   m_TagString: Untagged
@@ -188,7 +187,6 @@ RectTransform:
   - {fileID: 4204398552805936078}
   - {fileID: 6105133984920541912}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -253,24 +251,19 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4204398553410018897}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1.101754, y: 1.016906, z: 7.782201}
   m_Center: {x: 0.022053389, y: 0.008452989, z: -2.5912828}
---- !u!114 &4204398553410018900
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4204398553410018897}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e63548f222045d1a0d19cb693b51b08, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cubeContainerPrefab: {fileID: 4204398553410018897}
 --- !u!222 &4204398553410018907
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -279,6 +272,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4204398553410018897}
   m_CullTransparentMesh: 1
+--- !u!114 &6068743343741443068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4204398553410018897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 829b142e85e202c4d9ce644fbc936a76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  rulePhase: 0
+  containerType: 0
+  currentCube: {fileID: 0}
 --- !u!1 &4232191386392457628
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,7 +320,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4204398553410018896}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}

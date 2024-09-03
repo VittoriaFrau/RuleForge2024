@@ -1192,11 +1192,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
-      value: 1
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -1205,11 +1205,11 @@ PrefabInstance:
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 1499981244}
+      objectReference: {fileID: 1415814815}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
-      objectReference: {fileID: 1415814815}
+      objectReference: {fileID: 1499981244}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
@@ -1224,11 +1224,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: SetActive
+      value: ActivateCombineRulesMode
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
-      value: ActivateCombineRulesMode
+      value: SetActive
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -1236,11 +1236,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
+      value: UI.InteractionCreationController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
-      value: UI.InteractionCreationController, Assembly-CSharp
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 3338943046291832137, guid: 1e047477eb02efb4b8d1432a3226d184, type: 3}
       propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
@@ -21395,6 +21395,7 @@ MonoBehaviour:
   interactablesContainer: {fileID: 1353512104}
   resWidth: 2550
   resHeight: 2550
+  screenshots: []
 --- !u!1 &230346013
 GameObject:
   m_ObjectHideFlags: 0
@@ -112105,6 +112106,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84e5036f7de7bfe49a750053382cf795, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handMenu: {fileID: 10470153}
+  ruleEditorPlate: {fileID: 312976280}
+  removableBarrier: {fileID: 72606160}
+  modalityRuleCubePrefab: {fileID: 611475747482515778, guid: d8bc05dad8c6410468d3d7615acae91f, type: 3}
+  actionRuleCubePrefab: {fileID: 611475747482515778, guid: fe74fb6eb1855da4a877031a9d597d96, type: 3}
+  actionRuleCubePrefabVariant: {fileID: 611475747482515778, guid: f6adce9e163c98746a5b7da4d82f4c87, type: 3}
+  cubePlate: {fileID: 413883901}
+  screenshotCamera: {fileID: 0}
 --- !u!1 &1416792181
 GameObject:
   m_ObjectHideFlags: 0
@@ -122250,6 +122259,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8391222552659086748, guid: 4442a752612fc46d59d96ada408cd090, type: 3}
+      propertyPath: m_TagString
+      value: proximityCube
+      objectReference: {fileID: 0}
     - target: {fileID: -5477749408508380018, guid: 4442a752612fc46d59d96ada408cd090, type: 3}
       propertyPath: m_LocalScale.x
       value: 600
@@ -122614,6 +122627,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: 3771d9041bd68134287e4a1697cc77d0, type: 2}
+  screenshotCamera: {fileID: 230196857}
+  proximityScreenshot: {fileID: 0}
 --- !u!1 &1547031969
 GameObject:
   m_ObjectHideFlags: 0
@@ -148644,9 +148659,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8493469810320727241, guid: c6b351a67ceb69140b199996bbbea156, type: 3}
       propertyPath: m_text
-      value: 'Stop
-
-'
+      value: Show modalities
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

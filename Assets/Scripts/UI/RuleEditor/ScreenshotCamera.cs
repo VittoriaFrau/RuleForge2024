@@ -13,6 +13,8 @@ namespace UI.RuleEditor
         public int resHeight = 2550;
         private List<GameObject> interactableGameObjects;
 
+        public List<Texture2D> screenshots;
+
         private void Start()
         {
             secondaryCamera = this.GetComponent<Camera>();
@@ -124,8 +126,9 @@ namespace UI.RuleEditor
             Debug.Log(string.Format("Took screenshot to: {0}", filename));#1#
         }*/
         
-        private void CaptureImageFromCamera(Camera camera, ECAEvent ecaEvent)
+        public void CaptureImageFromCamera(Camera camera, ECAEvent ecaEvent)
         {
+            if (camera == null) camera = secondaryCamera;
             camera.gameObject.SetActive(true);
             // Take screenshot
             RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
@@ -140,6 +143,32 @@ namespace UI.RuleEditor
             Destroy(rt);
             ecaEvent.Texture = screenShot;
             camera.gameObject.SetActive(false);
+        }
+        
+        public void SaveImageFromCameraStatic(Camera camera, string filename)
+        {
+            int resWidth = 2550 , resHeight = 2550;
+            camera.gameObject.SetActive(true);
+            // Take screenshot
+            RenderTexture rt = new RenderTexture(resWidth, resHeight, 24);
+            camera.targetTexture = rt;
+            camera.Render();
+            RenderTexture.active = rt;
+            Texture2D screenShot = new Texture2D(resWidth, resHeight, TextureFormat.RGB24, false);
+            screenShot.ReadPixels(new Rect(0, 0, resWidth, resHeight), 0, 0);
+            screenShot.Apply();
+            camera.targetTexture = null;
+            RenderTexture.active = null;
+            
+            screenshots.Add(screenShot);
+            
+            Destroy(rt);
+            byte[] bytes = screenShot.EncodeToPNG();
+            
+            System.IO.File.WriteAllBytes(filename, bytes);
+            Debug.Log(string.Format("Took screenshot to: {0}", filename));
+            camera.gameObject.SetActive(false);
+           
         }
 
         /**

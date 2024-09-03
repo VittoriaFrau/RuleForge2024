@@ -18,6 +18,9 @@ TagManager:
   - debugText
   - handController
   - Bird
+  - RuleCubes
+  - ActionRuleCube
+  - proximityCube
   layers:
   - Default
   - TransparentFX

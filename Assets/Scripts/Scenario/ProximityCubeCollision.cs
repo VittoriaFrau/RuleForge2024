@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UI;
+using UI.RuleEditor;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ProximityCubeCollision : MonoBehaviour
@@ -11,6 +13,13 @@ public class ProximityCubeCollision : MonoBehaviour
     private Renderer rend;
     private GameObject eventHandler;
     private GeneralUIController _generalUIController;
+    private EditModeController _editModeController;
+    private InteractionCreationController _interactionCreationController;
+    private GeneralUIController generalUIController;
+    private GameObject bird;
+    public GameObject screenshotCamera;
+    private ScreenshotCamera _screenshotCamera;
+    public Texture2D proximityScreenshot;
 
     private void Start()
     {
@@ -18,6 +27,11 @@ public class ProximityCubeCollision : MonoBehaviour
         currentMaterial = rend.material;
         eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
         _generalUIController = eventHandler.GetComponent<GeneralUIController>();
+        bird = GameObject.FindGameObjectWithTag("Bird");
+        if (screenshotCamera != null)
+        {
+            _screenshotCamera = screenshotCamera.GetComponent<ScreenshotCamera>();
+        }
     }
 
     private void OnCollisionEnter(Collision other)
@@ -37,6 +51,7 @@ public class ProximityCubeCollision : MonoBehaviour
             //Change the material with highlight material
             rend.material = highlightMaterial;
             _generalUIController.SetDebugText("The box is colliding with the Bird");
+            _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
         }
     }
 

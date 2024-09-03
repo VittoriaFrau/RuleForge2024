@@ -273,7 +273,7 @@ namespace UI
             ShowModalitiesBubbles();
             generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                    + " use your modality to interact with any object in the scene");
-            categoryMenu.SetActive(false);
+            if(categoryMenu!=null) categoryMenu.SetActive(false);
         }
         
         private void ActivateTouchModality()
@@ -475,13 +475,13 @@ namespace UI
 
         public void ActivateCombineRulesMode()
         {
-            if (_modalityEvents.Count == 0 && _actionEvents.Count == 0)
+            /*if (_modalityEvents.Count == 0 && _actionEvents.Count == 0)
             {
                 generalUIController.SetDebugText("No recorded actions, please use the record button to record actions");
                 return;
             }
                 
-            generalUIController.CombineRulesState();
+            generalUIController.CombineRulesState();*/
             
             //Set the rule plate visible
             ruleEditorPlate.SetActive(true);
@@ -491,6 +491,12 @@ namespace UI
 
             //Generate the cubes using the list of events
             _originalPositions.Clear();
+            
+            //scenario
+            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "collides");
+            //PROBLEMA QUA CON LO SCREENSHOT
+            if(!_modalityEvents.Contains(ecaEvent)){ _modalityEvents.Add(ecaEvent);}
+            
             _originalPositions = Utils.GenerateCubesFromEventList(_modalityEvents, _actionEvents, 
                 modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate, cubeCreatedEvents);
 
@@ -707,6 +713,14 @@ namespace UI
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
                 }
             });
+        }
+
+        public void ProximityEvent(ECAEvent ecaEvent)
+        {
+            if (!_modalityEvents.Contains(ecaEvent))
+            {
+                _modalityEvents.Add(ecaEvent);
+            }
         }
         
         private void AddLaserListener(ObjectManipulator manipulator)
