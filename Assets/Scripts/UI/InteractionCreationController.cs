@@ -116,7 +116,7 @@ namespace UI
         //Speech
         public GameObject MRTKSpeech;
         public GameObject microphone;
-        private List<string> keywords = new() { "incendio", "leviosa", "change"};
+        private List<string> keywords = new() { "incendio", "leviosa", "change", "abracadabra" };
 
         //TEST
         /*private Test testScript;*/

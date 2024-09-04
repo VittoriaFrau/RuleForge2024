@@ -18,6 +18,7 @@ public class ScenarioRules : MonoBehaviour
     public GameObject cubePlate;
     public GameObject screenshotCamera;
     private ScreenshotCamera _screenshotCamera;
+    private Vector3 initialPositionBird;
     
     // Start is called before the first frame update
     void Start()
@@ -31,6 +32,7 @@ public class ScenarioRules : MonoBehaviour
 
     public void ShowBird()
     {
+        bird.transform.position = initialPositionBird;
         bird.SetActive(true);
     }
     
@@ -63,6 +65,7 @@ public class ScenarioRules : MonoBehaviour
     private void FindGameObjects()
     {
         bird = GameObject.FindGameObjectWithTag("Bird");
+        initialPositionBird = bird.transform.position;
         box = GameObject.Find("Box");
     }
 
