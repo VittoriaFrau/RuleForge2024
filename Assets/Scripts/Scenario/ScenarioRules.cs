@@ -29,10 +29,9 @@ public class ScenarioRules : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ShowBird()
     {
-        
+        bird.SetActive(true);
     }
     
     public void GoToNextInteraction(){
@@ -57,6 +56,7 @@ public class ScenarioRules : MonoBehaviour
     public void DeActivatePlayMode()
     {
         box.GetComponent<ProximityCubeCollision>().enabled = false;
+        ShowBird();
         GoToNextInteraction();
     }
 

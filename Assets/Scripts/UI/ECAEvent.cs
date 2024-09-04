@@ -70,6 +70,20 @@ namespace UI
             _index = _counter;
             _counter++;
         }
+        
+        public ECAEvent(GameObject gameObject, InteractionCreationController.Modalities modality, string _event, string objectName)
+        {
+            this._gameObject = gameObject;
+            this.modality = modality;
+            this._event = _event;
+            this._object = objectName;
+            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
+            _texture = null;
+            _subject = gameObject.name;
+            _index = _counter;
+            _counter++;
+        }
+        
 
         public ECAEvent(GameObject gameObject)
         {

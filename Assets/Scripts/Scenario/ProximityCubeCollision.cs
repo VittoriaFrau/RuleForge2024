@@ -48,10 +48,18 @@ public class ProximityCubeCollision : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Bird"))
         {
-            //Change the material with highlight material
-            rend.material = highlightMaterial;
-            _generalUIController.SetDebugText("The box is colliding with the Bird");
-            _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
+            if(gameObject.name.Equals("Box"))
+            {
+                other.gameObject.SetActive(false);
+            }
+            else
+            {
+                //Change the material with highlight material
+                rend.material = highlightMaterial;
+                _generalUIController.SetDebugText("The box is colliding with the Bird");
+                _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
+            }
+           
         }
     }
 

@@ -162,7 +162,7 @@ namespace UI
                 {
                     if (e.Texture == null)
                     {
-                        e.Texture = LoadTextureFromFile("birdcollision");
+                        e.Texture = LoadTextureFromFile("C:\\Users\\Contar\\RiderProjects\\RuleForge2024\\Assets\\Resources\\birdCollisionNear.PNG");
                     }
                     cube = InstantiateRuleCube(modalityCubePrefab, 1, 
                         staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
@@ -399,12 +399,15 @@ namespace UI
         public static void GenerateTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string logicalOperator)
         {
             string previousString = textLabel.text;
+            if (previousString == "Bird hides ") return;
             //Remove the new line
             string formattedText = cubeDescription.Replace("\n", " "); 
             if(previousString == "..." || previousString=="") //if it's the first cube
                 textLabel.text = formattedText;
             else
                 textLabel.text = previousString + " "+ logicalOperator + " " + formattedText;
+            
+            
         }
         
         public static void RemoveTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string locution)
@@ -505,6 +508,12 @@ namespace UI
             {
                 labelTexts[1] = "says"; //3rd person for reading
                 labelTexts[2] = e.Event; //keyword
+            }
+            else if (e.Modality == InteractionCreationController.Modalities.Proximity)
+            {
+                labelTexts[0] = e.Subject;
+                labelTexts[1] = "approaches"; //3rd person for reading
+                labelTexts[2] = e.Object; 
             }
 
             // Loop through each face and fill the text labels

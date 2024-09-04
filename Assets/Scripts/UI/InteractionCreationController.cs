@@ -306,7 +306,7 @@ namespace UI
             
         }
 
-        private void ActivateLaserModality()
+        public void ActivateLaserModality()
         {
             rightHandLaserPointer = OpenXRRightHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
             leftHandLaserPointer = OpenXRLeftHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
@@ -493,8 +493,8 @@ namespace UI
             _originalPositions.Clear();
             
             //scenario
-            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "collides");
-            //PROBLEMA QUA CON LO SCREENSHOT
+            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "collides", "Box");
+            
             if(!_modalityEvents.Contains(ecaEvent)){ _modalityEvents.Add(ecaEvent);}
             
             _originalPositions = Utils.GenerateCubesFromEventList(_modalityEvents, _actionEvents, 
