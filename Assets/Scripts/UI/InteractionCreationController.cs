@@ -742,7 +742,7 @@ namespace UI
                     _modalityEvents.Add(ecaEvent);
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
                 }
-                PrepareCategoryMenu(gameObject);
+                if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
                 
                 
 

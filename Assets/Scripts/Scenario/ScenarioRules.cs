@@ -30,7 +30,7 @@ public class ScenarioRules : MonoBehaviour
         }
     }
 
-    public void ShowBird()
+    public void ShowAndRepositionBird()
     {
         bird.transform.position = initialPositionBird;
         bird.SetActive(true);
@@ -58,7 +58,7 @@ public class ScenarioRules : MonoBehaviour
     public void DeActivatePlayMode()
     {
         box.GetComponent<ProximityCubeCollision>().enabled = false;
-        ShowBird();
+        ShowAndRepositionBird();
         GoToNextInteraction();
     }
 

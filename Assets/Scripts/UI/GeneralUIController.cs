@@ -137,7 +137,7 @@ namespace UI
 
         public void NewRuleState()
         {
-            DeActivatePreviousState();
+            if(_uiState != UIState.NewRule) DeActivatePreviousState();
             _uiState = UIState.NewRule;
             text.text = "Please, grab the modality you want to use to create the rule";
             HideOptionsMenu();
