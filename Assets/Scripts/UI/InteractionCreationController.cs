@@ -207,6 +207,17 @@ namespace UI
 
             //Show proximity cube
             proximityCube.SetActive(true);
+            
+            // add istrigger to the box
+            // loop to the objects in the interactables
+            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+            {
+                if (go.gameObject.name.Contains("Box"))
+                {
+                    go.gameObject.GetComponent<BoxCollider>().isTrigger = true;
+                    Physics.SyncTransforms();
+                }
+            }
         }
         
         private void DeActivateProximityModality()
@@ -214,7 +225,15 @@ namespace UI
             
             //Hide proximity cube
             proximityCube.SetActive(false);
-            
+            // loop to the objects in the interactables
+            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+            {
+                if (go.gameObject.name.Contains("Box"))
+                {
+                    go.gameObject.GetComponent<BoxCollider>().isTrigger = false;
+                    Physics.SyncTransforms();
+                }
+            }
         }
         
         private void ActivateHeadGazeModality()
@@ -436,9 +455,12 @@ namespace UI
             generalUIController.SetDebugText("Recording stopped.");
             
            // generalUIController.AddCombineRulesButtonToRadialMenu();
+           if (categoryMenu != null)
+           {
+               if(categoryMenu.activeSelf)
+                   categoryMenu.SetActive(false);
+           }
             
-            if(categoryMenu.activeSelf)
-                categoryMenu.SetActive(false);
 
             /*if (!generalUIController.test)
             {
@@ -449,7 +471,8 @@ namespace UI
                 }
             }
             */
-
+            
+            //Only for the demo, remove the object manipulator from the box
 
             /*if (!generalUIController.test)
                 _modalityEvents.AddRange(WsClient.MicrogestureEvents);
@@ -612,6 +635,8 @@ namespace UI
             //Activate screenshot camera
             //screenshotCamera.SetActive(true);
 
+         
+
             foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
             {
                 AddListener(go);
@@ -649,6 +674,11 @@ namespace UI
                 case Modalities.Laser:
                     manipulator.hoverEntered.RemoveAllListeners();
                     manipulator.hoverExited.RemoveAllListeners();
+                    /*if (manipulator.gameObject.name.Contains("Box"))
+                    {
+                        manipulator.gameObject.GetComponent<BoxCollider>().isTrigger = true;
+                        Physics.SyncTransforms(); 
+                    }*/
                     break;
                 case Modalities.Touch:
                     manipulator.OnClicked.RemoveAllListeners();
@@ -685,6 +715,7 @@ namespace UI
         private void AddHeadGazeListener(ObjectManipulator manipulator)
         {
             GameObject gameObject = manipulator.gameObject;
+
             gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
             {
                 Debug.Log(gameObject.name + " Hover entered");
@@ -726,10 +757,36 @@ namespace UI
         private void AddLaserListener(ObjectManipulator manipulator)
         {
             GameObject gameObject = manipulator.gameObject;
+            
+            /*if (gameObject.name.Contains("Box"))
+            {
+             //enable disable not working   
+                /*BoxCollider collider = gameObject.GetComponent<BoxCollider>();
+                collider.isTrigger = false; // Imposta il nuovo valore
+                collider.enabled = false; // Disabilita temporaneamente
+                collider.isTrigger = false; // Imposta il nuovo valore
+                collider.enabled = true; // Riabilita il collider
+                Physics.SyncTransforms(); // Sincronizza le trasformazioni fisiche#1#
+                
+                // Salva una copia delle proprietà del collider esistente, se necessario
+                BoxCollider oldCollider = gameObject.GetComponent<BoxCollider>();
+                Vector3 oldSize = oldCollider.size;
+                Vector3 oldCenter = oldCollider.center;
+
+                // Distruggi il vecchio collider
+                Destroy(oldCollider);
+
+                // Aggiungi un nuovo collider e imposta le proprietà
+                BoxCollider newCollider = gameObject.AddComponent<BoxCollider>();
+                newCollider.size = oldSize;
+                newCollider.center = oldCenter;
+                newCollider.isTrigger = false; // Imposta isTrigger su false
+
+            }*/
             manipulator.hoverEntered.AddListener(interactor =>
             {
                 Debug.Log("Hover entered");
-                //generalUIController.SetDebugText(manipulator.gameObject.name + " Hover entered");
+                generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
                 
                 //Set the laser pointer line width for the screenshot
                 SetLaserPointLineWidth(30.0f);
@@ -860,7 +917,7 @@ namespace UI
             HideModalitiesBubbles();
             editModeController.ShowHideRadialMenu(false);
             _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
-            ShowModalitiesBubblesExceptModality();
+            //ShowModalitiesBubblesExceptModality();
             editModeController.ShowHideRadialMenu(true);
 
         }

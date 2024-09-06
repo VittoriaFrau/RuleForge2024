@@ -44,7 +44,7 @@ namespace UI.RuleEditor
             }
 
             //TEST --> disattivato per il test perchè mostro un gameobject alla volta
-            //ShowGameobjects(gameObject);
+            ShowGameobjects(gameObject);
         }
 
         public void TakeActionScreenshot(GameObject gameObject, ECAEvent ecaEvent)

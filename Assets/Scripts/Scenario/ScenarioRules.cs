@@ -45,6 +45,10 @@ public class ScenarioRules : MonoBehaviour
         {
             case 1:
                 FindGameObjects();
+                // get the box collider component of the box and put istrigger true
+                box.GetComponent<BoxCollider>().isTrigger = true;
+                // reset physics
+                Physics.SyncTransforms(); 
                 //add a on collision enter to the box
                 box.AddComponent<ProximityCubeCollision>();
                 break;
@@ -52,6 +56,14 @@ public class ScenarioRules : MonoBehaviour
             case 2:
 
                 break;
+        }
+    }
+
+    public void AvoidDoubleCubeContainerActivation(CubeContainer cubeContainer)
+    {
+        if (interactionNumber == 2)
+        {
+            cubeContainer.enabled = false;
         }
     }
 
