@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using MixedReality.Toolkit;
+using MixedReality.Toolkit.Subsystems;
 using UI;
 using UI.RuleEditor;
 using UnityEngine;
@@ -54,8 +56,26 @@ public class ScenarioRules : MonoBehaviour
                 break;
             
             case 2:
-
+                SecondRule();
                 break;
+        }
+    }
+    
+    private void SecondRule()
+    {
+        box.GetComponent<BoxCollider>().isTrigger = true;
+        var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+
+        // If we found one...
+        if (keywordRecognitionSubsystem != null)
+        {
+            // Register a keyword and its associated action with the subsystem
+            string keyword = "abracadabra";
+                keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
+                    AddListener(() =>
+                    {
+                        bird.SetActive(false);
+                    });
         }
     }
 

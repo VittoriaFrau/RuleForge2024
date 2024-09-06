@@ -674,11 +674,6 @@ namespace UI
                 case Modalities.Laser:
                     manipulator.hoverEntered.RemoveAllListeners();
                     manipulator.hoverExited.RemoveAllListeners();
-                    /*if (manipulator.gameObject.name.Contains("Box"))
-                    {
-                        manipulator.gameObject.GetComponent<BoxCollider>().isTrigger = true;
-                        Physics.SyncTransforms(); 
-                    }*/
                     break;
                 case Modalities.Touch:
                     manipulator.OnClicked.RemoveAllListeners();
@@ -904,7 +899,7 @@ namespace UI
                                 //Generate ecaevent
                                 ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, keyword, 
                                     Utils.LoadPNG("Assets/Resources/Icons/microphone.png"));
-                                _modalityEvents.Add(ecaEvent);    
+                                if(!_modalityEvents.Contains(ecaEvent)) _modalityEvents.Add(ecaEvent);    
                             }
                         });
                     

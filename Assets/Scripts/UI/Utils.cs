@@ -515,6 +515,10 @@ namespace UI
                 labelTexts[1] = "approaches"; //3rd person for reading
                 labelTexts[2] = e.Object; 
             }
+            else if (e.Modality == InteractionCreationController.Modalities.Proximity)
+            {
+                labelTexts[1] = "points"; //3rd person for reading
+            }
 
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
