@@ -56,7 +56,7 @@ public class ProximityCubeCollision : MonoBehaviour
             {
                 //Change the material with highlight material
                 rend.material = highlightMaterial;
-                _generalUIController.SetDebugText("The box is colliding with the Bird");
+                _generalUIController.SetDebugText("The Bird is near to the Box");
                 _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
             }
            

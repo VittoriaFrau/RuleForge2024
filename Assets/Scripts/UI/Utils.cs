@@ -520,7 +520,7 @@ namespace UI
             else if (e.Modality == InteractionCreationController.Modalities.Proximity)
             {
                 labelTexts[0] = e.Subject;
-                labelTexts[1] = "approaches"; //3rd person for reading
+                labelTexts[1] = "is near to"; //3rd person for reading
                 labelTexts[2] = e.Object; 
             }
             else if (e.Modality == InteractionCreationController.Modalities.Laser)

@@ -603,7 +603,11 @@ namespace UI
                 _actionEvents.Add(ecaEvent);
                 Debug.Log(ecaEvent);
                 //generalUIController.SetDebugText(ecaEvent.ToString());
-                PrepareForActionScreenShot(selectedObject);
+                if (ecaEvent.Subject == "Bird")
+                {
+                    _actionEvents.Last().Texture = Utils.LoadPNG("Assets/Resources/birdHides.PNG");
+                }
+                else PrepareForActionScreenShot(selectedObject);
             }
         }
 

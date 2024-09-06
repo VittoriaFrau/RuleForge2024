@@ -155,9 +155,12 @@ public class CubeController : MonoBehaviour
             otherCube.GetComponent<CubeController>().IsAttached = true;
             
             GameObject mergedCube = Object.Instantiate(scenarioMergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
+            // set z to -36.8
             mergedCube.transform.rotation = Quaternion.identity;
             mergedCube.transform.localScale = new Vector3(25, 25, 25);
             mergedCube.transform.localPosition = mergedPosition;
+            mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);
+
             _ruleManager.DeactivateRuleDebugText();
             
             Destroy(gameObject);
