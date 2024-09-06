@@ -8,6 +8,7 @@ using UI;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Diagnostics;
+using Object = UnityEngine.Object;
 using Utils = UI.Utils;
 
 public class CubeController : MonoBehaviour
@@ -32,6 +33,7 @@ public class CubeController : MonoBehaviour
     public GameObject mergedCubePrefab;
     private RuleManager _ruleManager;
     private ObjectManipulator objectManipulator;
+    public GameObject scenarioMergedCubePrefab;
     
     private void Start()
     {
@@ -146,6 +148,22 @@ public class CubeController : MonoBehaviour
 
         // Finding the cubeplate by tag and then filtering the results by name
         GameObject cubePlate = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "CubePlate");
+        
+        if(scenarioMergedCubePrefab != null)
+        {
+            // Mark the other cube as attached to prevent double merge
+            otherCube.GetComponent<CubeController>().IsAttached = true;
+            
+            GameObject mergedCube = Object.Instantiate(scenarioMergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
+            mergedCube.transform.rotation = Quaternion.identity;
+            mergedCube.transform.localScale = new Vector3(25, 25, 25);
+            mergedCube.transform.localPosition = mergedPosition;
+            _ruleManager.DeactivateRuleDebugText();
+            
+            Destroy(gameObject);
+            Destroy(otherCube);
+            return;
+        }
                 
         // Get the texture of a gameobject
         Texture textureLeftCube = gameObject.GetComponent<Renderer>().material.mainTexture;

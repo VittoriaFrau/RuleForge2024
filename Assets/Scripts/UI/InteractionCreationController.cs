@@ -752,32 +752,6 @@ namespace UI
         private void AddLaserListener(ObjectManipulator manipulator)
         {
             GameObject gameObject = manipulator.gameObject;
-            
-            /*if (gameObject.name.Contains("Box"))
-            {
-             //enable disable not working   
-                /*BoxCollider collider = gameObject.GetComponent<BoxCollider>();
-                collider.isTrigger = false; // Imposta il nuovo valore
-                collider.enabled = false; // Disabilita temporaneamente
-                collider.isTrigger = false; // Imposta il nuovo valore
-                collider.enabled = true; // Riabilita il collider
-                Physics.SyncTransforms(); // Sincronizza le trasformazioni fisiche#1#
-                
-                // Salva una copia delle proprietà del collider esistente, se necessario
-                BoxCollider oldCollider = gameObject.GetComponent<BoxCollider>();
-                Vector3 oldSize = oldCollider.size;
-                Vector3 oldCenter = oldCollider.center;
-
-                // Distruggi il vecchio collider
-                Destroy(oldCollider);
-
-                // Aggiungi un nuovo collider e imposta le proprietà
-                BoxCollider newCollider = gameObject.AddComponent<BoxCollider>();
-                newCollider.size = oldSize;
-                newCollider.center = oldCenter;
-                newCollider.isTrigger = false; // Imposta isTrigger su false
-
-            }*/
             manipulator.hoverEntered.AddListener(interactor =>
             {
                 Debug.Log("Hover entered");
@@ -788,11 +762,24 @@ namespace UI
                 
                 //Note: event should be added before starting the coroutine
                 //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "Point Entered");
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points");
-                if (!_modalityEvents.Contains(ecaEvent))
+                
+
+                if (manipulator.gameObject.name.Equals("Box"))
                 {
-                    _modalityEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points", Utils.LoadPNG("Assets/Resources/pointBox.PNG"));
+                    if (!_modalityEvents.Contains(ecaEvent))
+                    {
+                        _modalityEvents.Add(ecaEvent);
+                    }
+                }
+                else
+                {
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points");
+                    if (!_modalityEvents.Contains(ecaEvent))
+                    {
+                        _modalityEvents.Add(ecaEvent);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                    }
                 }
                 if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
                 

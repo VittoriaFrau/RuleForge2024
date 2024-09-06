@@ -405,7 +405,15 @@ namespace UI
             if(previousString == "..." || previousString=="") //if it's the first cube
                 textLabel.text = formattedText;
             else
+            {
+                if (formattedText.Contains("meanwhile"))
+                {
+                    formattedText = "user is pointing at Box meanwhile is saying abracadabra";
+                }
                 textLabel.text = previousString + " "+ logicalOperator + " " + formattedText;
+                
+            }
+                
             
             
         }
@@ -515,7 +523,7 @@ namespace UI
                 labelTexts[1] = "approaches"; //3rd person for reading
                 labelTexts[2] = e.Object; 
             }
-            else if (e.Modality == InteractionCreationController.Modalities.Proximity)
+            else if (e.Modality == InteractionCreationController.Modalities.Laser)
             {
                 labelTexts[1] = "points"; //3rd person for reading
             }
@@ -611,6 +619,18 @@ namespace UI
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
             //string[] labelTexts = { events[0].Subject, events[0].Verb + " " + events[0].Event, events[0].Object, events[1].Verb + " " + events[1].Event, events[1].Object };
+            if (events[0].Event == null)
+            {
+                events[0].Event = events[0].Verb;
+                if(events[0].Event == "says") events[0].Event = "is saying";
+                else if (events[0].Event == "points") events[0].Event = "is pointing";
+            }
+            if (events[1].Event == null)
+            {
+                events[1].Event = events[1].Verb;
+                if(events[1].Event == "says") events[1].Event = "is saying";
+                else if (events[1].Event == "points") events[1].Event = "is pointing";
+            }
             string[] labelTexts = { events[0].Subject,  events[0].Event + " " + events[0].Object, "meanwhile", events[1].Event + " " + events[1].Object };
 
             // Loop through each face and fill the text labels

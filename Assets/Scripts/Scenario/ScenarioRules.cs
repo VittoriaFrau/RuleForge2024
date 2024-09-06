@@ -21,6 +21,7 @@ public class ScenarioRules : MonoBehaviour
     public GameObject screenshotCamera;
     private ScreenshotCamera _screenshotCamera;
     private Vector3 initialPositionBird;
+    public GameObject MRTKSpeech;
     
     // Start is called before the first frame update
     void Start()
@@ -63,6 +64,7 @@ public class ScenarioRules : MonoBehaviour
     
     private void SecondRule()
     {
+        MRTKSpeech.SetActive(true);
         box.GetComponent<BoxCollider>().isTrigger = true;
         var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
 
@@ -83,13 +85,13 @@ public class ScenarioRules : MonoBehaviour
     {
         if (interactionNumber == 2)
         {
-            cubeContainer.enabled = false;
+            Destroy(cubeContainer);
         }
     }
 
     public void DeActivatePlayMode()
     {
-        box.GetComponent<ProximityCubeCollision>().enabled = false;
+        Destroy(box.GetComponent<ProximityCubeCollision>());
         ShowAndRepositionBird();
         GoToNextInteraction();
     }
