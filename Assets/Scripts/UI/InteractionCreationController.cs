@@ -13,6 +13,7 @@ using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using Action = ECAPrototyping.RuleEngine.Action;
 using Object = UnityEngine.Object;
 
@@ -105,6 +106,7 @@ namespace UI
         public TextMeshProUGUI SingleObjectLabel;
         public TextMeshProUGUI CategoryLabel;
         public FontIconSelector CategoryIcon;
+        public Image CategoryImage;
         
         //Rule composition
         public GameObject removableBarrier;
@@ -516,7 +518,7 @@ namespace UI
             _originalPositions.Clear();
             
             //scenario
-            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "collides", "Box");
+            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "is near to", "Box");
             
             if(!_modalityEvents.Contains(ecaEvent)){ _modalityEvents.Add(ecaEvent);}
             
@@ -941,14 +943,30 @@ namespace UI
         public void PrepareCategoryMenu(GameObject gameObject)
         {
             string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
+            if(gameObject.name.Contains("Box"))
+                objectCategory = "Furniture"; 
             generalUIController.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
             categoryMenu.SetActive(true);
             
             CategoryLabel.text = objectCategory;
             SingleObjectLabel.text = gameObject.name;
             string icon = Utils.GetIconForECACategory(objectCategory);
-            if(icon!= null)
-                CategoryIcon.CurrentIconName = icon;
+            if (icon != null)
+            {
+                if (icon.Contains("door"))
+                {
+                    CategoryImage.sprite = Resources.Load<Sprite>(icon);
+                    CategoryImage.gameObject.SetActive(true);
+                    CategoryIcon.gameObject.SetActive(false);
+                }
+                else CategoryIcon.CurrentIconName = icon;
+            }
+                
+        }
+
+        public void CategoryMenuChoosing()
+        {
+            
         }
 
         public void AutomaticCubePosition()

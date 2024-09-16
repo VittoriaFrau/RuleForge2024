@@ -95,12 +95,12 @@ namespace UI.RuleEditor
             string formattedCubeDescription = cubeDescription.Replace("\n", " ");
             if (isAdded)
             {
-                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : "AND THEN";
+                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : ",";
                 Utils.GenerateTextFromCubePosition(rulePhase == RulePhase.When ? whenText : thenText, formattedCubeDescription, logicalOperator);
             }
             else
             {
-                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : "AND THEN";
+                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : ",";
                 switch (rulePhase)
                 {
                     case RulePhase.When:

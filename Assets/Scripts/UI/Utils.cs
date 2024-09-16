@@ -406,9 +406,9 @@ namespace UI
                 textLabel.text = formattedText;
             else
             {
-                if (formattedText.Contains("meanwhile"))
+                if (formattedText.Contains("abracadabra"))
                 {
-                    formattedText = "user is pointing at Box meanwhile is saying abracadabra";
+                    formattedText = "user is pointing Box and is saying \"abracadabra\"";
                 }
                 textLabel.text = previousString + " "+ logicalOperator + " " + formattedText;
                 
@@ -515,7 +515,7 @@ namespace UI
             else if (e.Modality == InteractionCreationController.Modalities.Speech)
             {
                 labelTexts[1] = "says"; //3rd person for reading
-                labelTexts[2] = e.Event; //keyword
+                labelTexts[2] = "\""  + e.Event + "\""; //keyword
             }
             else if (e.Modality == InteractionCreationController.Modalities.Proximity)
             {
@@ -748,7 +748,8 @@ namespace UI
                 case "Food":
                     return "Icon 54";
                 case "Environment":
-                    return "Icon 4";
+                case "Furniture":
+                    return "Assets/Resources/door.png";
                 case "Music":
                     return "Icon 22";
                 case "Light":

@@ -34,12 +34,13 @@ public class CubeController : MonoBehaviour
     private RuleManager _ruleManager;
     private ObjectManipulator objectManipulator;
     public GameObject scenarioMergedCubePrefab;
+    private TextMeshProUGUI ruleDebugText;
     
     private void Start()
     {
         _ruleManager = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<RuleManager>();
         
-        /*GameObject debugTextObject = GameObject.FindGameObjectWithTag("debugText");
+        GameObject debugTextObject = GameObject.FindGameObjectWithTag("debugText");
         // Verifica se l'oggetto è stato trovato e non è null
         if (debugTextObject != null)
         {
@@ -53,7 +54,7 @@ public class CubeController : MonoBehaviour
                 // L'oggetto è inattivo, puoi gestire questo caso qui se necessario
                 Debug.LogWarning("L'oggetto con tag 'debugText' è inattivo.");
             }
-        }*/
+        }
         
         objectManipulator = GetComponent<ObjectManipulator>();
         
@@ -118,8 +119,8 @@ public class CubeController : MonoBehaviour
         while (countdownTime > 0)
         {
             // Update the UI Text to show the countdown
-            //_ruleManager.ActivateDebugTextWithMessage("Merging in " + Mathf.CeilToInt(countdownTime) + " seconds");
-            //ruleDebugText.text = "Merging in " + Mathf.CeilToInt(countdownTime) + " seconds";
+            _ruleManager.ActivateDebugTextWithMessage("Merging in " + Mathf.CeilToInt(countdownTime) + " seconds");
+            ruleDebugText.text = "Merging in " + Mathf.CeilToInt(countdownTime) + " seconds";
             yield return null;
             countdownTime -= Time.deltaTime;
         }
