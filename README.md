@@ -14,6 +14,13 @@ How to import Ruleforge within a project:
 		- MRTK3 → MRTK UX Components
 
 
+2. Import the following external packages:
+	- AntLR
+	- Nuget:
+		- Newtonsoft.Json.13.0.3 from Nuget Unity
+		- Microsoft.CSharp.4.7.0 from Nuget in Assembly-CSharp (Rider or VS)
+
+
 
 How to import RuleForge in a new scene (of the same project):
 
