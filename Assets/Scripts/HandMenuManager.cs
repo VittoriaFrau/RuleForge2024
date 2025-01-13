@@ -1,3 +1,5 @@
+using MixedReality.Toolkit.SpatialManipulation;
+
 namespace UI.RuleEditor
 {
     using System.Collections;
@@ -23,6 +25,12 @@ namespace UI.RuleEditor
             mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             menus = new List<GameObject> {mainMenu, newObjectMenu, editObjectMenu, newInteractionMenu, shapesMenu};
             ShowMainMenu();
+            
+            //if in unity editor, move the menu closer to the camera
+            #if UNITY_EDITOR
+                GetComponent<HandConstraintPalmUp>().enabled = false;
+                transform.position = mainCamera.transform.position + mainCamera.transform.forward * 0.5f;
+            #endif
         }
 
         public void ShowMainMenu()

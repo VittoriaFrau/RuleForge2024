@@ -258,7 +258,7 @@ namespace UI
             go.transform.parent = interactableTransform;
             
             // Exceptions for some prefabs
-            if (go.name.Contains("Cube"))
+            /*if (go.name.Contains("Cube"))
             { 
                 go.transform.localPosition = new Vector3(go.transform.localPosition.x, 0.0011f, go.transform.localPosition.z);
             }
@@ -271,7 +271,7 @@ namespace UI
             else if (go.name.Contains("Box"))
             {
                 go.transform.localPosition = new Vector3(0.69f, 0.194f, -5.21f);
-            }
+            }*/
     
             Rigidbody rigidbody = go.GetComponent<Rigidbody>();
             if(rigidbody == null) rigidbody = go.GetComponentInChildren<Rigidbody>();
