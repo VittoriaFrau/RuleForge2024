@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Bird
+  - RuleCubes
+  - ActionRuleCube
+  - RuleUtils
+  - RuleText
+  - EventHandler
   layers:
   - Default
   - TransparentFX
