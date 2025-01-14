@@ -29,7 +29,11 @@ namespace UI.RuleEditor
             //if in unity editor, move the menu closer to the camera
             #if UNITY_EDITOR
                 GetComponent<HandConstraintPalmUp>().enabled = false;
-                transform.position = mainCamera.transform.position + mainCamera.transform.forward * 0.5f;
+                Vector3 forwardOffset = mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
+                Vector3 leftOffset = -mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
+
+                transform.position = mainCamera.transform.position + forwardOffset + leftOffset;
+                
             #endif
         }
 

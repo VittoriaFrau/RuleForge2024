@@ -17,26 +17,22 @@ namespace UI
     {
         
         internal bool EditMode { get;set; }
+        public GameObject interactablesParent;
         private List<GameObject> interactables;
         private GameObject canvas;
         public GameObject radialMenu;
         private GeneralUIController generalUIController;
         public List<GameObject> colors;
         public GameObject colorPalette;
-        private GameObject selectedObject;
         private Animator _animator;
         private RuleEngine _ruleEngine;
         public Light _mainlight;
         public GameObject _skybox;
         private Renderer plane;
         public Slider lightSlider, volumeSlider, effectSlider;
-        public List<GameObject> sceneButtonsToClose;
-        public GameObject SelectedObject
-        {
-            get => selectedObject;
-            set { selectedObject = value; }
-        }
-
+        public List<GameObject> ecaObjectEditOptions;
+        
+       
         private void Start()
         {
             EditMode = false;
@@ -66,7 +62,7 @@ namespace UI
             EditMode = false;
             UpdateInteractablesList();
             RemoveListenerToInteractables();
-            selectedObject = null;
+            generalUIController.SetSelectedObject(null);
             radialMenu.SetActive(true);
             colorPalette.SetActive(false);
             generalUIController.resetEditButtons();
@@ -76,42 +72,30 @@ namespace UI
         {
             foreach (var interactable in interactables)
             {
-                //Test:
-                if (generalUIController.test)
-                {
-                    if(interactable.name.Equals("Door") || interactable.name.Equals("Door_doorway") 
-                                                        || interactable.name.Equals("flame")) return;
-                }
-                
                 ObjectManipulator _objectManipulator = interactable.GetComponent<ObjectManipulator>();
                 if (_objectManipulator == null)
                 {
                     _objectManipulator = interactable.GetComponentInChildren<ObjectManipulator>();
                 }
-                //TEST:
-                if(generalUIController.test && interactable.name.Equals("Old_Door_Closed"))
+                
+                // Check if the Prototypation component is attached to the interactable object, if not, add it
+                if (interactable.GetComponent<Prototypation>() == null)
                 {
-                    GameObject[] children = { interactable.transform.GetChild(0).gameObject, interactable.transform.GetChild(1).gameObject };
-                    Prototypation prototypationScript = interactable.transform.GetChild(1).gameObject.GetComponent<Prototypation>();;
-                    foreach (var child in children)
-                    {
-                        if (child.name.Equals("Door"))
-                        {
-                            _objectManipulator = child.GetComponent<ObjectManipulator>();
-                            prototypationScript = child.GetComponent<Prototypation>();
-                        }
-                            
-                    }
-
-                    if (_objectManipulator == null)
-                    {
-                        _objectManipulator = interactable.transform.GetChild(1).gameObject.GetComponent<ObjectManipulator>();
-                    }
-                    
-                    //_objectManipulator.OnClicked.AddListener(() => prototypationScript.ShowPieUIMenu());
+                    interactable.AddComponent<Prototypation>();
                 }
-                //else _objectManipulator.OnClicked.AddListener(() => interactable.GetComponent<Prototypation>().ShowPieUIMenu());
+                _objectManipulator.OnClicked.AddListener(() => interactable.GetComponent<Prototypation>().ShowEditMenu());
             }
+        }
+        
+        public void ShowEcaObjectOptions()
+        {
+            foreach (var button in ecaObjectEditOptions)
+            {
+                button.SetActive(true);
+            }
+            
+            // set the parent of one of the buttons to active
+            ecaObjectEditOptions[0].transform.parent.gameObject.SetActive(true);
         }
         
         public void RemoveListenerToInteractables()
@@ -133,7 +117,7 @@ namespace UI
 
         private void UpdateInteractablesList()
         {
-            interactables = (from Transform child in GameObject.Find("Interactables").transform select child.gameObject).ToList();
+            interactables = (from Transform child in interactablesParent.transform select child.gameObject).ToList();
         }
         
         public void ShowHideRadialMenu(bool visibility)
@@ -171,9 +155,9 @@ namespace UI
         
         public void addAccessories(String accessory)
         {
-            if (selectedObject.GetComponent<ECACharacter>() != null)
+            if (generalUIController.GetSelectedObject().GetComponent<ECACharacter>() != null)
             {
-                GameObject accessoryObject = selectedObject.transform.Find(accessory).gameObject;
+                GameObject accessoryObject = generalUIController.GetSelectedObject().transform.Find(accessory).gameObject;
                 if (!accessoryObject.activeInHierarchy)
                 {
                     accessoryObject.SetActive(true);
@@ -183,9 +167,9 @@ namespace UI
         
         public void removeAccessories(String accessory)
         {
-            if (selectedObject.GetComponent<ECACharacter>() != null)
+            if (generalUIController.GetSelectedObject().GetComponent<ECACharacter>() != null)
             {
-                GameObject accessoryObject = selectedObject.transform.Find(accessory).gameObject;
+                GameObject accessoryObject = generalUIController.GetSelectedObject().transform.Find(accessory).gameObject;
                 if (accessoryObject.activeInHierarchy)
                 {
                     accessoryObject.SetActive(false);
@@ -196,17 +180,15 @@ namespace UI
         public void CreateAndPublishAction(string actionName)
         {
             if (_ruleEngine == null) return;
-            Action action = Utils.GetActionFromString(actionName, SelectedObject, volumeSlider, lightSlider,
-                effectSlider, plane.gameObject,
-                _skybox, _mainlight);
+            Action action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
             _ruleEngine.ExecuteAction(action);
             
             //TEST
             //Azione da fare se sto registrando e non è la porta 
-            if (generalUIController.isRecording && !selectedObject.name.Equals("Door") )
+            /*if (generalUIController.isRecording && !selectedObject.name.Equals("Door") )
             {
                 generalUIController.InteractionCreationController.RecordActionPressedButton(action, selectedObject);
-            }
+            }*/
 
         }
 

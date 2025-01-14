@@ -10,6 +10,9 @@ TagManager:
   - RuleUtils
   - RuleText
   - EventHandler
+  - proximityCube
+  - debugText
+  - Canvas
   layers:
   - Default
   - TransparentFX

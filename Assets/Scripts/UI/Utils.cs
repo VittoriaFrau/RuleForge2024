@@ -234,10 +234,27 @@ namespace UI
             }
 
             // instantiate prefab
-            Vector3 spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2;
-            GameObject go= Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            // Find a floor object
+            GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
 
+            Vector3 spawnPosition;
+
+            // Determine spawn position
+            if (floor != null)
+            {
+                // Spawn the object 1 meter above the floor and 2 meters in front of the camera
+                Vector3 upwardOffset = Vector3.up * 1f; // 1 meter above the floor
+                Vector3 forwardOffset = mainCamera.transform.forward * 2f; // 2 meters in front of the camera
+                spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
+            }
+            else
+            {
+                // Spawn the object 2 meters in front of the camera
+                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
+            }
             
+            // Instantiate the object at the calculated position
+            GameObject go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
 
             /*var transform1 = mainCamera.transform;
             var go = Object.Instantiate(GetPrefabFromString(prefabType, prefabList),
@@ -700,12 +717,11 @@ namespace UI
         }
 
         //TODO: capire dove lo metto
-        public static ECAEvent GetActionFromButton(GameObject button, GameObject selectedGameobject, Slider volumeSlider, 
-            Slider lightSlider,Slider effectSlider ,GameObject plane, GameObject _skybox, Light _mainlight)
+        public static ECAEvent GetActionFromButton(GameObject button, GameObject selectedGameobject)
         {
             //TODO add new Gador actions
             
-            Action action = GetActionFromString(button.name, selectedGameobject, volumeSlider, lightSlider,effectSlider ,plane, _skybox, _mainlight);
+            Action action = GetActionFromString(button.name, selectedGameobject);
             
             ECAEvent e = ConvertActionToECAEvent(action);
             
@@ -812,8 +828,91 @@ namespace UI
 
             return null;
         }
+        
+        public static Action GetActionFromString(string s, GameObject SelectedObject)
+        {
+            switch (s)
+            {
+                case "Show":
+                   return new Action(SelectedObject, "shows");
+                
+                case "Hide":
+                    return (new Action(SelectedObject, "hides"));
+                
+                case "Delete":
+                    return (new Action(SelectedObject, "deleted"));
+                
+                case "GravityON":
+                    return (new Action(SelectedObject, "gravityON"));
+                
+                case "GravityOFF":
+                    return (new Action(SelectedObject, "gravityOFF"));
+                
+                case "red":
+                    ECAColor red = new ECAColor("red");
+                    return (new Action(SelectedObject, "changes", "color", "to", red));
+                
+                case "blue":
+                    ECAColor blue = new ECAColor("blue");
+                    return (new Action(SelectedObject, "changes", "color", "to", blue));
+                    
+                case "green":
+                    ECAColor green = new ECAColor("green");
+                    return (new Action(SelectedObject, "changes", "color", "to", green));
+                    
+                case "purple":
+                    ECAColor purple = new ECAColor("purple");
+                    return (new Action(SelectedObject, "changes", "color", "to", purple));
+                
+                case "gray":
+                case "grey":
+                    ECAColor gray = new ECAColor("gray");
+                    return (new Action(SelectedObject, "changes", "color", "to", gray));                    
+                    
+                case "yellow":
+                    ECAColor yellow = new ECAColor("yellow");
+                    return (new Action(SelectedObject, "changes", "color", "to", yellow));
+                    
+                case "cyan":
+                    ECAColor cyan = new ECAColor("cyan");
+                    return (new Action(SelectedObject, "changes", "color", "to", cyan));                    
+                    
+                case "white":
+                    ECAColor white = new ECAColor("white");
+                    return (new Action(SelectedObject, "changes", "color", "to", white));
+                    
+                case "black":
+                    ECAColor black = new ECAColor("black");
+                    return (new Action(SelectedObject, "changes", "color", "to", black));
+                
+                case "WaveHand":
+                    return (new Action(SelectedObject, "waves hand"));
+                
+                case "Dance":
+                    return (new Action(SelectedObject, "dances"));
+                
+                case "TurnOnOff":
+                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
 
-        public static Action GetActionFromString(string s, GameObject SelectedObject, Slider volumeSlider, 
+                
+                case "TurnOnLight":
+                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
+                
+                case "TurnOffLight":
+                    return (new Action(SelectedObject, "turns", ECABoolean.OFF));
+
+                
+                case "OpenDoor":
+                    return (new Action(SelectedObject, "opens"));
+                case "CloseDoor":
+                    return (new Action(SelectedObject, "closes"));
+
+            }
+
+            return null;
+        }
+
+        public static Action GetActionFromStringSliders(string s, GameObject SelectedObject, Slider volumeSlider, 
             Slider lightSlider, Slider effectSlider,GameObject plane, GameObject _skybox, Light _mainlight)
         {
             switch (s)

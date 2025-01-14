@@ -33,9 +33,10 @@ namespace UI
         /*public RadialMenu radialMenu;*/
         private Prototypation _prototypation;
         public bool isRecording = false;
+        private GameObject _selectedObject;
         
         // Test poop just to make it work
-        public Boolean test = true;
+        public Boolean test = false;
         
 
         public enum UIState
@@ -126,7 +127,7 @@ namespace UI
         
         public void EditModeState()
         {
-            DeActivatePreviousState();
+            if (_uiState != UIState.EditMode) DeActivatePreviousState();
             _uiState = UIState.EditMode;
             text.text = "You can modify the scene properties or select an object to modify";    
             HideOptionsMenu();
@@ -153,9 +154,15 @@ namespace UI
             
         }
 
-        public void SelectedObject(string name)
+        public void SetSelectedObject(GameObject _selectedObject)
         {
-            text.text = "Selected object " + name;
+            this._selectedObject = _selectedObject;
+            text.text = "Selected object " + _selectedObject.name;
+        }
+        
+        public GameObject GetSelectedObject()
+        {
+            return _selectedObject;
         }
 
         public void SetDebugText(string text)

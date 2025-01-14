@@ -12,9 +12,8 @@ namespace UI
     public class Prototypation: MonoBehaviour
     {
         private EditModeController _editModeController;
-        private ObjectManipulator _objectManipulator;
         private GeneralUIController _generalUIController;
-        private InteractionCreationController _interactionCreationController;
+        private ObjectManipulator _objectManipulator;
         private GameObject eventHandler;
         private bool action_executed;
         
@@ -22,9 +21,8 @@ namespace UI
         {
             eventHandler = GameObject.Find("EventHandler");
             _editModeController = eventHandler.GetComponent<EditModeController>();
-            _objectManipulator = GetComponent<ObjectManipulator>();
             _generalUIController = eventHandler.GetComponent<GeneralUIController>();
-            _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
+            _objectManipulator = GetComponent<ObjectManipulator>();
 
             /*if (_editModeController.EditMode)
             {
@@ -32,22 +30,24 @@ namespace UI
                 UnityAction<SelectEnterEventArgs> firstSelectEntered = null;
                 firstSelectEntered = args =>
                 {
-                    _editModeController.ShowHidePiUIMenu(true);
+                    //_editModeController.ShowHidePiUIMenu(true);
                     _objectManipulator.firstSelectEntered.RemoveListener(firstSelectEntered);
                 };
                 _objectManipulator.firstSelectEntered.AddListener(firstSelectEntered);
             }*/
         }
         
-        /*public void ShowPieUIMenu()
+        //TODO use taxonomy to show the correct buttons
+        public void ShowPieUIMenu()
         {
             if (_editModeController.EditMode)
             {
-                _editModeController.ShowHideRadialMenu(true);
-                _editModeController.SelectedObject = gameObject;
-                _generalUIController.SelectedObject(gameObject.name);
+                //_editModeController.ShowHideRadialMenu(true);
+                _generalUIController.SetSelectedObject(gameObject);
+               // _generalUIController.SelectedObject(gameObject.name);
                 
-                if (_generalUIController.UIstate == GeneralUIController.UIState.EditMode)
+                
+                /*if (_generalUIController.UIstate == GeneralUIController.UIState.EditMode)
                 {
                     foreach (var button in _editModeController.sceneButtonsToClose)
                     {
@@ -56,9 +56,21 @@ namespace UI
                     _generalUIController.radialMenu.getListButtons(CheckECAObject(_editModeController.SelectedObject), false, true);
                 }
                 else _generalUIController.radialMenu.getListButtons(CheckECAObject(_editModeController.SelectedObject));
-                _generalUIController.radialMenu.gameObject.SetActive(true);
+                _generalUIController.radialMenu.gameObject.SetActive(true);*/
             }
-        }*/
+        }
+        
+        public void ShowEditMenu()
+        {
+            if (_editModeController.EditMode)
+            {
+                _generalUIController.EditModeState();
+                _generalUIController.SetSelectedObject(gameObject);
+                
+                //TODO use taxonomy to show the correct buttons
+                _editModeController.ShowEcaObjectOptions();
+            }
+        }
         
 
         //Function to check if the object is ECA Music/Character (only for the fist time I select the object)
