@@ -47,7 +47,7 @@ namespace UI
         private RuleEngine _ruleEngine;
         
         //Touch modality attributes
-        private GameObject OpenXRRightHandController, OpenXRLeftHandController;
+        public GameObject OpenXRRightHandController, OpenXRLeftHandController;
         private GameObject RightHand, LeftHand;
         private Material normalTouchMaterial;
         public Material shiningTouchMaterial;
@@ -131,11 +131,7 @@ namespace UI
         {
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             editModeController = this.gameObject.GetComponent<EditModeController>();
-            //find the gameobject looking for the tag and then filtering by name
-            OpenXRRightHandController = GameObject.FindGameObjectsWithTag("handController").FirstOrDefault(obj => obj.name 
-                == "MRTK RightHand Controller");
-            OpenXRLeftHandController = GameObject.FindGameObjectsWithTag("handController").FirstOrDefault(obj => obj.name 
-                == "MRTK LeftHand Controller");
+            
             if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
             _ruleManager = this.gameObject.GetComponent<RuleManager>();
@@ -563,11 +559,6 @@ namespace UI
         public void StartRecording()
         {
             generalUIController.isRecording = true;
-            //Make the record button not interactable
-            //StopButton.SetActive(true);
-            //RecordButton.SetActive(false);
-            /*_radialMenu.AddSingleButtonToList(StopButton);
-            _radialMenu.RemoveSingleButtonToList(RecordButton);*/
             
             switch (generalUIController.UIstate)
             {
@@ -577,39 +568,28 @@ namespace UI
                 case GeneralUIController.UIState.EditMode:
                     RecordAction();
                     break;
-                
             }
         }
 
         public void RecordAction()
         {
             generalUIController.SetDebugText("Recording started.");
-
-            if (!generalUIController.test)
-            {
-                ClearEventLists();
-            }
-            
-            
-            //screenshotCamera.SetActive(true);
+            ClearEventLists();
         }
 
 
-        public void RecordActionPressedButton(Action action, GameObject selectedObject)
+        public void SaveRecordedAction(Action action)
         {
             ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
+            GameObject selectedObject = generalUIController.GetSelectedObject();
             if (!_actionEvents.Contains(ecaEvent))
             {
-                Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent, selectedObject);
+                Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
                 _oppositeActionEvents.Add(oppositeAction);
                 _actionEvents.Add(ecaEvent);
-                Debug.Log(ecaEvent);
-                //generalUIController.SetDebugText(ecaEvent.ToString());
-                if (ecaEvent.Subject == "Bird")
-                {
-                    _actionEvents.Last().Texture = Utils.LoadPNG("Assets/Resources/birdHides.PNG");
-                }
-                else PrepareForActionScreenShot(selectedObject);
+                Debug.Log("Saved action: " + ecaEvent);
+                generalUIController.SetDebugText(ecaEvent.ToString());
+                PrepareForActionScreenShot(selectedObject);
             }
         }
 

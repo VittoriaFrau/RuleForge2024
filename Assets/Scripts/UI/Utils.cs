@@ -803,7 +803,7 @@ namespace UI
             return e;
         }
 
-        public static Action GetOppositeAction(Action action, ECAEvent ecaEvent, GameObject SelectedObject)
+        public static Action GetOppositeAction(Action action, ECAEvent ecaEvent)
         {
             // TODO inserire tutti gli altri
             switch (ecaEvent.Verb)
@@ -824,6 +824,9 @@ namespace UI
                     return new Action(action.GetSubject(), "turns", oppositeModifier);
                 case "changes":
                     return new Action(action.GetSubject(), "changes", action.GetModifier(), "to", action.GetModifierValue());
+                case "changes color to":
+                    ECAColor ECAColor = new ECAColor("white");
+                    return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
             }
 
             return null;

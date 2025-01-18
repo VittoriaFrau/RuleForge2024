@@ -67,7 +67,7 @@ namespace ECAPrototyping.RuleEngine
                         if (generalUIController.isRecording)
                         {
                             Action action = new Action(this.gameObject, "opens");
-                            generalUIController.InteractionCreationController.RecordActionPressedButton(action, this.gameObject);
+                            generalUIController.InteractionCreationController.SaveRecordedAction(action);
                         }
 
                     }));
@@ -94,7 +94,7 @@ namespace ECAPrototyping.RuleEngine
                     if (generalUIController.isRecording)
                     {
                         Action action = new Action(this.gameObject, "closes");
-                        generalUIController.InteractionCreationController.RecordActionPressedButton(action, this.gameObject);
+                        generalUIController.InteractionCreationController.SaveRecordedAction(action);
                     }
                     
                 }));

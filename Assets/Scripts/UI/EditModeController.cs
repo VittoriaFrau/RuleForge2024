@@ -183,12 +183,11 @@ namespace UI
             Action action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
             _ruleEngine.ExecuteAction(action);
             
-            //TEST
-            //Azione da fare se sto registrando e non è la porta 
-            /*if (generalUIController.isRecording && !selectedObject.name.Equals("Door") )
+            // If I'm recording, I need to save the action
+            if (generalUIController.isRecording)
             {
-                generalUIController.InteractionCreationController.RecordActionPressedButton(action, selectedObject);
-            }*/
+                generalUIController.InteractionCreationController.SaveRecordedAction(action);
+            }
 
         }
 
