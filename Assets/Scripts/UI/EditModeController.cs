@@ -19,32 +19,19 @@ namespace UI
         internal bool EditMode { get;set; }
         public GameObject interactablesParent;
         private List<GameObject> interactables;
-        private GameObject canvas;
         public GameObject radialMenu;
         private GeneralUIController generalUIController;
-        public List<GameObject> colors;
         public GameObject colorPalette;
-        private Animator _animator;
         private RuleEngine _ruleEngine;
-        public Light _mainlight;
-        public GameObject _skybox;
-        private Renderer plane;
-        public Slider lightSlider, volumeSlider, effectSlider;
         public List<GameObject> ecaObjectEditOptions;
         
        
         private void Start()
         {
             EditMode = false;
-            canvas = GameObject.FindGameObjectWithTag("Canvas");
-            //TODO SCENARIO UNCOMMENT
-            //if(radialMenu==null) radialMenu = canvas.transform.Find("RadialMenu").gameObject;
-            /*text = textGo.GetComponent<TextMeshPro>();*/
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             radialMenu.SetActive(true);
             _ruleEngine = RuleEngine.GetInstance();
-            //TODO SCENARIO UNCOMMENT
-            //plane = GameObject.FindGameObjectWithTag("Plane").GetComponent<Renderer>();
         }
 
 

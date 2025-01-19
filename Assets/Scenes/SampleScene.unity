@@ -1627,6 +1627,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4875906770422128306, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5054943533465465075, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -1694,6 +1698,10 @@ PrefabInstance:
     - target: {fileID: 5293875896988606967, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -45.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 5434054801277666805, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5536936301478717462, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1818,6 +1826,14 @@ PrefabInstance:
     - target: {fileID: 5723580070243297635, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5854988073896048259, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_text
+      value: "\uE878"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987570337823401671, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: currentIconName
+      value: Icon 128
       objectReference: {fileID: 0}
     - target: {fileID: 6004980030446898732, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2566,6 +2582,10 @@ PrefabInstance:
     - target: {fileID: 8265705638873041524, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8321488672558729543, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: currentIconName
+      value: Icon 10
       objectReference: {fileID: 0}
     - target: {fileID: 8379489182673439994, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_Size.x

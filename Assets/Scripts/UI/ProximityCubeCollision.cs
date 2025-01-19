@@ -11,12 +11,7 @@ public class ProximityCubeCollision : MonoBehaviour
     private Material currentMaterial;
     public Material highlightMaterial;
     private Renderer rend;
-    private GameObject eventHandler;
-    private GeneralUIController _generalUIController;
-    private EditModeController _editModeController;
-    private InteractionCreationController _interactionCreationController;
-    private GeneralUIController generalUIController;
-    private GameObject bird;
+    public GeneralUIController _generalUIController;
     public GameObject screenshotCamera;
     private ScreenshotCamera _screenshotCamera;
     public Texture2D proximityScreenshot;
@@ -25,9 +20,7 @@ public class ProximityCubeCollision : MonoBehaviour
     {
         rend = GetComponent<Renderer>();
         currentMaterial = rend.material;
-        eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
-        _generalUIController = eventHandler.GetComponent<GeneralUIController>();
-        bird = GameObject.FindGameObjectWithTag("Bird");
+        
         if (screenshotCamera != null)
         {
             _screenshotCamera = screenshotCamera.GetComponent<ScreenshotCamera>();
@@ -44,6 +37,7 @@ public class ProximityCubeCollision : MonoBehaviour
         Debug.Log(other.gameObject.name);
     }
 
+    //TODO
     void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Bird"))

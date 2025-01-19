@@ -175,19 +175,7 @@ namespace UI
             //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
             if (generalUIController.isRecording)
             {
-                RecordRule();
-            }
-            
-
-            if (!generalUIController.test)
-            {
-                /*if (WsClient.IsRecording)
-                {
-                    foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
-                    {
-                        AddListener(go);
-                    }
-                }*/
+                RecordInteraction();
             }
             
         }
@@ -258,6 +246,9 @@ namespace UI
 
         private void DeActivateHeadGazeModality()
         {
+            // remove all listeners from headgazeInteractor
+            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.RemoveAllListeners();
+            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.RemoveAllListeners();
             Destroy(headGazePointerInstance);
         }
 
@@ -563,7 +554,7 @@ namespace UI
             switch (generalUIController.UIstate)
             {
                 case GeneralUIController.UIState.NewRule:
-                    RecordRule();
+                    RecordInteraction();
                     break;
                 case GeneralUIController.UIState.EditMode:
                     RecordAction();
@@ -593,7 +584,7 @@ namespace UI
             }
         }
 
-        public void RecordRule()
+        public void RecordInteraction()
         {
             if (_modality == Modalities.Speech)
             {
@@ -710,7 +701,7 @@ namespace UI
                     PrepareForModalityScreenshot(gameObject, Modalities.Headgaze);
                 }
 
-                PrepareCategoryMenu(gameObject);        
+                if(categoryMenu != null) PrepareCategoryMenu(gameObject);        
             });
             
             gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
@@ -812,7 +803,8 @@ namespace UI
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                 }
 
-                PrepareCategoryMenu(gameObject);
+                if(categoryMenu != null)
+                    PrepareCategoryMenu(gameObject);
             };
             manipulator.OnClicked.AddListener(manipulationStarted);
             manipulator.selectEntered.AddListener(interactor =>
@@ -820,7 +812,7 @@ namespace UI
                 Debug.Log(manipulator.gameObject.name + " Select entered");
                 //generalUIController.SetDebugText(manipulator.gameObject.name + " Select entered");
                 
-                PrepareCategoryMenu(gameObject);
+                if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                 
                 //Note: event should be added before starting the coroutine
                 ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Select entered");

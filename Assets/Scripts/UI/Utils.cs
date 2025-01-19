@@ -825,6 +825,7 @@ namespace UI
                 case "changes":
                     return new Action(action.GetSubject(), "changes", action.GetModifier(), "to", action.GetModifierValue());
                 case "changes color to":
+                    //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
             }

@@ -31,6 +31,6 @@ How to import RuleForge in a new scene (of the same project):
 1) Create a new scene with:
 	- An empty object with Floor
 	- An empty object with Skybox
-    - Import the MRTK XR Rig & MRTK Input Simulator if needed
+    - Import the MRTK Input Simulator if needed (MRTK XR Rig is already in the prefab)
     - Import the RuleForge prefab
     - Optional: Rename your floor object "Floor" or "floor"
