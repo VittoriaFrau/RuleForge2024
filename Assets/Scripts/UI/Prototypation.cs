@@ -74,7 +74,7 @@ namespace UI
         
 
         //Function to check if the object is ECA Music/Character (only for the fist time I select the object)
-        public List<GameObject> CheckECAObject(GameObject gameObject)
+        /*public List<GameObject> CheckECAObject(GameObject gameObject)
         {
                 if (gameObject.GetComponent<ECACharacter>())
                 {
@@ -117,7 +117,7 @@ namespace UI
                 }
                 
                 return _generalUIController.editingButtonsTMP;
-        }
+        }*/
 
         public void HidePieUIMenu()
         {

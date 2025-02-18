@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using ECAPrototyping.RuleEngine;
 using TMPro;
-using Unity.VisualScripting;
+using UI.RuleEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -12,25 +10,13 @@ namespace UI
     {
         private GameObject textGo;
         public GameObject debugWindow;
-        public List<GameObject> optionButtons;
-        public List<GameObject> creationButtons;
-        public List<GameObject> editingButtons;
-        public List<GameObject> editingButtonsTMP;
-        public GameObject editSceneButton;
-        public List<GameObject> ruleButtons;
-        public List<GameObject> characterButtons;
-        public List<GameObject> musicButtons;
-        public List<GameObject> lightButtons;
-        public List<GameObject> effectButtons;
-        public List<GameObject> editSceneButtons;
-        public List<GameObject> doorButtons;
         public List<GameObject> stateDependentButtons;
-        public GameObject closeButton;
+        /*public GameObject closeButton;*/
         public GameObject eventHandler;
         private EditModeController _editModeController;
         private ObjectsMenuController _objectsMenuController;
         private InteractionCreationController _interactionCreationController;
-        /*public RadialMenu radialMenu;*/
+        public HandMenuManager handMenuManager;
         private Prototypation _prototypation;
         public bool isRecording = false;
         private GameObject _selectedObject;
@@ -80,8 +66,6 @@ namespace UI
             _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             DefaultState();
-            /*radialMenu.getListButtons(optionButtons);
-            radialMenu.gameObject.SetActive(true);*/
         }
 
         public void DeActivatePreviousState()
@@ -123,35 +107,36 @@ namespace UI
         {
             text.text = "Choose if you want to create an object, modify an existing one or create a rule";
             _uiState = UIState.Default;
+            handMenuManager.ShowMenu(_uiState);
+        }
+        
+        public void NewObjectState()
+        {
+            _uiState = UIState.NewObject;
+            text.text = "Please, select the object you want to create";
+            HideOptionsMenu();
+            handMenuManager.ShowMenu(_uiState);
         }
         
         public void EditModeState()
         {
-            if (_uiState != UIState.EditMode) DeActivatePreviousState();
             _uiState = UIState.EditMode;
-            text.text = "You can modify the scene properties or select an object to modify";    
-            HideOptionsMenu();
-            /*radialMenu.getListButtons(new List<GameObject>(){editSceneButton});*/
+            text.text = "You can select an object to modify";
+            handMenuManager.ShowMenu(_uiState);
 
         }
         
-
         public void NewRuleState()
         {
-            if(_uiState != UIState.NewRule) DeActivatePreviousState();
             _uiState = UIState.NewRule;
-            text.text = "Please, grab the modality you want to use to create the rule";
-            HideOptionsMenu();
-            /*radialMenu.getListButtons(ruleButtons);*/
+            text.text = "Please, grab the modality you want to use to create the rule"; 
+            handMenuManager.ShowMenu(_uiState);
         }
 
         public void CombineRulesState()
         {
-            DeActivatePreviousState();
             _uiState = UIState.RuleComposition;
-            HideDebugPanel();
-            HideRadialMenu();
-            
+            handMenuManager.ShowMenu(_uiState);
         }
 
         public void SetSelectedObject(GameObject _selectedObject)
@@ -169,50 +154,50 @@ namespace UI
         {
             this.text.text = text;
         }
-        
-        public void NewObjectState()
-        {
-            DeActivatePreviousState();
-            _uiState = UIState.NewObject;
-            text.text = "Please, select the object you want to create";
-            HideOptionsMenu();
-            /*radialMenu.getListButtons(creationButtons);*/
-        }
+
 
         private void HideOptionsMenu()
         {
+            /*
             foreach (var button in optionButtons)
             {
                 button.SetActive(false);
             }
+            */
         }
         
         public void ShowOptionsMenu()
         {
+            /*
             foreach (var button in optionButtons)
             {
                 button.SetActive(true);
             }
+            */
         }
         
         private void HideCreationMenu()
         {
+            /*
             foreach (var button in creationButtons)
             {
                 button.SetActive(false);
             }
+            */
         }
 
         private void HideRuleMenu()
         {
+            /*
             foreach (var button in ruleButtons)
             {
                 button.SetActive(false);
-            }
+            }*/
         }
 
         private void HideEditMenu()
         {
+            /*
             foreach (var button in editingButtons)
             {
                 button.SetActive(false);
@@ -255,14 +240,17 @@ namespace UI
             
             closeButton.SetActive(false);
             editSceneButton.SetActive(false);
-            
+            */
         }
 
         public void resetEditButtons()
         {
+            /*
             editingButtonsTMP.Clear();
             editingButtonsTMP.AddRange(editingButtons);
+            */
         }
+        
         
         public void DefaultRM()
         {
@@ -299,8 +287,8 @@ namespace UI
 
         public void AddCombineRulesButtonToRadialMenu()
         {
-            GameObject combineButton = optionButtons[optionButtons.Count - 1];
-            /*if(combineButton.name.Equals("CombineRules"))
+            /*GameObject combineButton = optionButtons[optionButtons.Count - 1];
+            if(combineButton.name.Equals("CombineRules"))
                 radialMenu.AddSingleButtonToList(combineButton);
             else Debug.LogError("Combine button not found");*/
         }
@@ -369,7 +357,7 @@ namespace UI
         public void ShowEditSceneMenu()
         {
             /*radialMenu.getListButtons(editSceneButtons);*/
-            text.text = "You can modify the scene properties"; 
+            /*text.text = "You can modify the scene properties";*/
         }
 
     }

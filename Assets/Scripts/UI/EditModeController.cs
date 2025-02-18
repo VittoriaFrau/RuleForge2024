@@ -52,7 +52,6 @@ namespace UI
             generalUIController.SetSelectedObject(null);
             radialMenu.SetActive(true);
             colorPalette.SetActive(false);
-            generalUIController.resetEditButtons();
         }
         
         private void AddListenerToInteractables()
