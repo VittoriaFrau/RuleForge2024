@@ -1,10 +1,9 @@
 using MixedReality.Toolkit.SpatialManipulation;
-
+using System.Collections.Generic;
+using UnityEngine;
+        
 namespace UI.RuleEditor
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public class HandMenuManager : MonoBehaviour
     {
         public GameObject mainMenu;
