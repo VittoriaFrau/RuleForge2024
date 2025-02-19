@@ -6695,7 +6695,7 @@ MonoBehaviour:
   debugWindow: {fileID: 2274138254633824154}
   stateDependentButtons: []
   eventHandler: {fileID: 5876039117203238164}
-  handMenuManager: {fileID: 0}
+  handMenuManager: {fileID: 607159369133769202}
   isRecording: 0
   test: 0
 --- !u!114 &2266740878681303224
