@@ -13,6 +13,11 @@ TagManager:
   - proximityCube
   - debugText
   - Canvas
+  - Headgaze
+  - Touch
+  - Laser
+  - Speech
+  - Proximity
   layers:
   - Default
   - TransparentFX

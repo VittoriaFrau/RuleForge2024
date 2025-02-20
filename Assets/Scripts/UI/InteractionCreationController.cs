@@ -126,11 +126,14 @@ namespace UI
         // Proximity
         public GameObject proximityCube;
 
+        private ModalitiesCollision _modalitiesCollision;
+
 
         private void Start()
         {
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             editModeController = this.gameObject.GetComponent<EditModeController>();
+            _modalitiesCollision = this.gameObject.GetComponent<ModalitiesCollision>();
             
             if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
@@ -252,7 +255,7 @@ namespace UI
             Destroy(headGazePointerInstance);
         }
 
-        private void DeActivateCurrentModality()
+        public void DeActivateCurrentModality()
         {
             switch (_modality)
             {
@@ -399,7 +402,7 @@ namespace UI
             }
         }
         
-        private void HideModalitiesBubble(string modality)
+        public void HideModalitiesBubble(string modality)
         {
             GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == modality);
             go.SetActive(false);
@@ -427,6 +430,7 @@ namespace UI
         {
             generalUIController.NewRuleState();
             ShowModalitiesBubbles();
+            _modalitiesCollision.EnableHandCollider();
         }
 
         public void StopRecording()
