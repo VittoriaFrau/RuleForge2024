@@ -4352,9 +4352,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5876039117203238164, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1303391262}
     - targetCorrespondingSourceObject: {fileID: 8609492459973673996, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2017590410}
@@ -4370,9 +4367,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3982236405960165213, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1446413503}
-    - targetCorrespondingSourceObject: {fileID: 3475199880675823045, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1320509298}
   m_SourcePrefab: {fileID: 100100000, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
 --- !u!1 &41511752 stripped
 GameObject:
@@ -5100,35 +5094,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e3ba5438fc1ad9543b4964aeccdec39d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1303391262
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1303391255}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc662c71349a4c94b9d4719a89ddb455, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &1320509293 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3475199880675823045, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-  m_PrefabInstance: {fileID: 30245621}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1320509298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1320509293}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc662c71349a4c94b9d4719a89ddb455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1446413495 stripped

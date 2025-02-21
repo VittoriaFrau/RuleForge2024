@@ -430,7 +430,6 @@ namespace UI
         {
             generalUIController.NewRuleState();
             ShowModalitiesBubbles();
-            _modalitiesCollision.EnableHandCollider();
         }
 
         public void StopRecording()
