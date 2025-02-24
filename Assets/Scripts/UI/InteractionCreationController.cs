@@ -148,7 +148,8 @@ namespace UI
         public void SelectModality(string modality)
         {
             if(_modality != Modalities.None) DeActivateCurrentModality();
-                _modality = (Modalities) System.Enum.Parse(typeof(Modalities), modality);
+            
+            _modality = (Modalities) System.Enum.Parse(typeof(Modalities), modality);
             generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                    + " use your modality to interact with any object in the scene");
 

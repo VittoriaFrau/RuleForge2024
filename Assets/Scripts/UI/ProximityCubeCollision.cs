@@ -6,64 +6,68 @@ using UI.RuleEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ProximityCubeCollision : MonoBehaviour
+namespace UI
 {
-    private Material currentMaterial;
-    public Material highlightMaterial;
-    private Renderer rend;
-    public GeneralUIController _generalUIController;
-    public GameObject screenshotCamera;
-    private ScreenshotCamera _screenshotCamera;
-    public Texture2D proximityScreenshot;
-
-    private void Start()
+    public class ProximityCubeCollision : MonoBehaviour
     {
-        rend = GetComponent<Renderer>();
-        currentMaterial = rend.material;
+        private Material currentMaterial;
+        public Material highlightMaterial;
+        private Renderer rend;
+        public GeneralUIController _generalUIController;
+        public GameObject screenshotCamera;
+        private ScreenshotCamera _screenshotCamera;
+        public Texture2D proximityScreenshot;
+
+        private void Start()
+        {
+            rend = GetComponent<Renderer>();
+            currentMaterial = rend.material;
         
-        if (screenshotCamera != null)
-        {
-            _screenshotCamera = screenshotCamera.GetComponent<ScreenshotCamera>();
-        }
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        Debug.Log(other.gameObject.name);
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        Debug.Log(other.gameObject.name);
-    }
-
-    //TODO
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Bird"))
-        {
-            if(gameObject.name.Equals("Box"))
+            if (screenshotCamera != null)
             {
-                other.gameObject.SetActive(false);
+                _screenshotCamera = screenshotCamera.GetComponent<ScreenshotCamera>();
             }
-            else
+        }
+
+        private void OnCollisionEnter(Collision other)
+        {
+            Debug.Log(other.gameObject.name);
+        }
+
+        private void OnCollisionExit(Collision other)
+        {
+            Debug.Log(other.gameObject.name);
+        }
+
+        //TODO
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.CompareTag("Bird"))
+            {
+                if(gameObject.name.Equals("Box"))
+                {
+                    other.gameObject.SetActive(false);
+                }
+                else
+                {
+                    //Change the material with highlight material
+                    rend.material = highlightMaterial;
+                    _generalUIController.SetDebugText("The Bird is near to the Box");
+                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
+                }
+           
+            }
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.gameObject.CompareTag("Bird"))
             {
                 //Change the material with highlight material
-                rend.material = highlightMaterial;
-                _generalUIController.SetDebugText("The Bird is near to the Box");
-                _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
+                rend.material = currentMaterial;
             }
-           
         }
+    
     }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.CompareTag("Bird"))
-        {
-            //Change the material with highlight material
-            rend.material = currentMaterial;
-        }
-    }
-    
 }

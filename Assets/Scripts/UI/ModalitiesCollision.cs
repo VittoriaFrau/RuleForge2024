@@ -7,6 +7,10 @@ using UnityEngine.UIElements;
 public class ModalitiesCollision : MonoBehaviour
 {
     private InteractionCreationController _interactionCreationController;
+    // This prevents multiple unwanted OnTriggerEnter activations when bubbles redistribute.
+    // It adds a temporary lock (isRedistributing) to ignore new trigger events until the redistribution is complete.
+    private bool isRedistributing = false;
+    private float distributionTime = 5.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -14,13 +18,6 @@ public class ModalitiesCollision : MonoBehaviour
         var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
         _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     
     /// <summary>
     /// Controls the collision between the modalities and the hand
@@ -28,6 +25,8 @@ public class ModalitiesCollision : MonoBehaviour
     /// <param name="other"></param> refears to the hand AttachTransform component
     private void OnTriggerEnter(Collider other)
     {
+        if (isRedistributing) return;
+
         if (other.gameObject.name=="AttachTransform") 
         {
             switch (gameObject.tag)
@@ -48,7 +47,21 @@ public class ModalitiesCollision : MonoBehaviour
                     _interactionCreationController.SelectModality("Proximity");
                     break;
             }
+            StartRedistribution(); // Prevents new triggers until redistribution ends
         }
+    }
+    
+    // This function starts the redistribution process and temporarily disables triggers
+    public void StartRedistribution()
+    {
+        isRedistributing = true;
+        Invoke(nameof(EndRedistribution), distributionTime); // Waits for 2s before allowing new triggers
+    }
+
+    // This function re-enables triggers after redistribution is complete
+    private void EndRedistribution()
+    {
+        isRedistributing = false;
     }
     
 }
