@@ -18,17 +18,17 @@ namespace UI.RuleEditor
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
-        public List<GameObject> shapePrefabs;
-        public List<GameObject> animalPrefabs;
-        public List<GameObject> furniturePrefabs;
         private Camera _mainCamera;
-        public GameObject interactables; //Parent of all interactable gameobjects in the scene
-
+        private GameObject eventHandler;
+        private GeneralUIController generalUIController;
+        
         void Start()
         {
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             menus = new List<GameObject> {mainMenu, newObjectMenu, editObjectMenu, newInteractionMenu, 
                 shapesMenu, colorPalette, backButton};
+            eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
+            generalUIController = eventHandler.GetComponent<GeneralUIController>();
 
             //if in unity editor, move the menu closer to the camera
             #if UNITY_EDITOR
@@ -82,6 +82,7 @@ namespace UI.RuleEditor
         public void ShowMainMenu()
         {
             HideMenus();
+            generalUIController.DeActivatePreviousState();
             debugPanel.SetActive(true);
             mainMenu.SetActive(true);
         }
@@ -91,8 +92,6 @@ namespace UI.RuleEditor
             HideMenus();
             editObjectMenu.SetActive(true);
         }
-        
-
         public void ShowShapesMenu()
         {
             HideMenus();
@@ -115,21 +114,6 @@ namespace UI.RuleEditor
         {
             HideMenus();
             furnitureMenu.SetActive(true);
-        }
-    
-        public void CreateShape(string type)
-        {
-            UI.Utils.InstantiateObject(type, shapePrefabs, _mainCamera, interactables.transform);
-        }
-
-        public void CreateAnimal(string type)
-        {
-            UI.Utils.InstantiateObject(type, animalPrefabs, _mainCamera, interactables.transform);
-        }
-    
-        public void CreateFurniture(string type)
-        {
-            UI.Utils.InstantiateObject(type, furniturePrefabs, _mainCamera, interactables.transform);
         }
     
     }
