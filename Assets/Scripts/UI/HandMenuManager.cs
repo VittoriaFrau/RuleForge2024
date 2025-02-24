@@ -10,6 +10,7 @@ namespace UI.RuleEditor
         public GameObject newObjectMenu;
         public GameObject editObjectMenu;
         public GameObject newInteractionMenu;
+        public GameObject backButton;
         public GameObject rulePlateMenu;
         public GameObject shapesMenu;
         public GameObject animalMenu;
@@ -27,7 +28,7 @@ namespace UI.RuleEditor
         {
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             menus = new List<GameObject> {mainMenu, newObjectMenu, editObjectMenu, newInteractionMenu, 
-                shapesMenu, colorPalette};
+                shapesMenu, colorPalette, backButton};
 
             //if in unity editor, move the menu closer to the camera
             #if UNITY_EDITOR
@@ -55,6 +56,7 @@ namespace UI.RuleEditor
                     newObjectMenu.SetActive(true);
                     break;
                 case GeneralUIController.UIState.EditMode:
+                    backButton.SetActive(false);
                     break;
                 case GeneralUIController.UIState.NewRule:
                     newInteractionMenu.SetActive(true);
@@ -89,10 +91,18 @@ namespace UI.RuleEditor
             HideMenus();
             editObjectMenu.SetActive(true);
         }
+        
+
         public void ShowShapesMenu()
         {
             HideMenus();
             shapesMenu.SetActive(true);
+        }
+        
+        public void ShowNewObjectMenu()
+        {
+            HideMenus();
+            newObjectMenu.SetActive(true);
         }
         
         public void ShowAnimalMenu()

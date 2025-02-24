@@ -671,13 +671,6 @@ namespace UI
             DeActivateCurrentModality();
             // Nascondere bolle se presenti
             HideModalitiesBubbles();
-            // Nascondere opzioni menu
-            //BackButton.SetActive(false);
-            //RecordButton.SetActive(false);
-            //StopButton.SetActive(false);
-            /*_radialMenu.RemoveSingleButtonToList(BackButton);
-            _radialMenu.RemoveSingleButtonToList(RecordButton);
-            _radialMenu.RemoveSingleButtonToList(StopButton);*/
         }
 
         IEnumerator TakeScreenShot(List<ECAEvent> _events)
