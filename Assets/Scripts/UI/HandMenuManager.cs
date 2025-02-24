@@ -1,7 +1,8 @@
 using MixedReality.Toolkit.SpatialManipulation;
 using System.Collections.Generic;
 using UnityEngine;
-        
+using UnityEngine.Serialization;
+
 namespace UI.RuleEditor
 {
     public class HandMenuManager : MonoBehaviour
@@ -10,7 +11,7 @@ namespace UI.RuleEditor
         public GameObject newObjectMenu;
         public GameObject editObjectMenu;
         public GameObject newInteractionMenu;
-        public GameObject backButton;
+        public GameObject chooseAnObjectMenu;
         public GameObject rulePlateMenu;
         public GameObject shapesMenu;
         public GameObject animalMenu;
@@ -21,12 +22,13 @@ namespace UI.RuleEditor
         private Camera _mainCamera;
         private GameObject eventHandler;
         private GeneralUIController generalUIController;
+        public GameObject menuContentCanvas;
         
         void Start()
         {
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             menus = new List<GameObject> {mainMenu, newObjectMenu, editObjectMenu, newInteractionMenu, 
-                shapesMenu, colorPalette, backButton};
+                shapesMenu, colorPalette, chooseAnObjectMenu};
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             generalUIController = eventHandler.GetComponent<GeneralUIController>();
 
@@ -42,28 +44,27 @@ namespace UI.RuleEditor
         }
 
         /// <summary>
-        /// <b>ShowMenu</b> shows the correct menu depending on the current state.
+        /// <b>HandleHandMenu</b> shows the correct menu depending on the current state.
         /// </summary>
-        public void ShowMenu(GeneralUIController.UIState uiState)
+        public void HandleHandMenu(GeneralUIController.UIState uiState)
         {
             HideMenus();
             switch (uiState)
             {
                 case GeneralUIController.UIState.Default:
-                    mainMenu.SetActive(true);
+                    ShowMainMenu();
                     break;
                 case GeneralUIController.UIState.NewObject:
-                    newObjectMenu.SetActive(true);
+                    ShowNewObjectMenu();
                     break;
                 case GeneralUIController.UIState.EditMode:
-                    backButton.SetActive(false);
+                    ShowEditMenu();
                     break;
-                case GeneralUIController.UIState.NewRule:
-                    newInteractionMenu.SetActive(true);
+                case GeneralUIController.UIState.NewInteraction:
+                    ShowNewInteractionMenu();
                     break;
                 case GeneralUIController.UIState.RuleComposition:
-                    rulePlateMenu.SetActive(true);
-                    debugPanel.SetActive(false);
+                    ShowRuleCompositionMenu();
                     break;
             }
         }
@@ -71,37 +72,55 @@ namespace UI.RuleEditor
         /// <summary>
         /// <b>HideMenus</b> hides all the menus.
         /// </summary>
-        private void HideMenus()
+        public void HideMenus()
         {
             foreach (var m in menus)
             {
                 m.SetActive(false);
             }
         }
+
+        public void ChangeMenuVisibility(bool visibility)
+        {
+            menuContentCanvas.SetActive(visibility);
+        }
         
         public void ShowMainMenu()
         {
-            HideMenus();
-            generalUIController.DeActivatePreviousState();
+            generalUIController.DeActivatePreviousState(GeneralUIController.UIState.Default);
             debugPanel.SetActive(true);
             mainMenu.SetActive(true);
         }
-        
+
+        //TODO use taxonomy to show the correct buttons
         public void ShowEditMenu()
         {
-            HideMenus();
-            editObjectMenu.SetActive(true);
+            if(generalUIController.GetSelectedObject() != null)
+                editObjectMenu.SetActive(true);
+            else chooseAnObjectMenu.SetActive(true);
         }
-        public void ShowShapesMenu()
+        
+        public void ShowNewInteractionMenu()
         {
-            HideMenus();
-            shapesMenu.SetActive(true);
+            newInteractionMenu.SetActive(true);
         }
         
         public void ShowNewObjectMenu()
         {
-            HideMenus();
             newObjectMenu.SetActive(true);
+        }
+        
+        public void ShowRuleCompositionMenu()
+        {
+            rulePlateMenu.SetActive(true);
+            debugPanel.SetActive(false);
+            menuContentCanvas.SetActive(false);
+        }
+        
+        public void ShowShapesMenu()
+        {
+            HideMenus();
+            shapesMenu.SetActive(true);
         }
         
         public void ShowAnimalMenu()

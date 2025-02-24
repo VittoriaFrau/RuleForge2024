@@ -21,16 +21,13 @@ namespace UI
         public bool isRecording = false;
         private GameObject _selectedObject;
         
-        // Test poop just to make it work
-        public Boolean test = false;
-        
 
         public enum UIState
         {
             Default,
             EditMode,
             NewObject,
-            NewRule,
+            NewInteraction,
             RuleComposition
         }
         private UIState _uiState;
@@ -59,7 +56,6 @@ namespace UI
         
         private void Start()
         {
-            _uiState = UIState.Default;
             textGo = GameObject.FindGameObjectWithTag("debugText");
             text = textGo.GetComponent<TextMeshProUGUI>();
             _editModeController = eventHandler.GetComponent<EditModeController>();
@@ -68,19 +64,19 @@ namespace UI
             DefaultState();
         }
 
-        public void DeActivatePreviousState()
+        public void DeActivatePreviousState(UIState newState)
         {
             var previousState = _uiState;
+            if(previousState == newState) return;
             
             switch (previousState)
             {
                 case UIState.EditMode:
-                    _editModeController.DeActivateEditMode();
+                    _editModeController.UpdateAndRemoveListeners();
                     break;
                 case UIState.NewObject:
-                    _objectsMenuController.DeActivateObjectsMenu();
                     break;
-                case UIState.NewRule:
+                case UIState.NewInteraction:
                     _interactionCreationController.DeActivateNewRule();
                     break;
                 case UIState.RuleComposition:
@@ -89,60 +85,53 @@ namespace UI
             }
         }
 
-        public void Close()
-        {
-            DeActivatePreviousState();
-            DefaultState();
-
-            if (isRecording)
-                _interactionCreationController.StopRecording();
-            
-            ShowOptionsMenu();
-            
-            //closeButton.SetActive(false);
-            /*radialMenu.RemoveSingleButtonToList(closeButton);*/
-        }
-
         public void DefaultState()
         {
             text.text = "Choose if you want to create an object, modify an existing one or create a rule";
+            DeActivatePreviousState(UIState.Default);
             _uiState = UIState.Default;
-            handMenuManager.ShowMenu(_uiState);
+            handMenuManager.HandleHandMenu(_uiState);
         }
         
         public void NewObjectState()
         {
+            DeActivatePreviousState(UIState.NewObject);
             _uiState = UIState.NewObject;
             text.text = "Please, select the object you want to create";
-            HideOptionsMenu();
-            handMenuManager.ShowMenu(_uiState);
+            handMenuManager.HandleHandMenu(_uiState);
         }
         
         public void EditModeState()
         {
+            DeActivatePreviousState(UIState.EditMode);
             _uiState = UIState.EditMode;
-            text.text = "You can select an object to modify";
-            handMenuManager.ShowMenu(_uiState);
-
+            if(_selectedObject == null) text.text = "You can select an object to modify";
+            else text.text = "You are modifying the object " + _selectedObject.name;
+            _editModeController.UpdateAndAddListeners();
+            handMenuManager.HandleHandMenu(_uiState);
         }
         
-        public void NewRuleState()
+        public void NewInteractionState()
         {
-            _uiState = UIState.NewRule;
+            DeActivatePreviousState(UIState.NewInteraction);
+            _uiState = UIState.NewInteraction;
             text.text = "Please, grab the modality you want to use to create the rule"; 
-            handMenuManager.ShowMenu(_uiState);
+            handMenuManager.HandleHandMenu(_uiState);
+            _interactionCreationController.ShowModalitiesBubbles();
         }
 
         public void CombineRulesState()
         {
+            DeActivatePreviousState(UIState.RuleComposition);
             _uiState = UIState.RuleComposition;
-            handMenuManager.ShowMenu(_uiState);
+            handMenuManager.HandleHandMenu(_uiState);
         }
 
         public void SetSelectedObject(GameObject _selectedObject)
         {
             this._selectedObject = _selectedObject;
-            text.text = "Selected object " + _selectedObject.name;
+            if(_selectedObject != null) 
+                text.text = "Selected object " + _selectedObject.name;
         }
         
         public GameObject GetSelectedObject()
@@ -153,211 +142,6 @@ namespace UI
         public void SetDebugText(string text)
         {
             this.text.text = text;
-        }
-
-
-        private void HideOptionsMenu()
-        {
-            /*
-            foreach (var button in optionButtons)
-            {
-                button.SetActive(false);
-            }
-            */
-        }
-        
-        public void ShowOptionsMenu()
-        {
-            /*
-            foreach (var button in optionButtons)
-            {
-                button.SetActive(true);
-            }
-            */
-        }
-        
-        private void HideCreationMenu()
-        {
-            /*
-            foreach (var button in creationButtons)
-            {
-                button.SetActive(false);
-            }
-            */
-        }
-
-        private void HideRuleMenu()
-        {
-            /*
-            foreach (var button in ruleButtons)
-            {
-                button.SetActive(false);
-            }*/
-        }
-
-        private void HideEditMenu()
-        {
-            /*
-            foreach (var button in editingButtons)
-            {
-                button.SetActive(false);
-            }
-
-            foreach (var button in characterButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in musicButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in lightButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in effectButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in stateDependentButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in editSceneButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            foreach (var button in doorButtons)
-            {
-                button.SetActive(false);
-            }
-            
-            closeButton.SetActive(false);
-            editSceneButton.SetActive(false);
-            */
-        }
-
-        public void resetEditButtons()
-        {
-            /*
-            editingButtonsTMP.Clear();
-            editingButtonsTMP.AddRange(editingButtons);
-            */
-        }
-        
-        
-        public void DefaultRM()
-        {
-            HideOptionsMenu();
-            HideCreationMenu();
-            HideEditMenu();
-            HideRuleMenu();
-            /*radialMenu.getListButtons(optionButtons);*/
-            resetEditButtons();
-            ShowDebugPanel();
-        }
-
-        
-
-        public void HideDebugPanel()
-        {
-            debugWindow.SetActive(false);
-        }
-        
-        public void ShowDebugPanel()
-        {
-            debugWindow.SetActive(true);
-        }
-
-        public void HideRadialMenu()
-        {
-            /*radialMenu.gameObject.SetActive(false);*/
-        }
-
-        /*public List<GameObject> GetActiveButtons()
-        {
-            /*return radialMenu.PressableButtons;#1#
-        }*/
-
-        public void AddCombineRulesButtonToRadialMenu()
-        {
-            /*GameObject combineButton = optionButtons[optionButtons.Count - 1];
-            if(combineButton.name.Equals("CombineRules"))
-                radialMenu.AddSingleButtonToList(combineButton);
-            else Debug.LogError("Combine button not found");*/
-        }
-
-        public void SwitchButtonTo (string name)
-        {
-            switch (name)
-            {
-                case "Show":
-                    ChangeButton("Hide","Show");
-                    break;
-                case "Hide":
-                    ChangeButton("Show", "Hide");
-                    break;
-                case "Stop":
-                    ChangeButton("Play", "Stop");
-                    break;
-                case "Play":
-                    ChangeButton("Stop", "Play");
-                    break;
-                case "GravityOFF":
-                    ChangeButton("GravityON","GravityOFF");
-                    break;
-                case "GravityON":
-                    ChangeButton("GravityOFF", "GravityON");
-                    break;
-                case "TurnOn":
-                    ChangeButton("TurnOff","TurnOn");
-                    break;
-                case "TurnOff":
-                    ChangeButton("TurnOn","TurnOff");
-                    break;
-                case "OpenDoor":
-                    ChangeButton("CloseDoor","OpenDoor");
-                    break;
-                case "CloseDoor":
-                    ChangeButton("OpenDoor","CloseDoor");
-                    break;
-            }
-        }
-        public void ChangeButton(string prevButtonName, string newButtonName)
-        {
-            GameObject newButton = null, prevButton = null;
-            foreach (var button in stateDependentButtons)
-            {
-                if (button.name.Equals(newButtonName))
-                {
-                    newButton = button;
-                    button.SetActive(true);
-                }
-                else if (button.name.Equals(prevButtonName))
-                {
-                    prevButton = button;
-                    button.SetActive(false);
-                }
-                    
-            }
-            
-            if(newButton==null || prevButton==null) return;
-            /*int indexButtonToBeRemoved = radialMenu.PressableButtons.IndexOf(prevButton);
-            //Substitute with the new one
-            radialMenu.PressableButtons[indexButtonToBeRemoved] = newButton;
-            radialMenu.getListButtons(radialMenu.PressableButtons, isRecording);*/
-        }
-
-        public void ShowEditSceneMenu()
-        {
-            /*radialMenu.getListButtons(editSceneButtons);*/
-            /*text.text = "You can modify the scene properties";*/
         }
 
     }

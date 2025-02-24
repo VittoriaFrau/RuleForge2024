@@ -73,9 +73,6 @@ namespace UI
         //Recording
         private List<ECAEvent> _modalityEvents = new();
         
-        //TEST
-        
-
         public List<ECAEvent> ModalityEvents
         {
             get => _modalityEvents;
@@ -98,8 +95,7 @@ namespace UI
         public GameObject cubePlate;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
-        public GameObject _RadialMenuGameObject;
-        
+        public HandMenuManager handMenuManager;
 
         //Category choice
         public GameObject categoryMenu;
@@ -126,14 +122,10 @@ namespace UI
         // Proximity
         public GameObject proximityCube;
 
-        private ModalitiesCollision _modalitiesCollision;
-
-
         private void Start()
         {
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             editModeController = this.gameObject.GetComponent<EditModeController>();
-            _modalitiesCollision = this.gameObject.GetComponent<ModalitiesCollision>();
             
             if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
@@ -149,7 +141,7 @@ namespace UI
         {
             if(_modality != Modalities.None) DeActivateCurrentModality();
             
-            _modality = (Modalities) System.Enum.Parse(typeof(Modalities), modality);
+            _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
             generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                    + " use your modality to interact with any object in the scene");
 
@@ -311,9 +303,8 @@ namespace UI
             HideModalitiesBubble("Touch");
             
             //Microgesture listener
-            /*if (!generalUIController.test)
-            {
-                WsClient.StartSocket();
+            /*
+             WsClient.StartSocket();
             }*/
             
         }
@@ -355,10 +346,8 @@ namespace UI
             RightHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
             LeftHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
 
-            /*if (!generalUIController.test)
-            {
+            /*
                 WsClient.StopSocket();
-            }
             */
             
         }
@@ -426,23 +415,10 @@ namespace UI
                     bubble.SetActive(true);
             }
         }
-        
-        public void ActivateNewRuleMode()
-        {
-            generalUIController.NewRuleState();
-            ShowModalitiesBubbles();
-        }
 
         public void StopRecording()
         {
             generalUIController.isRecording = false;
-
-            /*if (generalUIController.UIstate != GeneralUIController.UIState.Default)
-            {
-                _radialMenu.AddSingleButtonToList(RecordButton);
-                _radialMenu.RemoveSingleButtonToList(StopButton);
-            }*/
-                
             screenshotCamera.SetActive(false);
 
             generalUIController.SetDebugText("Recording stopped.");
@@ -453,27 +429,10 @@ namespace UI
                if(categoryMenu.activeSelf)
                    categoryMenu.SetActive(false);
            }
-            
-
-            /*if (!generalUIController.test)
-            {
-                WsClient.IsRecording= false;
-                if (WsClient.ServerOpen)
-                {
-                    WsClient.StopSocket();
-                }
-            }
-            */
-            
-            //Only for the demo, remove the object manipulator from the box
-
-            /*if (!generalUIController.test)
-                _modalityEvents.AddRange(WsClient.MicrogestureEvents);
-            else testScript.AddMicrogestureTask(_modalityEvents);*/
-            
+           
             //TODO trovare un modo per farlo solo con il primo task
 
-            if (generalUIController.UIstate == GeneralUIController.UIState.NewRule)
+            if (generalUIController.UIstate == GeneralUIController.UIState.NewInteraction)
             {
                 DeActivateCurrentModality();
                 HideModalitiesBubbles();
@@ -520,17 +479,13 @@ namespace UI
             
             _ruleManager.InitializeVariables();
             
-            editModeController.ShowHideRadialMenu(false);
-            
             //Add to the list of created cubes, the cubes that are already in the scene
             cubeCreatedEvents.AddRange(_modalityEvents);
             cubeCreatedEvents.AddRange(_actionEvents);
         }
 
         public void DeActivateRuleComposition()
-        {
-            
-            
+        { 
             /*ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);*/
             
             //Set the rule plate visible
@@ -541,14 +496,6 @@ namespace UI
             
             generalUIController.State = GeneralUIController.UIState.Default;
             generalUIController.DefaultState();
-            generalUIController.DefaultRM();
-            editModeController.ShowHideRadialMenu(true);
-
-            //Clear events and action queues 
-            if (!generalUIController.test)
-            {
-                ClearEventLists();
-            }
         }
 
         public void StartRecording()
@@ -557,7 +504,7 @@ namespace UI
             
             switch (generalUIController.UIstate)
             {
-                case GeneralUIController.UIState.NewRule:
+                case GeneralUIController.UIState.NewInteraction:
                     RecordInteraction();
                     break;
                 case GeneralUIController.UIState.EditMode:
@@ -606,17 +553,6 @@ namespace UI
                 _radialMenu.RemoveSingleButtonToList(StopButton);*/
                 return;
             }
-            
-            
-            
-            //Alert WsClient that we are recording
-            /*if(!generalUIController.test)
-                WsClient.IsRecording = true;*/
-
-            //Activate screenshot camera
-            //screenshotCamera.SetActive(true);
-
-         
 
             foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
             {
@@ -761,9 +697,7 @@ namespace UI
 
             });
 
-            if (!generalUIController.test)
-            {
-                manipulator.hoverExited.AddListener(interactor =>
+            manipulator.hoverExited.AddListener(interactor =>
                 {
                     Debug.Log(manipulator.gameObject.name +" Hover exited"); 
                 
@@ -777,7 +711,7 @@ namespace UI
                     }
 
                 });
-            }
+            
            
         }
 
@@ -820,8 +754,6 @@ namespace UI
                 }
 
             });
-            if (!generalUIController.test)
-            {
                 manipulator.selectExited.AddListener(interactor =>
                 {
                     Debug.Log(manipulator.gameObject.name + " Select exited");
@@ -837,7 +769,7 @@ namespace UI
                     }
                     //categoryMenu.SetActive(false);
                 });
-            }
+            
             
         }
 
@@ -872,23 +804,15 @@ namespace UI
         public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
         {
             HideModalitiesBubbles();
-            editModeController.ShowHideRadialMenu(false);
+            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
             _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
             //ShowModalitiesBubblesExceptModality();
-            editModeController.ShowHideRadialMenu(true);
+            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
 
         }
 
         public void ResetCubePositions()
         {
-            /*if (testScript != null)
-            {
-                testScript.ResetForTest(ruleEditorPlate.transform, _originalPositions.Keys.ToList());
-                Utils.ClearTextDescription(whenText, thenText);
-
-                Utils.ResetCubeContainers();
-                return;
-            }*/
             //Repositioning the plate in case the user has moved it
             ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);
             
@@ -904,9 +828,9 @@ namespace UI
 
         public void PrepareForActionScreenShot(GameObject gameObject)
         {
-            editModeController.ShowHideRadialMenu(false);
+            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
             _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
-            editModeController.ShowHideRadialMenu(true);
+            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
         }
 
         public void PrepareCategoryMenu(GameObject gameObject)
@@ -931,11 +855,6 @@ namespace UI
                 else CategoryIcon.CurrentIconName = icon;
             }
                 
-        }
-
-        public void CategoryMenuChoosing()
-        {
-            
         }
 
         public void AutomaticCubePosition()
