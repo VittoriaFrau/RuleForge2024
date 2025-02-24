@@ -361,6 +361,8 @@ namespace UI
 
             generalUIController.SetDebugText("Speak to the microphone");
             
+            // if not in unity editor, start the socket
+            #if !UNITY_EDITOR
             // Get the first running phrase recognition subsystem.
             var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
 
@@ -374,6 +376,10 @@ namespace UI
                         AddListener(() => { generalUIController.SetDebugText("You said " + keyword); });
                 }
             }
+            #else 
+                Debug.Log("You are not using an headset, you can't use the speech modality");
+            #endif
+            
         }
 
         public void DeActivateSpeechModality()
