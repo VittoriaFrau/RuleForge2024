@@ -34122,30 +34122,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 4875906770422128306}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 2200053490646479438}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   <OnEnabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
@@ -37597,7 +37573,7 @@ GameObject:
   - component: {fileID: 2781015704948174126}
   - component: {fileID: 4214231892154346334}
   m_Layer: 0
-  m_Name: OLDmicrophone
+  m_Name: microphone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53745,21 +53721,9 @@ MonoBehaviour:
   <OnClicked>k__BackingField:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 607159369133769202}
-        m_TargetAssemblyTypeName: UI.RuleEditor.HandMenuManager, Assembly-CSharp
-        m_MethodName: ShowMainMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6679534885180054317}
-        m_TargetAssemblyTypeName: UI.InteractionCreationController, Assembly-CSharp
-        m_MethodName: DeActivateNewRule
+      - m_Target: {fileID: 4290745511058819159}
+        m_TargetAssemblyTypeName: UI.GeneralUIController, Assembly-CSharp
+        m_MethodName: DefaultState
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -83553,9 +83517,8 @@ MonoBehaviour:
   - {fileID: 5167961641841103246}
   - {fileID: 5888020213602804899}
   - {fileID: 3982236405960165213}
-  BackButton: {fileID: 0}
-  RecordButton: {fileID: 0}
-  StopButton: {fileID: 0}
+  recordInteractionButton: {fileID: 2200053490646479438}
+  stopInteractionButton: {fileID: 4875906770422128306}
   OpenXRRightHandController: {fileID: 7981104327104482295}
   OpenXRLeftHandController: {fileID: 6623258334691215276}
   shiningTouchMaterial: {fileID: 2100000, guid: 35d364361cde318409f388164d1423e0, type: 2}

@@ -41,9 +41,8 @@ namespace UI
         
         private Modalities _modality;
         private GeneralUIController generalUIController;
-        private EditModeController editModeController;
         public List<GameObject> modalitiesBubbles;
-        public GameObject BackButton, RecordButton, StopButton;
+        public GameObject recordInteractionButton, stopInteractionButton;
         private RuleEngine _ruleEngine;
         
         //Touch modality attributes
@@ -72,18 +71,6 @@ namespace UI
         
         //Recording
         private List<ECAEvent> _modalityEvents = new();
-        
-        public List<ECAEvent> ModalityEvents
-        {
-            get => _modalityEvents;
-            set => _modalityEvents = value;
-        }
-
-        public List<ECAEvent> ActionEvents
-        {
-            get => _actionEvents;
-            set => _actionEvents = value;
-        }
 
         private List<ECAEvent> _actionEvents = new();
         //Opposite action events are used to revert the action when we go back to the previous state
@@ -125,14 +112,12 @@ namespace UI
         private void Start()
         {
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
-            editModeController = this.gameObject.GetComponent<EditModeController>();
             
             if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
             _ruleManager = this.gameObject.GetComponent<RuleManager>();
             if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
             if(microphone.activeSelf) microphone.SetActive(false);
-            /*testScript = this.gameObject.GetComponent<Test>();*/
             
             _ruleEngine = RuleEngine.GetInstance();
         }
@@ -144,10 +129,6 @@ namespace UI
             _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
             generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                    + " use your modality to interact with any object in the scene");
-
-            //Se non sta registrando devo attivare la modality con i listener normali
-            /*if (!generalUIController.isRecording)
-            {*/
                 switch (_modality)
                 {
                     case Modalities.Headgaze:
@@ -166,7 +147,6 @@ namespace UI
                         ActivateProximityModality();
                         break;
                 }
-            /*}*/
             
             //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
             if (generalUIController.isRecording)
@@ -204,7 +184,6 @@ namespace UI
         
         private void DeActivateProximityModality()
         {
-            
             //Hide proximity cube
             proximityCube.SetActive(false);
             // loop to the objects in the interactables
@@ -345,24 +324,20 @@ namespace UI
             //Color of the hands back to the normal
             RightHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
             LeftHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
-
             /*
                 WsClient.StopSocket();
             */
-            
         }
 
         public void ActivateSpeechModality()
         {
-            MRTKSpeech.SetActive(true);
             microphone.SetActive(true);
-            
             HideModalitiesBubble("Speech");
-
             generalUIController.SetDebugText("Speak to the microphone");
             
             // if not in unity editor, start the socket
             #if !UNITY_EDITOR
+            MRTKSpeech.SetActive(true);
             // Get the first running phrase recognition subsystem.
             var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
 
@@ -385,10 +360,8 @@ namespace UI
         public void DeActivateSpeechModality()
         {
             MRTKSpeech.SetActive(false);
-            
             microphone.SetActive(false);
         }
-        
         
         public void HideModalitiesBubbles()
         {
@@ -411,7 +384,6 @@ namespace UI
                 go.SetActive(true);
             }
         }
-
         public void ShowModalitiesBubblesExceptModality()
         {
             GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == _modality.ToString());
@@ -429,15 +401,12 @@ namespace UI
 
             generalUIController.SetDebugText("Recording stopped.");
             
-           // generalUIController.AddCombineRulesButtonToRadialMenu();
            if (categoryMenu != null)
            {
                if(categoryMenu.activeSelf)
                    categoryMenu.SetActive(false);
            }
            
-            //TODO trovare un modo per farlo solo con il primo task
-
             if (generalUIController.UIstate == GeneralUIController.UIState.NewInteraction)
             {
                 DeActivateCurrentModality();
@@ -490,10 +459,9 @@ namespace UI
             cubeCreatedEvents.AddRange(_actionEvents);
         }
 
+        // TODO why is here
         public void DeActivateRuleComposition()
         { 
-            /*ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);*/
-            
             //Set the rule plate visible
             ruleEditorPlate.SetActive(false);
             
@@ -524,8 +492,7 @@ namespace UI
             generalUIController.SetDebugText("Recording started.");
             ClearEventLists();
         }
-
-
+        
         public void SaveRecordedAction(Action action)
         {
             ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
@@ -553,12 +520,11 @@ namespace UI
             {
                 Debug.Log("No modality selected");
                 generalUIController.SetDebugText("No modality selected, please select one");
-                //StopButton.SetActive(false);
-                //RecordButton.SetActive(true);
-                /*_radialMenu.AddSingleButtonToList(RecordButton);
-                _radialMenu.RemoveSingleButtonToList(StopButton);*/
                 return;
             }
+            
+            recordInteractionButton.SetActive(false);
+            stopInteractionButton.SetActive(true);
 
             foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
             {
@@ -607,11 +573,9 @@ namespace UI
         }
         
 
-        //TODO: per chiudere il menu
-        public void DeActivateNewRule()
+        public void DeActivateNewInteraction()
         {
             DeActivateCurrentModality();
-            // Nascondere bolle se presenti
             HideModalitiesBubbles();
         }
 
@@ -726,14 +690,15 @@ namespace UI
             GameObject gameObject = manipulator.gameObject;
 
             //attach listener to object manipulator manipulation started event
-            UnityAction manipulationStarted = () =>
+            manipulator.OnClicked.AddListener (() =>
             {
                 Debug.Log(manipulator.gameObject.name + " On clicked");
-                //generalUIController.SetDebugText(manipulator.gameObject.name + " On clicked");
+                generalUIController.SetDebugText("You clicked on " + manipulator.gameObject.name);
+                
+                if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                 
                 //Note: event should be added before starting the coroutine
-                //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicked");
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Select entered");
+                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicked");
                 if (!_modalityEvents.Contains(ecaEvent))
                 {
                     _modalityEvents.Add(ecaEvent);
@@ -742,17 +707,17 @@ namespace UI
 
                 if(categoryMenu != null)
                     PrepareCategoryMenu(gameObject);
-            };
-            manipulator.OnClicked.AddListener(manipulationStarted);
+            });
+            
             manipulator.selectEntered.AddListener(interactor =>
             {
                 Debug.Log(manipulator.gameObject.name + " Select entered");
-                //generalUIController.SetDebugText(manipulator.gameObject.name + " Select entered");
+                generalUIController.SetDebugText("You selected " + manipulator.gameObject.name);
                 
                 if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                 
                 //Note: event should be added before starting the coroutine
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Select entered");
+                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects");
                 if (!_modalityEvents.Contains(ecaEvent))
                 {
                     _modalityEvents.Add(ecaEvent);
@@ -760,23 +725,20 @@ namespace UI
                 }
 
             });
-                manipulator.selectExited.AddListener(interactor =>
+                
+            manipulator.selectExited.AddListener(interactor =>
                 {
                     Debug.Log(manipulator.gameObject.name + " Select exited");
-                    //generalUIController.SetDebugText(manipulator.gameObject.name + " Select exited");
+                    generalUIController.SetDebugText("You deselected " + manipulator.gameObject.name);
                     //Note: event should be added before starting the coroutine
                     //Add the event only if it doesn't exist already
-                    //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Select exited");
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "stops");
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "deselects");
                     if (!_modalityEvents.Contains(ecaEvent))
                     {
                         _modalityEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                     }
-                    //categoryMenu.SetActive(false);
                 });
-            
-            
         }
 
         private void AddSpeechListener()

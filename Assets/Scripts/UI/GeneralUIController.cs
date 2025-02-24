@@ -77,7 +77,7 @@ namespace UI
                 case UIState.NewObject:
                     break;
                 case UIState.NewInteraction:
-                    _interactionCreationController.DeActivateNewRule();
+                    _interactionCreationController.DeActivateNewInteraction();
                     break;
                 case UIState.RuleComposition:
                     _interactionCreationController.DeActivateRuleComposition();
@@ -87,10 +87,10 @@ namespace UI
 
         public void DefaultState()
         {
-            text.text = "Choose if you want to create an object, modify an existing one or create a rule";
             DeActivatePreviousState(UIState.Default);
             _uiState = UIState.Default;
             handMenuManager.HandleHandMenu(_uiState);
+            text.text = "Choose if you want to create an object, modify an existing one or create a rule";
         }
         
         public void NewObjectState()
