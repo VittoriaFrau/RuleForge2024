@@ -50,7 +50,7 @@ GameObject:
   - component: {fileID: 3345797505881301632}
   - component: {fileID: 3142988248803855176}
   m_Layer: 5
-  m_Name: MergedScenario
+  m_Name: ScenarioMerged
   m_TagString: RuleCubes
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

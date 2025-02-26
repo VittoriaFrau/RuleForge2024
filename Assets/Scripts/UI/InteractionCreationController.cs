@@ -1,761 +1,743 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using ECAPrototyping.RuleEngine;
-using JetBrains.Annotations;
-using MixedReality.Toolkit;
-using MixedReality.Toolkit.Input;
-using MixedReality.Toolkit.SpatialManipulation;
-using MixedReality.Toolkit.Subsystems;
-using MixedReality.Toolkit.UX;
-using TMPro;
-using UI.RuleEditor;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
-using Action = ECAPrototyping.RuleEngine.Action;
-using Object = UnityEngine.Object;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using ECAPrototyping.RuleEngine;
+    using JetBrains.Annotations;
+    using MixedReality.Toolkit;
+    using MixedReality.Toolkit.Input;
+    using MixedReality.Toolkit.SpatialManipulation;
+    using MixedReality.Toolkit.Subsystems;
+    using MixedReality.Toolkit.UX;
+    using TMPro;
+    using UI.RuleEditor;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using UnityEngine.Serialization;
+    using UnityEngine.UI;
+    using Action = ECAPrototyping.RuleEngine.Action;
+    using Object = UnityEngine.Object;
 
-namespace UI
-{
-    public class InteractionCreationController:MonoBehaviour
+    namespace UI
     {
-        public enum Modalities
+        public class InteractionCreationController:MonoBehaviour
         {
-            None, 
-            Headgaze,
-            Touch,
-            Laser,
-            Microgesture,
-            Speech,
-            Proximity
-        }
+            public enum Modalities
+            {
+                None, 
+                Headgaze,
+                Touch,
+                Laser,
+                Microgesture,
+                Speech,
+                Proximity
+            }
 
-        public enum CategoryObjectSelected
-        {
-            GameObject,
-            Category,
-            AllObject
-        }
-        
-        private Modalities _modality;
-        private GeneralUIController generalUIController;
-        public List<GameObject> modalitiesBubbles;
-        private bool bubblesVisible = true;
-        public GameObject recordInteractionButton, stopInteractionButton;
-        private RuleEngine _ruleEngine;
-        
-        //Touch modality attributes
-        public GameObject OpenXRRightHandController, OpenXRLeftHandController;
-        private GameObject RightHand, LeftHand;
-        private Material normalTouchMaterial;
-        public Material shiningTouchMaterial;
-        public GameObject interactables;
-        
-        //Microgesture
-        
-        
-        //Laser modality attributes
-        private GameObject rightHandLaserPointer, leftHandLaserPointer;
-        private LineRenderer rightHandLaserPointerLineRenderer, leftHandLaserPointerLineRenderer;
-        private Material normalLaserMaterial;
-        public Material shiningLaserMaterial;
-        
-        //Headgaze modality attributes
-        public GameObject headGazePointer;
-        public GameObject gazeInteractor;
-        private GameObject headGazePointerInstance;
-        public Material normalHeadGazeMaterial;
-        public Material shiningHeadGazeMaterial;
-        
-        
-        //Recording
-        private List<ECAEvent> _modalityEvents = new();
-        private List<ECAEvent> _actionEvents = new();
-        // Create getters for modality and action events
-        public List<ECAEvent> ModalityEvents => _modalityEvents;
-        public List<ECAEvent> ActionEvents => _actionEvents;
-        
-        //Opposite action events are used to revert the action when we go back to the previous state
-        private List<Action> _oppositeActionEvents = new();
-        public GameObject screenshotCamera;
-        private ScreenshotCamera _screenshotCamera;
-        public HandMenuManager handMenuManager;
-
-        //Category choice
-        public GameObject categoryMenu;
-        public TextMeshProUGUI SingleObjectLabel;
-        public TextMeshProUGUI CategoryLabel;
-        public FontIconSelector CategoryIcon;
-        public Image CategoryImage;
-
-        //Speech
-        public GameObject MRTKSpeech;
-        public GameObject microphone;
-        private List<string> keywords = new() { "incendio", "leviosa", "change", "abracadabra" };
-        
-        // Proximity
-        public GameObject proximityCube;
-
-        private void Start()
-        {
-            generalUIController = this.gameObject.GetComponent<GeneralUIController>();
+            public enum CategoryObjectSelected
+            {
+                GameObject,
+                Category,
+                AllObject
+            }
             
-            if(screenshotCamera != null) 
-                _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
-            if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
-            if(microphone.activeSelf) microphone.SetActive(false);
-            _ruleEngine = RuleEngine.GetInstance();
-        }
-
-        public void SelectModality(string modality)
-        {
-            if(_modality != Modalities.None) DeActivateCurrentModality();
+            private Modalities _modality;
+            private GeneralUIController generalUIController;
+            public List<GameObject> modalitiesBubbles;
+            private bool bubblesVisible = true;
+            public GameObject recordInteractionButton, stopInteractionButton;
+            private RuleEngine _ruleEngine;
             
-            _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
-            generalUIController.SetDebugText("Selected modality: " + _modality 
-                                                                   + " use your modality to interact with any object in the scene");
+            //Touch modality attributes
+            public GameObject OpenXRRightHandController, OpenXRLeftHandController;
+            private GameObject RightHand, LeftHand;
+            private Material normalTouchMaterial;
+            public Material shiningTouchMaterial;
+            public GameObject interactables;
+            
+            //Microgesture
+            
+            
+            //Laser modality attributes
+            private GameObject rightHandLaserPointer, leftHandLaserPointer;
+            private LineRenderer rightHandLaserPointerLineRenderer, leftHandLaserPointerLineRenderer;
+            private Material normalLaserMaterial;
+            public Material shiningLaserMaterial;
+            
+            //Headgaze modality attributes
+            public GameObject headGazePointer;
+            public GameObject gazeInteractor;
+            private GameObject headGazePointerInstance;
+            public Material normalHeadGazeMaterial;
+            public Material shiningHeadGazeMaterial;
+            
+            
+            //Recording
+            private List<ECAEvent> _modalityEvents = new();
+            private List<ECAEvent> _actionEvents = new();
+            // Create getters for modality and action events
+            public List<ECAEvent> ModalityEvents => _modalityEvents;
+            public List<ECAEvent> ActionEvents => _actionEvents;
+            
+            //Opposite action events are used to revert the action when we go back to the previous state
+            private List<Action> _oppositeActionEvents = new();
+            public GameObject screenshotCamera;
+            private ScreenshotCamera _screenshotCamera;
+            public HandMenuManager handMenuManager;
+
+            //Category choice
+            public GameObject categoryMenu;
+            public TextMeshProUGUI SingleObjectLabel;
+            public TextMeshProUGUI CategoryLabel;
+            public FontIconSelector CategoryIcon;
+            public Image CategoryImage;
+
+            //Speech
+            public GameObject MRTKSpeech;
+            public GameObject microphone;
+            private List<string> keywords = new() { "incendio", "leviosa", "change", "abracadabra" };
+            
+            // Proximity
+            public GameObject proximityCube;
+
+            private void Start()
+            {
+                generalUIController = this.gameObject.GetComponent<GeneralUIController>();
+                
+                if(screenshotCamera != null) 
+                    _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
+                if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
+                if(microphone.activeSelf) microphone.SetActive(false);
+                _ruleEngine = RuleEngine.GetInstance();
+            }
+
+            public void SelectModality(string modality)
+            {
+                if(_modality != Modalities.None) DeActivateCurrentModality();
+                
+                _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
+                generalUIController.SetDebugText("Selected modality: " + _modality 
+                                                                       + " use your modality to interact with any object in the scene");
+                    switch (_modality)
+                    {
+                        case Modalities.Headgaze:
+                            ActivateHeadGazeModality();
+                            break;
+                        case Modalities.Laser:
+                            ActivateLaserModality();
+                            break;
+                        case Modalities.Touch:
+                            ActivateTouchModality();
+                            break;
+                        case Modalities.Speech:
+                            ActivateSpeechModality();
+                            break;
+                        case Modalities.Proximity:
+                            ActivateProximityModality();
+                            break;
+                    }
+                
+                //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
+                if (generalUIController.isRecording)
+                {
+                    RecordInteraction();
+                }
+                
+            }
+
+            public void ClearEventLists()
+            {
+                _modalityEvents.Clear();
+                _actionEvents.Clear();
+                _oppositeActionEvents.Clear();
+            }
+
+            private void ActivateProximityModality()
+            {
+                HideModalityBubble("Proximity");
+
+                //Show proximity cube
+                proximityCube.SetActive(true);
+                
+                // add istrigger to the box
+                // loop to the objects in the interactables
+                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (go.gameObject.name.Contains("Box"))
+                    {
+                        go.gameObject.GetComponent<BoxCollider>().isTrigger = true;
+                        Physics.SyncTransforms();
+                    }
+                }
+            }
+            
+            private void DeActivateProximityModality()
+            {
+                //Hide proximity cube
+                proximityCube.SetActive(false);
+                // loop to the objects in the interactables
+                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (go.gameObject.name.Contains("Box"))
+                    {
+                        go.gameObject.GetComponent<BoxCollider>().isTrigger = false;
+                        Physics.SyncTransforms();
+                    }
+                }
+            }
+            
+            private void ActivateHeadGazeModality()
+            {
+                //Instantiate the headgaze pointer inside the gaze interactor object
+                headGazePointerInstance = Instantiate(headGazePointer, gazeInteractor.transform);
+                //Set z axes to 0.33
+                headGazePointerInstance.transform.localPosition = new Vector3(0,0,0.33f);
+                
+                //Change the material of the gaze pointer everytime the user looks at an object
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
+                {
+                    headGazePointerInstance.GetComponent<Renderer>().material = shiningHeadGazeMaterial;
+                });
+                
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
+                {
+                    headGazePointerInstance.GetComponent<Renderer>().material = normalHeadGazeMaterial;
+                });
+                
+                //Disappear the Bubble of the modality
+                HideModalityBubble("Headgaze");
+            }
+
+            private void DeActivateHeadGazeModality()
+            {
+                // remove all listeners from headgazeInteractor
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.RemoveAllListeners();
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.RemoveAllListeners();
+                Destroy(headGazePointerInstance);
+            }
+
+            public void DeActivateCurrentModality()
+            {
                 switch (_modality)
                 {
                     case Modalities.Headgaze:
-                        ActivateHeadGazeModality();
+                        DeActivateHeadGazeModality();
                         break;
                     case Modalities.Laser:
-                        ActivateLaserModality();
+                        DeActivateLaserModality();
                         break;
                     case Modalities.Touch:
-                        ActivateTouchModality();
+                        DeActivateTouchModality();
                         break;
                     case Modalities.Speech:
-                        ActivateSpeechModality();
+                        DeActivateSpeechModality();
                         break;
                     case Modalities.Proximity:
-                        ActivateProximityModality();
+                        DeActivateProximityModality();
                         break;
                 }
-            
-            //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
-            if (generalUIController.isRecording)
-            {
-                RecordInteraction();
-            }
-            
-        }
-
-        public void ClearEventLists()
-        {
-            _modalityEvents.Clear();
-            _actionEvents.Clear();
-            _oppositeActionEvents.Clear();
-        }
-
-        private void ActivateProximityModality()
-        {
-            HideModalityBubble("Proximity");
-
-            //Show proximity cube
-            proximityCube.SetActive(true);
-            
-            // add istrigger to the box
-            // loop to the objects in the interactables
-            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
-            {
-                if (go.gameObject.name.Contains("Box"))
+                //Remove the listeners
+                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
-                    go.gameObject.GetComponent<BoxCollider>().isTrigger = true;
-                    Physics.SyncTransforms();
+                    RemoveListener(go);
                 }
+                
+                ShowModalitiesBubbles();
+                generalUIController.SetDebugText("Selected modality: " + _modality 
+                                                                       + " use your modality to interact with any object in the scene");
+                if(categoryMenu!=null) categoryMenu.SetActive(false);
             }
-        }
-        
-        private void DeActivateProximityModality()
-        {
-            //Hide proximity cube
-            proximityCube.SetActive(false);
-            // loop to the objects in the interactables
-            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+            
+            private void ActivateTouchModality()
             {
-                if (go.gameObject.name.Contains("Box"))
+                //Color of the hands to the shining
+                GameObject modelParentRight = OpenXRRightHandController.transform
+                    .Find("[MRTK RightHand Controller] Model Parent").gameObject;
+                GameObject modelParentLeft = OpenXRLeftHandController.transform
+                    .Find("[MRTK LeftHand Controller] Model Parent").gameObject;
+                
+                GameObject L_R_Hand = modelParentLeft.transform.Find("openxr_left_hand(Clone)").gameObject;
+                GameObject R_R_Hand = modelParentRight.transform.Find("openxr_right_hand(Clone)").gameObject;
+                
+                LeftHand = L_R_Hand.transform.Find("R_Hand").gameObject;
+                RightHand = R_R_Hand.transform.Find("R_Hand").gameObject;
+                
+                normalTouchMaterial = LeftHand.GetComponent<SkinnedMeshRenderer>().material;
+                
+                RightHand.GetComponent<SkinnedMeshRenderer>().material = shiningTouchMaterial;
+                LeftHand.GetComponent<SkinnedMeshRenderer>().material = shiningTouchMaterial;
+                
+                //Disappear the Bubble of the modality
+                HideModalityBubble("Touch");
+                
+                //Microgesture listener
+                /*
+                 WsClient.StartSocket();
+                }*/
+                
+            }
+
+            public void ActivateLaserModality()
+            {
+                rightHandLaserPointer = OpenXRRightHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
+                leftHandLaserPointer = OpenXRLeftHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
+                
+                rightHandLaserPointerLineRenderer = rightHandLaserPointer.GetComponent<LineRenderer>();
+                leftHandLaserPointerLineRenderer = leftHandLaserPointer.GetComponent<LineRenderer>();
+
+                normalLaserMaterial = rightHandLaserPointer.GetComponent<LineRenderer>().material;
+                
+                //Assign the new material to both laser hands
+                rightHandLaserPointerLineRenderer.material = shiningLaserMaterial;
+                leftHandLaserPointerLineRenderer.material = shiningLaserMaterial;
+
+                //Disappear the Bubble of the modality
+                HideModalityBubble("Laser");
+            }
+            
+            public void SetLaserPointLineWidth(float width)
+            {
+                leftHandLaserPointerLineRenderer.widthMultiplier = width;
+                rightHandLaserPointerLineRenderer.widthMultiplier = width;
+            }
+
+            private void DeActivateLaserModality()
+            {
+                //Color of the laser back to the normal
+                rightHandLaserPointer.GetComponent<LineRenderer>().material = normalLaserMaterial;
+                leftHandLaserPointer.GetComponent<LineRenderer>().material = normalLaserMaterial;
+            }
+            
+            private void DeActivateTouchModality()
+            {
+                //Color of the hands back to the normal
+                RightHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
+                LeftHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
+                /*
+                    WsClient.StopSocket();
+                */
+            }
+
+            public void ActivateSpeechModality()
+            {
+                microphone.SetActive(true);
+                HideModalityBubble("Speech");
+                generalUIController.SetDebugText("Speak to the microphone");
+                
+                // if not in unity editor, start the socket
+                #if !UNITY_EDITOR
+                MRTKSpeech.SetActive(true);
+                // Get the first running phrase recognition subsystem.
+                var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+
+                // If we found one...
+                if (keywordRecognitionSubsystem != null)
                 {
-                    go.gameObject.GetComponent<BoxCollider>().isTrigger = false;
-                    Physics.SyncTransforms();
+                    // Register a keyword and its associated action with the subsystem
+                    foreach (var keyword in keywords)
+                    {
+                        keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
+                            AddListener(() => { generalUIController.SetDebugText("You said " + keyword); });
+                    }
                 }
+                #else 
+                    Debug.Log("You are not using an headset, you can't use the speech modality");
+                #endif
+                
             }
-        }
-        
-        private void ActivateHeadGazeModality()
-        {
-            //Instantiate the headgaze pointer inside the gaze interactor object
-            headGazePointerInstance = Instantiate(headGazePointer, gazeInteractor.transform);
-            //Set z axes to 0.33
-            headGazePointerInstance.transform.localPosition = new Vector3(0,0,0.33f);
-            
-            //Change the material of the gaze pointer everytime the user looks at an object
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
-            {
-                headGazePointerInstance.GetComponent<Renderer>().material = shiningHeadGazeMaterial;
-            });
-            
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
-            {
-                headGazePointerInstance.GetComponent<Renderer>().material = normalHeadGazeMaterial;
-            });
-            
-            //Disappear the Bubble of the modality
-            HideModalityBubble("Headgaze");
-        }
 
-        private void DeActivateHeadGazeModality()
-        {
-            // remove all listeners from headgazeInteractor
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.RemoveAllListeners();
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.RemoveAllListeners();
-            Destroy(headGazePointerInstance);
-        }
-
-        public void DeActivateCurrentModality()
-        {
-            switch (_modality)
+            public void DeActivateSpeechModality()
             {
-                case Modalities.Headgaze:
-                    DeActivateHeadGazeModality();
-                    break;
-                case Modalities.Laser:
-                    DeActivateLaserModality();
-                    break;
-                case Modalities.Touch:
-                    DeActivateTouchModality();
-                    break;
-                case Modalities.Speech:
-                    DeActivateSpeechModality();
-                    break;
-                case Modalities.Proximity:
-                    DeActivateProximityModality();
-                    break;
-            }
-            //Remove the listeners
-            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
-            {
-                RemoveListener(go);
+                MRTKSpeech.SetActive(false);
+                microphone.SetActive(false);
             }
             
-            ShowModalitiesBubbles();
-            generalUIController.SetDebugText("Selected modality: " + _modality 
-                                                                   + " use your modality to interact with any object in the scene");
-            if(categoryMenu!=null) categoryMenu.SetActive(false);
-        }
-        
-        private void ActivateTouchModality()
-        {
-            //Color of the hands to the shining
-            GameObject modelParentRight = OpenXRRightHandController.transform
-                .Find("[MRTK RightHand Controller] Model Parent").gameObject;
-            GameObject modelParentLeft = OpenXRLeftHandController.transform
-                .Find("[MRTK LeftHand Controller] Model Parent").gameObject;
-            
-            GameObject L_R_Hand = modelParentLeft.transform.Find("openxr_left_hand(Clone)").gameObject;
-            GameObject R_R_Hand = modelParentRight.transform.Find("openxr_right_hand(Clone)").gameObject;
-            
-            LeftHand = L_R_Hand.transform.Find("R_Hand").gameObject;
-            RightHand = R_R_Hand.transform.Find("R_Hand").gameObject;
-            
-            normalTouchMaterial = LeftHand.GetComponent<SkinnedMeshRenderer>().material;
-            
-            RightHand.GetComponent<SkinnedMeshRenderer>().material = shiningTouchMaterial;
-            LeftHand.GetComponent<SkinnedMeshRenderer>().material = shiningTouchMaterial;
-            
-            //Disappear the Bubble of the modality
-            HideModalityBubble("Touch");
-            
-            //Microgesture listener
-            /*
-             WsClient.StartSocket();
-            }*/
-            
-        }
-
-        public void ActivateLaserModality()
-        {
-            rightHandLaserPointer = OpenXRRightHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
-            leftHandLaserPointer = OpenXRLeftHandController.transform.Find("Far Ray").gameObject.transform.Find("BendyRay").gameObject;
-            
-            rightHandLaserPointerLineRenderer = rightHandLaserPointer.GetComponent<LineRenderer>();
-            leftHandLaserPointerLineRenderer = leftHandLaserPointer.GetComponent<LineRenderer>();
-
-            normalLaserMaterial = rightHandLaserPointer.GetComponent<LineRenderer>().material;
-            
-            //Assign the new material to both laser hands
-            rightHandLaserPointerLineRenderer.material = shiningLaserMaterial;
-            leftHandLaserPointerLineRenderer.material = shiningLaserMaterial;
-
-            //Disappear the Bubble of the modality
-            HideModalityBubble("Laser");
-        }
-        
-        public void SetLaserPointLineWidth(float width)
-        {
-            leftHandLaserPointerLineRenderer.widthMultiplier = width;
-            rightHandLaserPointerLineRenderer.widthMultiplier = width;
-        }
-
-        private void DeActivateLaserModality()
-        {
-            //Color of the laser back to the normal
-            rightHandLaserPointer.GetComponent<LineRenderer>().material = normalLaserMaterial;
-            leftHandLaserPointer.GetComponent<LineRenderer>().material = normalLaserMaterial;
-        }
-        
-        private void DeActivateTouchModality()
-        {
-            //Color of the hands back to the normal
-            RightHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
-            LeftHand.GetComponent<SkinnedMeshRenderer>().material = normalTouchMaterial;
-            /*
-                WsClient.StopSocket();
-            */
-        }
-
-        public void ActivateSpeechModality()
-        {
-            microphone.SetActive(true);
-            HideModalityBubble("Speech");
-            generalUIController.SetDebugText("Speak to the microphone");
-            
-            // if not in unity editor, start the socket
-            #if !UNITY_EDITOR
-            MRTKSpeech.SetActive(true);
-            // Get the first running phrase recognition subsystem.
-            var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
-
-            // If we found one...
-            if (keywordRecognitionSubsystem != null)
-            {
-                // Register a keyword and its associated action with the subsystem
-                foreach (var keyword in keywords)
-                {
-                    keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
-                        AddListener(() => { generalUIController.SetDebugText("You said " + keyword); });
-                }
-            }
-            #else 
-                Debug.Log("You are not using an headset, you can't use the speech modality");
-            #endif
-            
-        }
-
-        public void DeActivateSpeechModality()
-        {
-            MRTKSpeech.SetActive(false);
-            microphone.SetActive(false);
-        }
-        
-        public void HideModalitiesBubbles()
-        {
-            foreach (var go in modalitiesBubbles)
-            {
-                go.SetActive(false);
-            }
-            bubblesVisible = false;
-        }
-        
-        public void HideModalityBubble(string modalityName)
-        {
-            GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == modalityName);
-            go.SetActive(false);
-        }
-        
-        public void ShowModalitiesBubbles()
-        {
-            // if a modality bubble is already selected, hide it
-            if(_modality != Modalities.None)
-            {
-                ShowBubblesExceptSelectedModality();
-            }
-            else
+            public void HideModalitiesBubbles()
             {
                 foreach (var go in modalitiesBubbles)
                 {
-                    go.SetActive(true);
+                    go.SetActive(false);
                 }
+                bubblesVisible = false;
             }
-            bubblesVisible = true;
-        }
-        public void ShowBubblesExceptSelectedModality()
-        {
-            GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == _modality.ToString());
-            foreach (var bubble in modalitiesBubbles)
-            {
-                if(bubble != go)
-                    bubble.SetActive(true);
-            }
-        }
-
-        public void StopRecording()
-        {
-            generalUIController.isRecording = false;
-            screenshotCamera.SetActive(false);
-
-            generalUIController.SetDebugText("Recording stopped.");
             
-           if (categoryMenu != null)
-           {
-               if(categoryMenu.activeSelf)
-                   categoryMenu.SetActive(false);
-           }
-           
-            if (generalUIController.UIstate == GeneralUIController.UIState.NewInteraction)
+            public void HideModalityBubble(string modalityName)
             {
-                DeActivateCurrentModality();
-                HideModalitiesBubbles();
-            } else if (generalUIController.UIstate == GeneralUIController.UIState.EditMode)
+                GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == modalityName);
+                go.SetActive(false);
+            }
+            
+            public void ShowModalitiesBubbles()
             {
-                //The changes during the recording have to be reverted
-                foreach (var action in _oppositeActionEvents)
+                // if a modality bubble is already selected, hide it
+                if(_modality != Modalities.None)
                 {
-                    _ruleEngine.ExecuteAction(action);
-                }
-            }
-
-
-        }
-
-        public void StartRecording()
-        {
-            generalUIController.isRecording = true;
-            
-            switch (generalUIController.UIstate)
-            {
-                case GeneralUIController.UIState.NewInteraction:
-                    RecordInteraction();
-                    break;
-                case GeneralUIController.UIState.EditMode:
-                    RecordAction();
-                    break;
-            }
-        }
-
-        public void RecordAction()
-        {
-            generalUIController.SetDebugText("Recording started.");
-            ClearEventLists();
-        }
-        
-        public void SaveRecordedAction(Action action)
-        {
-            ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
-            GameObject selectedObject = generalUIController.GetSelectedObject();
-            if (!_actionEvents.Contains(ecaEvent))
-            {
-                Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
-                _oppositeActionEvents.Add(oppositeAction);
-                _actionEvents.Add(ecaEvent);
-                Debug.Log("Saved action: " + ecaEvent);
-                generalUIController.SetDebugText(ecaEvent.ToString());
-                PrepareForActionScreenShot(selectedObject);
-            }
-        }
-
-        public void RecordInteraction()
-        {
-            if (_modality == Modalities.Speech)
-            {
-                generalUIController.SetDebugText("Recording started. Please, speak to the microphone");
-            }
-            else generalUIController.SetDebugText("Recording started. Please, interact with an object");
-            
-            if (_modality == Modalities.None)
-            {
-                Debug.Log("No modality selected");
-                generalUIController.SetDebugText("No modality selected, please select one");
-                return;
-            }
-            
-            recordInteractionButton.SetActive(false);
-            stopInteractionButton.SetActive(true);
-
-            foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
-            {
-                AddListener(go);
-            }
-        }
-
-        private void AddListener(ObjectManipulator manipulator)
-        {
-            switch (_modality)
-            {
-                case Modalities.Headgaze:
-                    AddHeadGazeListener(manipulator);
-                    break;
-                case Modalities.Laser:
-                    AddLaserListener(manipulator);
-                    break;
-                case Modalities.Touch:
-                    AddTouchListener(manipulator);
-                    break;
-                case Modalities.Speech:
-                    AddSpeechListener();
-                    break;
-            }
-            
-        }
-
-        private void RemoveListener(ObjectManipulator manipulator)
-        {
-             switch (_modality)
-            {
-                case Modalities.Headgaze:
-                    gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.RemoveAllListeners();
-                    gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.RemoveAllListeners();
-                    break;
-                case Modalities.Laser:
-                    manipulator.hoverEntered.RemoveAllListeners();
-                    manipulator.hoverExited.RemoveAllListeners();
-                    break;
-                case Modalities.Touch:
-                    manipulator.OnClicked.RemoveAllListeners();
-                    manipulator.selectEntered.RemoveAllListeners();
-                    manipulator.selectExited.RemoveAllListeners();
-                    break;
-            }
-        }
-        
-        public void DeActivateNewInteraction()
-        {
-            _modality = Modalities.None;
-            DeActivateCurrentModality();
-            HideModalitiesBubbles();
-        }
-
-        IEnumerator TakeScreenShot(List<ECAEvent> _events)
-        {
-            yield return new WaitForEndOfFrame();
-            var texture = ScreenCapture.CaptureScreenshotAsTexture();
-            //Set the texture of the last events in the list to the screenshot
-            _events.Last().Texture = texture;
-        }
-        
-        private void AddHeadGazeListener(ObjectManipulator manipulator)
-        {
-            GameObject gameObject = manipulator.gameObject;
-
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
-            {
-                Debug.Log(gameObject.name + " Hover entered");
-                generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
-
-                
-                //Note: event should be added before starting the coroutine
-                ECAEvent ecaEvent = new ECAEvent(gameObject, Modalities.Headgaze, "points");
-                if (!_modalityEvents.Contains(ecaEvent))
-                {
-                    _modalityEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(gameObject, Modalities.Headgaze);
-                }
-
-                if(categoryMenu != null) PrepareCategoryMenu(gameObject);        
-            });
-            
-            gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
-            {
-                Debug.Log(manipulator.gameObject.name + " Hover exited");
-                generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "stops");
-                if (!_modalityEvents.Contains(ecaEvent))
-                {
-                    _modalityEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
-                }
-            });
-        }
-
-        public void ProximityEvent(ECAEvent ecaEvent)
-        {
-            if (!_modalityEvents.Contains(ecaEvent))
-            {
-                _modalityEvents.Add(ecaEvent);
-            }
-        }
-        
-        private void AddLaserListener(ObjectManipulator manipulator)
-        {
-            GameObject gameObject = manipulator.gameObject;
-            manipulator.hoverEntered.AddListener(interactor =>
-            {
-                Debug.Log("Hover entered");
-                generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
-                
-                //Set the laser pointer line width for the screenshot
-                SetLaserPointLineWidth(30.0f);
-                
-                //Note: event should be added before starting the coroutine
-                //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "Point Entered");
-                
-
-                if (manipulator.gameObject.name.Equals("Box"))
-                {
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points", Utils.LoadPNG("Assets/Resources/pointBox.PNG"));
-                    if (!_modalityEvents.Contains(ecaEvent))
-                    {
-                        _modalityEvents.Add(ecaEvent);
-                    }
+                    ShowBubblesExceptSelectedModality();
                 }
                 else
                 {
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points");
-                    if (!_modalityEvents.Contains(ecaEvent))
+                    foreach (var go in modalitiesBubbles)
                     {
-                        _modalityEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                        go.SetActive(true);
                     }
                 }
-                if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
-                
-                
-
-            });
-
-            manipulator.hoverExited.AddListener(interactor =>
+                bubblesVisible = true;
+            }
+            public void ShowBubblesExceptSelectedModality()
+            {
+                GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == _modality.ToString());
+                foreach (var bubble in modalitiesBubbles)
                 {
-                    Debug.Log(manipulator.gameObject.name +" Hover exited"); 
+                    if(bubble != go)
+                        bubble.SetActive(true);
+                }
+            }
+
+            public void StopRecording()
+            {
+                generalUIController.isRecording = false;
+                screenshotCamera.SetActive(false);
+
+                generalUIController.SetDebugText("Recording stopped.");
                 
+               if (categoryMenu != null)
+               {
+                   if(categoryMenu.activeSelf)
+                       categoryMenu.SetActive(false);
+               }
+               
+                if (generalUIController.UIstate == GeneralUIController.UIState.NewInteraction)
+                {
+                    DeActivateCurrentModality();
+                    HideModalitiesBubbles();
+                } else if (generalUIController.UIstate == GeneralUIController.UIState.EditMode)
+                {
+                    //The changes during the recording have to be reverted
+                    foreach (var action in _oppositeActionEvents)
+                    {
+                        _ruleEngine.ExecuteAction(action);
+                    }
+                }
+
+
+            }
+
+            public void StartRecording()
+            {
+                generalUIController.isRecording = true;
+                
+                switch (generalUIController.UIstate)
+                {
+                    case GeneralUIController.UIState.NewInteraction:
+                        RecordInteraction();
+                        break;
+                    case GeneralUIController.UIState.EditMode:
+                        RecordAction();
+                        break;
+                }
+            }
+
+            public void RecordAction()
+            {
+                generalUIController.SetDebugText("Recording started.");
+                ClearEventLists();
+            }
+            
+            public void SaveRecordedAction(Action action)
+            {
+                ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
+                GameObject selectedObject = generalUIController.GetSelectedObject();
+                if (!_actionEvents.Contains(ecaEvent))
+                {
+                    Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
+                    _oppositeActionEvents.Add(oppositeAction);
+                    _actionEvents.Add(ecaEvent);
+                    Debug.Log("Saved action: " + ecaEvent);
+                    generalUIController.SetDebugText(ecaEvent.ToString());
+                    PrepareForActionScreenShot(selectedObject);
+                }
+            }
+
+            public void RecordInteraction()
+            {
+                if (_modality == Modalities.Speech)
+                {
+                    generalUIController.SetDebugText("Recording started. Please, speak to the microphone");
+                }
+                else generalUIController.SetDebugText("Recording started. Please, interact with an object");
+                
+                if (_modality == Modalities.None)
+                {
+                    Debug.Log("No modality selected");
+                    generalUIController.SetDebugText("No modality selected, please select one");
+                    return;
+                }
+                
+                recordInteractionButton.SetActive(false);
+                stopInteractionButton.SetActive(true);
+
+                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    AddListener(go);
+                }
+            }
+
+            private void AddListener(ObjectManipulator manipulator)
+            {
+                switch (_modality)
+                {
+                    case Modalities.Headgaze:
+                        AddHeadGazeListener(manipulator);
+                        break;
+                    case Modalities.Laser:
+                        AddLaserListener(manipulator);
+                        break;
+                    case Modalities.Touch:
+                        AddTouchListener(manipulator);
+                        break;
+                    case Modalities.Speech:
+                        AddSpeechListener();
+                        break;
+                }
+                
+            }
+
+            private void RemoveListener(ObjectManipulator manipulator)
+            {
+                 switch (_modality)
+                {
+                    case Modalities.Headgaze:
+                        gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.RemoveAllListeners();
+                        gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.RemoveAllListeners();
+                        break;
+                    case Modalities.Laser:
+                        manipulator.hoverEntered.RemoveAllListeners();
+                        manipulator.hoverExited.RemoveAllListeners();
+                        break;
+                    case Modalities.Touch:
+                        manipulator.OnClicked.RemoveAllListeners();
+                        manipulator.selectEntered.RemoveAllListeners();
+                        manipulator.selectExited.RemoveAllListeners();
+                        break;
+                }
+            }
+            
+            public void DeActivateNewInteraction()
+            {
+                _modality = Modalities.None;
+                DeActivateCurrentModality();
+                HideModalitiesBubbles();
+            }
+
+            IEnumerator TakeScreenShot(List<ECAEvent> _events)
+            {
+                yield return new WaitForEndOfFrame();
+                var texture = ScreenCapture.CaptureScreenshotAsTexture();
+                //Set the texture of the last events in the list to the screenshot
+                _events.Last().Texture = texture;
+            }
+            
+            private void AddHeadGazeListener(ObjectManipulator manipulator)
+            {
+                GameObject gameObject = manipulator.gameObject;
+
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
+                {
+                    Debug.Log(gameObject.name + " Hover entered");
+                    generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
+
+                    
                     //Note: event should be added before starting the coroutine
-                    //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "Hover Exited");
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "stops");
+                    ECAEvent ecaEvent = new ECAEvent(gameObject, Modalities.Headgaze, "looks", null);
                     if (!_modalityEvents.Contains(ecaEvent))
                     {
                         _modalityEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                        PrepareForModalityScreenshot(gameObject, Modalities.Headgaze);
                     }
 
+                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);        
                 });
-            
-           
-        }
+                
+                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
+                {
+                    Debug.Log(manipulator.gameObject.name + " Hover exited");
+                    generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "stops looking", null);
+                    if (!_modalityEvents.Contains(ecaEvent))
+                    {
+                        _modalityEvents.Add(ecaEvent);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
+                    }
+                });
+            }
 
-        private void AddTouchListener(ObjectManipulator manipulator)
-        {
-            GameObject gameObject = manipulator.gameObject;
-
-            //attach listener to object manipulator manipulation started event
-            manipulator.OnClicked.AddListener (() =>
+            public void ProximityEvent(ECAEvent ecaEvent)
             {
-                Debug.Log(manipulator.gameObject.name + " On clicked");
-                generalUIController.SetDebugText("You clicked on " + manipulator.gameObject.name);
-                
-                if(categoryMenu != null) PrepareCategoryMenu(gameObject);
-                
-                //Note: event should be added before starting the coroutine
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicked");
                 if (!_modalityEvents.Contains(ecaEvent))
                 {
                     _modalityEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                 }
-
-                if(categoryMenu != null)
-                    PrepareCategoryMenu(gameObject);
-            });
+            }
             
-            manipulator.selectEntered.AddListener(interactor =>
+            private void AddLaserListener(ObjectManipulator manipulator)
             {
-                Debug.Log(manipulator.gameObject.name + " Select entered");
-                generalUIController.SetDebugText("You selected " + manipulator.gameObject.name);
-                
-                if(categoryMenu != null) PrepareCategoryMenu(gameObject);
-                
-                //Note: event should be added before starting the coroutine
-                ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects");
-                if (!_modalityEvents.Contains(ecaEvent))
+                GameObject gameObject = manipulator.gameObject;
+                manipulator.hoverEntered.AddListener(interactor =>
                 {
-                    _modalityEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
-                }
-
-            });
-                
-            manipulator.selectExited.AddListener(interactor =>
-                {
-                    Debug.Log(manipulator.gameObject.name + " Select exited");
-                    generalUIController.SetDebugText("You deselected " + manipulator.gameObject.name);
+                    Debug.Log("Hover entered");
+                    generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
+                    
+                    //Set the laser pointer line width for the screenshot
+                    SetLaserPointLineWidth(30.0f);
+                    
                     //Note: event should be added before starting the coroutine
-                    //Add the event only if it doesn't exist already
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "deselects");
+                    
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points", null);
+                        if (!_modalityEvents.Contains(ecaEvent))
+                        {
+                            _modalityEvents.Add(ecaEvent);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                        }
+                    if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
+                });
+
+                manipulator.hoverExited.AddListener(interactor =>
+                    {
+                        Debug.Log(manipulator.gameObject.name +" Hover exited"); 
+                        generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
+                        
+                        //Note: event should be added before starting the coroutine
+                        //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "Hover Exited");
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "stops pointing", null);
+                        if (!_modalityEvents.Contains(ecaEvent))
+                        {
+                            _modalityEvents.Add(ecaEvent);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                        }
+                    });
+            }
+
+            private void AddTouchListener(ObjectManipulator manipulator)
+            {
+                GameObject gameObject = manipulator.gameObject;
+
+                //attach listener to object manipulator manipulation started event
+                manipulator.OnClicked.AddListener (() =>
+                {
+                    Debug.Log(manipulator.gameObject.name + " On clicked");
+                    generalUIController.SetDebugText("You clicked on " + manipulator.gameObject.name);
+                    
+                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);
+                    
+                    //Note: event should be added before starting the coroutine
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicked", null);
                     if (!_modalityEvents.Contains(ecaEvent))
                     {
                         _modalityEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                     }
+
+                    if(categoryMenu != null)
+                        PrepareCategoryMenu(gameObject);
                 });
-        }
-
-        private void AddSpeechListener()
-        {
-            // Get the first running phrase recognition subsystem.
-            var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
-
-            // If we found one...
-            if (keywordRecognitionSubsystem != null)
-            {
-                // Register a keyword and its associated action with the subsystem
-                foreach (var keyword in keywords)
-                {
-                    keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
-                        AddListener(() =>
-                        {
-                            generalUIController.SetDebugText("You said " + keyword);
-                            if (generalUIController.isRecording)
-                            {
-                                //Generate ecaevent
-                                ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, keyword, 
-                                    Utils.LoadPNG("Assets/Resources/Icons/microphone.png"));
-                                if(!_modalityEvents.Contains(ecaEvent)) _modalityEvents.Add(ecaEvent);    
-                            }
-                        });
-                    
-                }
-            }
-        }
-        
-        public void PrepareCategoryMenu(GameObject gameObject)
-        {
-            string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
-            if(gameObject.name.Contains("Box"))
-                objectCategory = "Furniture"; 
-            generalUIController.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
-            categoryMenu.SetActive(true);
-            
-            CategoryLabel.text = objectCategory;
-            SingleObjectLabel.text = gameObject.name;
-            string icon = Utils.GetIconForECACategory(objectCategory);
-            if (icon != null)
-            {
-                if (icon.Contains("door"))
-                {
-                    CategoryImage.sprite = Resources.Load<Sprite>(icon);
-                    CategoryImage.gameObject.SetActive(true);
-                    CategoryIcon.gameObject.SetActive(false);
-                }
-                else CategoryIcon.CurrentIconName = icon;
-            }
                 
-        }
+                manipulator.selectEntered.AddListener(interactor =>
+                {
+                    Debug.Log(manipulator.gameObject.name + " Select entered");
+                    generalUIController.SetDebugText("You selected " + manipulator.gameObject.name);
+                    
+                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);
+                    
+                    //Note: event should be added before starting the coroutine
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects", null);
+                    if (!_modalityEvents.Contains(ecaEvent))
+                    {
+                        _modalityEvents.Add(ecaEvent);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
+                    }
 
-        public void PrepareForActionScreenShot(GameObject gameObject)
-        {
-            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-            _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
-            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
-        }
-        
-        public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
-        {
-            if(bubblesVisible) HideModalitiesBubbles();
-            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-            _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
-            if(bubblesVisible) ShowBubblesExceptSelectedModality();
-            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
+                });
+                    
+                manipulator.selectExited.AddListener(interactor =>
+                    {
+                        Debug.Log(manipulator.gameObject.name + " Select exited");
+                        generalUIController.SetDebugText("You deselected " + manipulator.gameObject.name);
+                        //Note: event should be added before starting the coroutine
+                        //Add the event only if it doesn't exist already
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "deselects", null);
+                        if (!_modalityEvents.Contains(ecaEvent))
+                        {
+                            _modalityEvents.Add(ecaEvent);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
+                        }
+                    });
+            }
+
+            private void AddSpeechListener()
+            {
+                // Get the first running phrase recognition subsystem.
+                var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+
+                // If we found one...
+                if (keywordRecognitionSubsystem != null)
+                {
+                    // Register a keyword and its associated action with the subsystem
+                    foreach (var keyword in keywords)
+                    {
+                        keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
+                            AddListener(() =>
+                            {
+                                generalUIController.SetDebugText("You said " + keyword);
+                                if (generalUIController.isRecording)
+                                {
+                                    //Generate ecaevent
+                                    ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, keyword, 
+                                        Utils.LoadPNG("Assets/Resources/Icons/microphone.png"));
+                                    if(!_modalityEvents.Contains(ecaEvent)) _modalityEvents.Add(ecaEvent);    
+                                }
+                            });
+                        
+                    }
+                }
+            }
+            
+            public void PrepareCategoryMenu(GameObject gameObject)
+            {
+                string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
+                if(gameObject.name.Contains("Box"))
+                    objectCategory = "Furniture"; 
+                generalUIController.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
+                categoryMenu.SetActive(true);
+                
+                CategoryLabel.text = objectCategory;
+                SingleObjectLabel.text = gameObject.name;
+                string icon = Utils.GetIconForECACategory(objectCategory);
+                if (icon != null)
+                {
+                    if (icon.Contains("door"))
+                    {
+                        CategoryImage.sprite = Resources.Load<Sprite>(icon);
+                        CategoryImage.gameObject.SetActive(true);
+                        CategoryIcon.gameObject.SetActive(false);
+                    }
+                    else CategoryIcon.CurrentIconName = icon;
+                }
+                    
+            }
+
+            public void PrepareForActionScreenShot(GameObject gameObject)
+            {
+                handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
+                _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
+                handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
+            }
+            
+            public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
+            {
+                if(bubblesVisible) HideModalitiesBubbles();
+                handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
+                _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
+                if(bubblesVisible) ShowBubblesExceptSelectedModality();
+                handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
+            }
         }
     }
-}

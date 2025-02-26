@@ -47,6 +47,7 @@ namespace UI
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
+            if(_combineRulesController.ruleEditorPlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlate.gameObject.SetActive(false);
             DefaultState();
         }
 

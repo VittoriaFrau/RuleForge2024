@@ -14,47 +14,16 @@ using Utils = UI.Utils;
 public class CubeController : MonoBehaviour
 {
     private bool isAttached = false;
-    private static bool timerStarted = false;
-    
-    public bool IsAttached
-    {
-        get => isAttached;
-        set => isAttached = value;
-    }
-
-    public bool TimerStarted
-    {
-        get => timerStarted;
-        set => timerStarted = value;
-    }
+    private bool timerStarted = false;
     
     public float minimumJoinTime = 2.0f; // Minimum time (in seconds) for the cubes to stay attached
     private float joinStartTime;
     public GameObject mergedCubePrefab;
     private CombineRulesController _combineRulesController;
-    public GameObject scenarioMergedCubePrefab;
-    private TextMeshProUGUI ruleDebugText;
     
     private void Start()
     {
         _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
-        
-        GameObject debugTextObject = GameObject.FindGameObjectWithTag("debugText");
-        // Verifica se l'oggetto è stato trovato e non è null
-        if (debugTextObject != null)
-        {
-            // Ottieni il componente TextMeshProUGUI solo se l'oggetto è attivo
-            if (debugTextObject.activeSelf)
-            {
-                ruleDebugText = debugTextObject.GetComponent<TextMeshProUGUI>();
-            }
-            else
-            {
-                // L'oggetto è inattivo, puoi gestire questo caso qui se necessario
-                Debug.LogWarning("L'oggetto con tag 'debugText' è inattivo.");
-            }
-        }
-        
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -110,13 +79,12 @@ public class CubeController : MonoBehaviour
     private IEnumerator StartCountdown(GameObject otherCube)
     {
         timerStarted = true;
-        otherCube.GetComponent<CubeController>().TimerStarted = true;
+        otherCube.GetComponent<CubeController>().timerStarted = true;
         float countdownTime = minimumJoinTime;
         while (countdownTime > 0)
         {
             // Update the UI Text to show the countdown
             _combineRulesController.ActivateDebugTextWithMessage("Merging in " + Mathf.CeilToInt(countdownTime) + " seconds");
-            ruleDebugText.text = "Merging in " + Mathf.CeilToInt(countdownTime) + " seconds";
             yield return null;
             countdownTime -= Time.deltaTime;
         }
@@ -146,12 +114,12 @@ public class CubeController : MonoBehaviour
         // Finding the cubeplate by tag and then filtering the results by name
         GameObject cubePlate = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "CubePlate");
         
-        if(scenarioMergedCubePrefab != null)
+        if(mergedCubePrefab != null)
         {
             // Mark the other cube as attached to prevent double merge
-            otherCube.GetComponent<CubeController>().IsAttached = true;
+            otherCube.GetComponent<CubeController>().isAttached = true;
             
-            GameObject mergedCube = Object.Instantiate(scenarioMergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
+            GameObject mergedCube = Object.Instantiate(mergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
             // set z to -36.8
             mergedCube.transform.rotation = Quaternion.identity;
             mergedCube.transform.localScale = new Vector3(25, 25, 25);
@@ -171,12 +139,10 @@ public class CubeController : MonoBehaviour
         
         Texture copyTextureLeftCube = CopyTexture(textureLeftCube);
         Texture copyTextureRightCube = CopyTexture(textureRightCube);
-
-                
-        // Mark the other cube as attached to prevent double merge
-        otherCube.GetComponent<CubeController>().IsAttached = true;
         
-                
+        // Mark the other cube as attached to prevent double merge
+        otherCube.GetComponent<CubeController>().isAttached = true;
+        
         GameObject cube = Utils.InstantiateRuleCube(mergedCubePrefab, 2, mergedPosition, cubePlate.transform, new []{copyTextureLeftCube, copyTextureRightCube});
         ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject);
         ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);

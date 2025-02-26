@@ -156,7 +156,7 @@ namespace UI
                 Vector3 staticLocalPosition = CalculateStaticLocalPosition(i);
                 GameObject cube;
 
-                bool isModality = e.Event != null;
+                bool isModality = e.EventStr != null;
 
                 if (isModality)
                 {
@@ -167,7 +167,7 @@ namespace UI
                     cube = InstantiateRuleCube(modalityCubePrefab, 1, 
                         staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
                 }
-                else cube = InstantiateRuleCube(e.Object == null ? actionCubePrefabVariant : actionCubePrefab, 1, 
+                else cube = InstantiateRuleCube(e.ObjectStr == null ? actionCubePrefabVariant : actionCubePrefab, 1, 
                     staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
 
                 result.Add(cube, staticLocalPosition);
@@ -322,12 +322,12 @@ namespace UI
             e.Verb = verbAndEvent[0];
             if (verbAndEvent.Length > 1)
             {
-                e.Event = verbAndEvent[1];
+                e.EventStr = verbAndEvent[1];
             }
             
                 
             TextMeshProUGUI objectFront = frontFace.transform.Find("Object").transform.Find("Image").GetComponent<TextMeshProUGUI>();
-            e.Object = objectFront.text;
+            e.ObjectStr = objectFront.text;
             
             e.Texture = (Texture2D)cube.GetComponent<Renderer>().material.mainTexture;
 
@@ -441,36 +441,26 @@ namespace UI
         {
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
-            string[] labelTexts = { e.Subject, e.Verb + " " + e.Event, e.Object };
+            string[] labelTexts = { e.Subject, e.Verb + " " + e.EventStr, e.ObjectStr };
 
             switch (e.Modality)
             {
                 case InteractionCreationController.Modalities.Microgesture:
-                    labelTexts[1] = e.Verb + " " + e.Event;
+                    labelTexts[1] = e.Verb + " " + e.EventStr;
                     labelTexts[2] = "microgesture";
-                    break;
-                case InteractionCreationController.Modalities.Touch:
-                    labelTexts[1] = "touches"; //3rd person for reading
                     break;
                 case InteractionCreationController.Modalities.Speech:
                     labelTexts[1] = "says"; //3rd person for reading
-                    labelTexts[2] = "\""  + e.Event + "\""; //keyword
+                    labelTexts[2] = "\""  + e.EventStr + "\""; //keyword
                     break; 
                 case InteractionCreationController.Modalities.Proximity:
                     labelTexts[0] = e.Subject;
                     labelTexts[1] = "is near to"; //3rd person for reading
-                    labelTexts[2] = e.Object;
+                    labelTexts[2] = e.ObjectStr;
                     break;
-                case InteractionCreationController.Modalities.Laser:
-                    labelTexts[1] = "points"; //3rd person for reading
+                default:
+                    labelTexts[1] = e.EventStr; 
                     break;
-                case InteractionCreationController.Modalities.Headgaze:
-                    labelTexts[1] = "looks at"; //3rd person for reading
-                    break;
-            }
-            if (e.Event == "stops")
-            {
-                labelTexts[1] = e.Event + " " + e.Verb;
             }
 
             // Loop through each face and fill the text labels
@@ -538,19 +528,19 @@ namespace UI
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
             //string[] labelTexts = { events[0].Subject, events[0].Verb + " " + events[0].Event, events[0].Object, events[1].Verb + " " + events[1].Event, events[1].Object };
-            if (events[0].Event == null)
+            if (events[0].EventStr == null)
             {
-                events[0].Event = events[0].Verb;
-                if(events[0].Event == "says") events[0].Event = "is saying";
-                else if (events[0].Event == "points") events[0].Event = "is pointing";
+                events[0].EventStr = events[0].Verb;
+                if(events[0].EventStr == "says") events[0].EventStr = "is saying";
+                else if (events[0].EventStr == "points") events[0].EventStr = "is pointing";
             }
-            if (events[1].Event == null)
+            if (events[1].EventStr == null)
             {
-                events[1].Event = events[1].Verb;
-                if(events[1].Event == "says") events[1].Event = "is saying";
-                else if (events[1].Event == "points") events[1].Event = "is pointing";
+                events[1].EventStr = events[1].Verb;
+                if(events[1].EventStr == "says") events[1].EventStr = "is saying";
+                else if (events[1].EventStr == "points") events[1].EventStr = "is pointing";
             }
-            string[] labelTexts = { events[0].Subject,  events[0].Event + " " + events[0].Object, "meanwhile", events[1].Event + " " + events[1].Object };
+            string[] labelTexts = { events[0].Subject,  events[0].EventStr + " " + events[0].ObjectStr, "meanwhile", events[1].EventStr + " " + events[1].ObjectStr };
 
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
@@ -677,16 +667,16 @@ namespace UI
                 case Action.ActionType.CHANGES:
                 case Action.ActionType.CUSTOMCHANGE:
                     e.Verb = action.GetActionMethod() + " " + action.GetObject() + " " +  action.GetModifier();
-                    e.Object = action.GetModifierValue().ToString();
+                    e.ObjectStr = action.GetModifierValue().ToString();
                     break;
                 case Action.ActionType.VALUE:
                     e.Verb = action.GetActionMethod();
-                    e.Object = action.GetObject().ToString();
+                    e.ObjectStr = action.GetObject().ToString();
                     break;
                 case Action.ActionType.VERB:
                     break;
                 case Action.ActionType.OBJECT:
-                    e.Object = action.GetModifierValue().ToString();
+                    e.ObjectStr = action.GetModifierValue().ToString();
                     break;
             }
 

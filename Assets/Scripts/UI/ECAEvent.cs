@@ -1,103 +1,53 @@
 using ECAPrototyping.RuleEngine;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace UI
 {
     public class ECAEvent
     {
-        private GameObject _gameObject;
         private InteractionCreationController.Modalities modality;
-        private string _event;
         //TODO: sto selezionando cubo, shape o un qualsiasi oggetto?
         private InteractionCreationController.CategoryObjectSelected typeOfObject;
-        private Texture2D _texture;
-        private string _subject, _verb, _object;
-        private Action _action;
-        private int _index;
-        private string cubeID; //Per recuperare il cubo generato
-
-        public int Index
-        {
-            get => _index;
-            set => _index = value;
-        }
-
-        public string CubeID
-        {
-            get => cubeID;
-            set => cubeID = value;
-        }
-
         private static int _counter = 0;
-
-        public Action Action
-        {
-            get => _action;
-            set => _action = value;
-        }
-
-        public ECAEvent(GameObject gameObject, string _verb, string _object)
-        {
-            _gameObject = gameObject;
-            this._verb = _verb;
-            this._object = _object;
-            this._subject = gameObject.name;
-            _index = _counter;
-            _counter++;
-        }
+        
+        public string Subject { get; set; }
+        public string Verb { get; set; }
+        public string ObjectStr{ get; set; }
+        public GameObject GameObjectRef{ get; set; }
+        public Texture2D Texture{ get; set; }
+        public string EventStr{ get; set; }
+        public string CubeID{ get; set; }
+        public int Index{ get; set; }
+        public Action Action { get; set; }
         
         public ECAEvent(GameObject gameObject, InteractionCreationController.Modalities modality, string _event, 
-            Texture2D screenshot)
+            [CanBeNull] Texture2D screenshot)
         {
-            this._gameObject = gameObject;
+            this.GameObjectRef = gameObject;
             this.modality = modality;
-            this._event = _event;
+            this.EventStr = _event;
             typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
-            _texture = screenshot;
+            if(screenshot != null) Texture = screenshot;
+            else Texture = null;
             SetModalityRule();
-            _index = _counter;
+            Index = _counter;
             _counter++;
         }
         
-        public ECAEvent(GameObject gameObject, InteractionCreationController.Modalities modality, string _event)
-        {
-            this._gameObject = gameObject;
-            this.modality = modality;
-            this._event = _event;
-            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
-            _texture = null;
-            SetModalityRule();
-            _index = _counter;
-            _counter++;
-        }
-        
-        public ECAEvent(GameObject gameObject, InteractionCreationController.Modalities modality, string _event, string objectName)
-        {
-            this._gameObject = gameObject;
-            this.modality = modality;
-            this._event = _event;
-            this._object = objectName;
-            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
-            _texture = null;
-            _subject = gameObject.name;
-            _index = _counter;
-            _counter++;
-        }
-        
-
         public ECAEvent(GameObject gameObject)
         {
-            _gameObject = gameObject;
-            _index = _counter;
+            GameObjectRef = gameObject;
+            Index = _counter;
             _counter++;
         }
         
         public ECAEvent(GameObject gameObject, string verb)
         {
-            _gameObject = gameObject;
-            _verb = verb;
-            _subject = gameObject.name;
-            _index = _counter;
+            GameObjectRef = gameObject;
+            Verb = verb;
+            Subject = gameObject.name;
+            Index = _counter;
             _counter++;
         }
 
@@ -120,7 +70,7 @@ namespace UI
                 return false;
             }
 
-            if (!ReferenceEquals(_gameObject, e._gameObject))
+            if (!ReferenceEquals(GameObjectRef, e.GameObjectRef))
             {
                 return false;
             }
@@ -130,18 +80,18 @@ namespace UI
                 return true;
             }
 
-            if (_verb != null && e._verb != null)
+            if (Verb != null && e.Verb != null)
             {
-                if (!ReferenceEquals(_object, e._object))
+                if (!ReferenceEquals(ObjectStr, e.ObjectStr))
                 {
                     return false;
                 }
 
-                return _verb == e._verb;
+                return Verb == e.Verb;
             }
 
             // ModalityEvent:
-            return _gameObject == e.GameObject && modality == e.modality && _event == e._event;
+            return GameObjectRef == e.GameObjectRef && modality == e.modality && EventStr == e.EventStr;
         }
 
 
@@ -149,81 +99,45 @@ namespace UI
         {
             if (modality == InteractionCreationController.Modalities.Microgesture)
             {
-                return "The user performs " + _event + " microgesture";
+                return "The user performs " + EventStr + " microgesture";
             }
             if(modality == InteractionCreationController.Modalities.Speech)
             {
-                return "The user says " + _event;
+                return "The user says " + EventStr;
             }
 
             if (modality != InteractionCreationController.Modalities.None)
             {
-                if (_event != null && _verb != null && _event != null)
+                if (EventStr != null && Verb != null && EventStr != null)
                 {
-                    return "The user " + _event + " " + _verb + " the " + _gameObject.name + " object";
+                    return "The user " + EventStr + " " + Verb + " the " + GameObjectRef.name + " object";
                 }
-                if (_verb != null) return "The user " + _verb + " the " + _gameObject.name + " object";
-                if(_event == null && _verb == null) return "The user " + modality + " the " + _gameObject.name + " object";
+                if (Verb != null) return "The user " + Verb + " the " + GameObjectRef.name + " object";
+                if(EventStr == null && Verb == null) return "The user " + modality + " the " + GameObjectRef.name + " object";
             }
-            if(_object == null) return _gameObject.name + " " + _verb;
+            if(ObjectStr == null) return GameObjectRef.name + " " + Verb;
             
-            return _gameObject.name + " " + _verb + " " + _object;
+            return GameObjectRef.name + " " + Verb + " " + ObjectStr;
         }
 
         private void SetModalityRule()
         {
-            _subject = "user";
+            Subject = "user";
             switch (modality)
             {
                 case InteractionCreationController.Modalities.Microgesture:
-                    _verb = "performs";
-                    _object = _event;
+                    Verb = "performs";
+                    ObjectStr = EventStr;
                     break;
                 case InteractionCreationController.Modalities.Speech:
-                    _verb = "says";
-                    _object = _event;
+                    Verb = "says";
+                    ObjectStr = EventStr;
                     break;
                 default:   
-                    _verb = modality.ToString();
-                    _object = _gameObject.name;
+                    Verb = modality.ToString();
+                    ObjectStr = GameObjectRef.name;
                     break;
             }
-        }
-        
-        public string Subject
-        {
-            get => _subject;
-            set => _subject = value;
-        }
-        
-        public string Verb
-        {
-            get => _verb;
-            set => _verb = value;
-        }
-        
-        public string Object
-        {
-            get => _object;
-            set => _object = value;
-        }
-        
-        public GameObject GameObject
-        {
-            get => _gameObject;
-            set => _gameObject = value;
-        }
-        
-        public Texture2D Texture
-        {
-            get => _texture;
-            set => _texture = value;
-        }
-        
-        public string Event
-        {
-            get => _event;
-            set => _event = value;
         }
 
     }
