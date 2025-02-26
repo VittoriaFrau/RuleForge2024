@@ -379,12 +379,20 @@ namespace UI
         
         public void ShowModalitiesBubbles()
         {
-            foreach (var go in modalitiesBubbles)
+            // if a modality bubble is already selected, hide it
+            if(_modality != Modalities.None)
             {
-                go.SetActive(true);
+                ShowBubblesExceptSelectedModality();
+            }
+            else
+            {
+                foreach (var go in modalitiesBubbles)
+                {
+                    go.SetActive(true);
+                }
             }
         }
-        public void ShowModalitiesBubblesExceptModality()
+        public void ShowBubblesExceptSelectedModality()
         {
             GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == _modality.ToString());
             foreach (var bubble in modalitiesBubbles)
@@ -575,6 +583,7 @@ namespace UI
 
         public void DeActivateNewInteraction()
         {
+            _modality = Modalities.None;
             DeActivateCurrentModality();
             HideModalitiesBubbles();
         }
@@ -594,9 +603,10 @@ namespace UI
             gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
             {
                 Debug.Log(gameObject.name + " Hover entered");
+                generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
+
                 
                 //Note: event should be added before starting the coroutine
-                //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "Entered");
                 ECAEvent ecaEvent = new ECAEvent(gameObject, Modalities.Headgaze, "points");
                 if (!_modalityEvents.Contains(ecaEvent))
                 {
@@ -610,8 +620,7 @@ namespace UI
             gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
             {
                 Debug.Log(manipulator.gameObject.name + " Hover exited");
-                //generalUIController.SetDebugText(manipulator.gameObject.name + " Hover exited");
-                //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "Exited");
+                generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
                 ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "stops");
                 if (!_modalityEvents.Contains(ecaEvent))
                 {
