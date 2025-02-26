@@ -9,12 +9,9 @@ namespace UI
     public class GeneralUIController: MonoBehaviour
     {
         private GameObject textGo;
-        public GameObject debugWindow;
-        public List<GameObject> stateDependentButtons;
         /*public GameObject closeButton;*/
         public GameObject eventHandler;
         private EditModeController _editModeController;
-        private ObjectsMenuController _objectsMenuController;
         private InteractionCreationController _interactionCreationController;
         public HandMenuManager handMenuManager;
         private Prototypation _prototypation;
@@ -36,17 +33,7 @@ namespace UI
             get => _uiState;
             set => _uiState = value;
         }
-        public UIState State
-        {
-            get => _uiState;
-            set { _uiState = value; }
-        }
         private TextMeshProUGUI text;
-        public TextMeshProUGUI Text
-        {
-            get => text;
-            set { text = value; }
-        }
         
         public InteractionCreationController InteractionCreationController
         {
@@ -59,7 +46,6 @@ namespace UI
             textGo = GameObject.FindGameObjectWithTag("debugText");
             text = textGo.GetComponent<TextMeshProUGUI>();
             _editModeController = eventHandler.GetComponent<EditModeController>();
-            _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             DefaultState();
         }

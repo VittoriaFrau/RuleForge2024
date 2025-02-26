@@ -19,24 +19,19 @@ namespace UI
         public GameObject interactablesParent;
         private List<GameObject> interactables;
         private GeneralUIController generalUIController;
-        public GameObject colorPalette;
         private RuleEngine _ruleEngine;
-        public List<GameObject> ecaObjectEditOptions;
-        
        
         private void Start()
         {
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
             _ruleEngine = RuleEngine.GetInstance();
         }
-
-
+        
         public void UpdateAndAddListeners()
         {
             UpdateInteractablesList();
             AddListenerToInteractables();
         }
-        
         
         public void UpdateAndRemoveListeners()
         {
@@ -78,7 +73,6 @@ namespace UI
         {
             interactables = (from Transform child in interactablesParent.transform select child.gameObject).ToList();
         }
-        
 
         public void CreateAndPublishAction(string actionName)
         {

@@ -37,9 +37,7 @@ namespace UI.RuleEditor
                 GetComponent<HandConstraintPalmUp>().enabled = false;
                 Vector3 forwardOffset = _mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
                 Vector3 leftOffset = -_mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
-
                 transform.position = _mainCamera.transform.position + forwardOffset + leftOffset;
-                
             #endif
         }
 

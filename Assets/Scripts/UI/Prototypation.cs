@@ -26,6 +26,5 @@ namespace UI
             _generalUIController.EditModeState();
         }
         
-
     }
 }

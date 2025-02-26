@@ -476,7 +476,7 @@ namespace UI
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(false);
             
-            generalUIController.State = GeneralUIController.UIState.Default;
+            generalUIController.UIstate = GeneralUIController.UIState.Default;
             generalUIController.DefaultState();
         }
 
