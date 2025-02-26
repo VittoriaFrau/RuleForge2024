@@ -43,6 +43,7 @@ namespace UI
             if (_modalityEvents.Count == 0 && _actionEvents.Count == 0)
             {
                 generalUIController.SetDebugText("No recorded actions, please use the record button to record actions");
+                DeActivateRuleComposition();
                 return;
             }
             

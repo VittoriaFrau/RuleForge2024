@@ -344,20 +344,6 @@ namespace UI
             cube.transform.rotation = Quaternion.identity;
             cube.transform.localScale = new Vector3(25, 25, 25);
             cube.transform.localPosition = position;
-            //TEST
-            /*
-            Test testScript = GameObject.FindGameObjectsWithTag("EventHandler").FirstOrDefault(x => x.name == "EventHandler").GetComponent<Test>();
-            
-
-            if (testScript != null)
-            {
-                cube.transform.localPosition = testScript.GetFixedPosition();
-            }
-            
-            */
-                
-            //Material using screenshot
-            
             if (cubeLevel < 2)
             {
                 Material material = new Material(Shader.Find("Standard"));
@@ -376,8 +362,6 @@ namespace UI
                     Debug.LogError("Invalid texture array or missing textures!");
                     return cube;
                 }
-                
-                
                 GameObject cubeLeft = cube.transform.Find("CubeLeft").gameObject;
                 GameObject cubeRight = cube.transform.Find("CubeRight").gameObject;
 
@@ -416,66 +400,20 @@ namespace UI
         public static void GenerateTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string logicalOperator)
         {
             string previousString = textLabel.text;
-            if (previousString == "Bird hides ") return;
             //Remove the new line
             string formattedText = cubeDescription.Replace("\n", " "); 
             if(previousString == "..." || previousString=="") //if it's the first cube
                 textLabel.text = formattedText;
             else
             {
-                if (formattedText.Contains("abracadabra"))
-                {
-                    formattedText = "user is pointing Box and is saying \"abracadabra\"";
-                }
                 textLabel.text = previousString + " "+ logicalOperator + " " + formattedText;
-                
             }
-                
-            
             
         }
         
         public static void RemoveTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string locution)
         {
             string input = textLabel.text;
-
-            /*int index = input.IndexOf(locutionToRemove, StringComparison.OrdinalIgnoreCase);
-
-            if (index != -1)
-            {
-                // Trova l'indice della locuzione da eliminare
-                int phraseIndex = input.IndexOf(cubeDescription, StringComparison.OrdinalIgnoreCase);
-
-                if (phraseIndex != -1)
-                {
-                    if (phraseIndex < index)
-                    {
-                        // Se la locuzione da eliminare è presente prima della locuzione da rimuovere,
-                        // rimuoviamo entrambe le locuzioni dalla stringa di input
-                        input = input.Remove(phraseIndex, cubeDescription.Length).TrimStart(' ');
-                        input = input.Remove(0, index + locutionToRemove.Length).TrimStart(' ');
-                        textLabel.text = input;
-                    }
-                    else
-                    {
-                        // Se la locuzione da rimuovere viene trovata prima della locuzione da eliminare,
-                        // rimuoviamo solo la locuzione da rimuovere dalla stringa di input
-                        input = input.Remove(index, locutionToRemove.Length).TrimStart(' ');
-                        textLabel.text = input;
-                    }
-                }
-            }
-            else
-            {
-                // Se la locuzione da rimuovere non viene trovata, ma la frase da eliminare è presente nella stringa di input,
-                // restituiamo una stringa vuota
-                int phraseIndex = input.IndexOf(cubeDescription, StringComparison.OrdinalIgnoreCase);
-                if (phraseIndex != -1)
-                {
-                    input = "...";
-                    textLabel.text = input;
-                }
-            }*/
             
             int locutionIndex = input.IndexOf(locution, StringComparison.OrdinalIgnoreCase);
             int phraseIndex = input.IndexOf(cubeDescription, StringComparison.OrdinalIgnoreCase);
@@ -497,19 +435,6 @@ namespace UI
                     textLabel.text = input;
                 }
             }
-
-            /*int index = previousString.IndexOf(cubeDescription);
-            if (index >= 0)
-            {
-                //Remove the cube description
-                previousString = previousString.Remove(index, cubeDescription.Length);
-                //Remove the logical operator AND or OR
-                int indexOfLogicalOperator = previousString.IndexOf(logicalOperator);
-                if (indexOfLogicalOperator >= 0)
-                    previousString = previousString.Remove(indexOfLogicalOperator - 1, logicalOperator.Length + 1);
-                /*previousString = previousString.Remove(index - 3, logicalOperator.Length + 3);#1#
-                textLabel.text = previousString;
-            }*/
         }
 
         public static void FillTextLabelsInCube(ECAEvent e, GameObject cube)
@@ -517,10 +442,6 @@ namespace UI
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
             string[] labelTexts = { e.Subject, e.Verb + " " + e.Event, e.Object };
-            if (e.Event == "stops")
-            {
-                labelTexts[1] = e.Event + " " + e.Verb;
-            }
 
             switch (e.Modality)
             {
@@ -546,6 +467,10 @@ namespace UI
                 case InteractionCreationController.Modalities.Headgaze:
                     labelTexts[1] = "looks at"; //3rd person for reading
                     break;
+            }
+            if (e.Event == "stops")
+            {
+                labelTexts[1] = e.Event + " " + e.Verb;
             }
 
             // Loop through each face and fill the text labels
