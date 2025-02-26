@@ -11,19 +11,10 @@ using Utils = UI.Utils;
 public class MergedCubeController : MonoBehaviour
 {
     private static bool timerStarted = false;
-    
-
-    public bool TimerStarted
-    {
-        get => timerStarted;
-        set => timerStarted = value;
-    }
-    
     public float minimumJoinTime = 2.0f; // Minimum time (in seconds) for the cubes to stay attached
     private float joinStartTime;
     
     private TextMeshProUGUI countdownText;
-    private ObjectManipulator objectManipulator;
     
     private void Start()
     {
@@ -42,10 +33,6 @@ public class MergedCubeController : MonoBehaviour
                 Debug.LogWarning("L'oggetto con tag 'debugText' è inattivo.");
             }
         }
-        
-        objectManipulator = GetComponent<ObjectManipulator>();
-        
-        
     }
 
     public void DetachCubes()

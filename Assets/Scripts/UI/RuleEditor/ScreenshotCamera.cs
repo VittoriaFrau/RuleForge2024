@@ -7,12 +7,10 @@ namespace UI.RuleEditor
     public class ScreenshotCamera:MonoBehaviour
     {
         private Camera secondaryCamera, mainCamera;
-
         public GameObject interactablesContainer;
         public int resWidth = 2550; 
         public int resHeight = 2550;
         private List<GameObject> interactableGameObjects;
-
         public List<Texture2D> screenshots;
 
         private void Start()
@@ -25,7 +23,6 @@ namespace UI.RuleEditor
         public void TakeModalityScreenshot(GameObject gameObject, InteractionCreationController.Modalities modality, ECAEvent ecaEvent)
         {
             GetInteractableGameObjects();
-            
             HideOtherGameobjects(gameObject);
             
             switch (modality)

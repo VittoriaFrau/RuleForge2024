@@ -467,7 +467,6 @@ namespace UI
             cubeCreatedEvents.AddRange(_actionEvents);
         }
 
-        // TODO why is here
         public void DeActivateRuleComposition()
         { 
             //Set the rule plate visible

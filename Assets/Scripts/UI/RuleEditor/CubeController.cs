@@ -32,7 +32,6 @@ public class CubeController : MonoBehaviour
     private float joinStartTime;
     public GameObject mergedCubePrefab;
     private RuleManager _ruleManager;
-    private ObjectManipulator objectManipulator;
     public GameObject scenarioMergedCubePrefab;
     private TextMeshProUGUI ruleDebugText;
     
@@ -55,9 +54,6 @@ public class CubeController : MonoBehaviour
                 Debug.LogWarning("L'oggetto con tag 'debugText' è inattivo.");
             }
         }
-        
-        objectManipulator = GetComponent<ObjectManipulator>();
-        
         
     }
 
@@ -206,41 +202,5 @@ public class CubeController : MonoBehaviour
         RenderTexture.ReleaseTemporary(tempRT);
         return copyTexture;
     }
-
-    /*public void DetachCubes()
-    {
-        // Remove the joint to detach the cubes
-        if (isAttached)
-        {
-            if (!timerStarted && countdownText != null)
-            {
-                // Start the countdown timer when collision starts
-                StartCoroutine(StartCountdownDetaching());
-            }
-            
-            if (Time.time - joinStartTime >= minimumJoinTime)
-            {
-                // Merge the cubes if the minimum join time has passed
-                Debug.Log("Detach cubes");
-            }
-        }
-        
-        isAttached = false;
-    }
-
-    private IEnumerator StartCountdownDetaching()
-    {
-        timerStarted = true;
-        float countdownTime = minimumJoinTime;
-        while (countdownTime > 0)
-        {
-            // Update the UI Text to show the countdown
-            countdownText.text = "Detaching in " + Mathf.CeilToInt(countdownTime) + " seconds";
-            yield return null;
-            countdownTime -= Time.deltaTime;
-        }
-
-        // Reset the countdown
-        timerStarted = false;
-    }*/
+    
 }

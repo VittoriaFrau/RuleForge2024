@@ -16,7 +16,6 @@ public class RepositionRulePlate : MonoBehaviour
     
     private PlateState _plateState;
     public ObjectManipulator rulePlateManipulator;
-    
     private BoundsControl _boundsController;
     private RuleManager _ruleManager;
     private Vector3 originalLocalPlatePosition = new (-14.4f, -119.0f, 774.0f);

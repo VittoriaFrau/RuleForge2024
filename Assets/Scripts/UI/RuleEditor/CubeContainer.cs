@@ -71,10 +71,8 @@ namespace UI.RuleEditor
                 isInstantiating = true;
                 ruleManager.DeactivateRuleDebugText();
                 PositionGameObjectInContainer(collision);
-                
                 CreateSequenceContainer();
                 ruleManager.AddContainer(rulePhase, this.gameObject);
-
 
                 if (rulePhase != RuleManager.RulePhase.Then)
                 {
@@ -82,19 +80,14 @@ namespace UI.RuleEditor
                     ruleManager.AddContainer(rulePhase, gameObject);
                 }
                 
-
                 currentCube = collision.gameObject;
 
                 collision.gameObject.GetComponent<ObjectManipulator>().enabled = true;
                 
                 //Update text
                 ruleManager.CalculateRuleText(collision.gameObject, rulePhase, true, containerType, id );
-                
                 StartCoroutine(ResetInstantiation());
-                
             }
-            
-            
         }
 
         private void FindRulePhase(Transform parent)
@@ -109,7 +102,6 @@ namespace UI.RuleEditor
                 {
                     rulePhase = RuleManager.RulePhase.Then; 
                 }
-
                 parent = parent.parent;
             }
         }
