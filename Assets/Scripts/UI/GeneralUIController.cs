@@ -9,16 +9,15 @@ namespace UI
     public class GeneralUIController: MonoBehaviour
     {
         private GameObject textGo;
-        /*public GameObject closeButton;*/
         public GameObject eventHandler;
         private EditModeController _editModeController;
         private InteractionCreationController _interactionCreationController;
+        private CombineRulesController _combineRulesController;
         public HandMenuManager handMenuManager;
         private Prototypation _prototypation;
         public bool isRecording = false;
         private GameObject _selectedObject;
         
-
         public enum UIState
         {
             Default,
@@ -47,6 +46,7 @@ namespace UI
             text = textGo.GetComponent<TextMeshProUGUI>();
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
+            _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
             DefaultState();
         }
 
@@ -66,7 +66,7 @@ namespace UI
                     _interactionCreationController.DeActivateNewInteraction();
                     break;
                 case UIState.RuleComposition:
-                    _interactionCreationController.DeActivateRuleComposition();
+                    _combineRulesController.DeActivateRuleComposition();
                     break;
             }
         }
@@ -111,6 +111,7 @@ namespace UI
             DeActivatePreviousState(UIState.RuleComposition);
             _uiState = UIState.RuleComposition;
             handMenuManager.HandleHandMenu(_uiState);
+            _combineRulesController.ActivateCombineRules();
         }
 
         public void SetSelectedObject(GameObject _selectedObject)

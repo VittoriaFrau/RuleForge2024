@@ -17,7 +17,7 @@ public class RepositionRulePlate : MonoBehaviour
     private PlateState _plateState;
     public ObjectManipulator rulePlateManipulator;
     private BoundsControl _boundsController;
-    private RuleManager _ruleManager;
+    private CombineRulesController _combineRulesController;
     private Vector3 originalLocalPlatePosition = new (-14.4f, -119.0f, 774.0f);
     private GameObject ruleEditorPlate;
     
@@ -29,12 +29,9 @@ public class RepositionRulePlate : MonoBehaviour
     {
         _plateState = PlateState.Default;
         
-        _ruleManager = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<RuleManager>();
-        
-        _ruleManager.DeactivateRuleDebugText();
-        
-        ruleEditorPlate = GameObject.FindGameObjectsWithTag("RuleUtils")
-            .ToList().Find(x=>x.name=="RuleEditorPlate");
+        _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
+        _combineRulesController.DeactivateRuleDebugText();
+        ruleEditorPlate = _combineRulesController.ruleEditorPlate;
         _boundsController = ruleEditorPlate.GetComponent<BoundsControl>();
         if(rulePlateManipulator==null) rulePlateManipulator = ruleEditorPlate.GetComponent<ObjectManipulator>();
         
@@ -52,7 +49,7 @@ public class RepositionRulePlate : MonoBehaviour
             rulePlateManipulator.enabled = true;
             _boundsController.enabled = true;
             _plateState = PlateState.Moving;
-            _ruleManager.ActivateDebugTextWithMessage("Moving the plate, click again the moving button to stop moving.");
+            _combineRulesController.ActivateDebugTextWithMessage("Moving the plate, click again the moving button to stop moving.");
             ChangeButtonAppearence(false);
         }
         else
@@ -70,7 +67,7 @@ public class RepositionRulePlate : MonoBehaviour
             _boundsController.enabled = false;
             _plateState = PlateState.Default;
 
-            _ruleManager.DeactivateRuleDebugText();
+            _combineRulesController.DeactivateRuleDebugText();
         }
        
     }

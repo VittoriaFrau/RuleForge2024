@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ECAPrototyping.RuleEngine;
+using JetBrains.Annotations;
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
@@ -42,6 +43,7 @@ namespace UI
         private Modalities _modality;
         private GeneralUIController generalUIController;
         public List<GameObject> modalitiesBubbles;
+        private bool bubblesVisible = true;
         public GameObject recordInteractionButton, stopInteractionButton;
         private RuleEngine _ruleEngine;
         
@@ -71,15 +73,13 @@ namespace UI
         
         //Recording
         private List<ECAEvent> _modalityEvents = new();
-
         private List<ECAEvent> _actionEvents = new();
+        // Create getters for modality and action events
+        public List<ECAEvent> ModalityEvents => _modalityEvents;
+        public List<ECAEvent> ActionEvents => _actionEvents;
+        
         //Opposite action events are used to revert the action when we go back to the previous state
         private List<Action> _oppositeActionEvents = new();
-        public GameObject ruleEditorPlate;
-        public GameObject modalityRuleCubePrefab;
-        public GameObject actionRuleCubePrefab;
-        public GameObject actionRuleCubePrefabVariant;
-        public GameObject cubePlate;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         public HandMenuManager handMenuManager;
@@ -90,21 +90,11 @@ namespace UI
         public TextMeshProUGUI CategoryLabel;
         public FontIconSelector CategoryIcon;
         public Image CategoryImage;
-        
-        //Rule composition
-        public GameObject removableBarrier;
-        private Dictionary<GameObject, Vector3> _originalPositions = new(); //positions of the cubes to easily revert it
-        public TextMeshProUGUI whenText, thenText;
-        private RuleManager _ruleManager;
-        private List<ECAEvent> cubeCreatedEvents = new();
 
         //Speech
         public GameObject MRTKSpeech;
         public GameObject microphone;
         private List<string> keywords = new() { "incendio", "leviosa", "change", "abracadabra" };
-
-        //TEST
-        /*private Test testScript;*/
         
         // Proximity
         public GameObject proximityCube;
@@ -115,10 +105,8 @@ namespace UI
             
             if(screenshotCamera != null) 
                 _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
-            _ruleManager = this.gameObject.GetComponent<RuleManager>();
             if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
             if(microphone.activeSelf) microphone.SetActive(false);
-            
             _ruleEngine = RuleEngine.GetInstance();
         }
 
@@ -165,7 +153,7 @@ namespace UI
 
         private void ActivateProximityModality()
         {
-            HideModalitiesBubble("Proximity");
+            HideModalityBubble("Proximity");
 
             //Show proximity cube
             proximityCube.SetActive(true);
@@ -216,7 +204,7 @@ namespace UI
             });
             
             //Disappear the Bubble of the modality
-            HideModalitiesBubble("Headgaze");
+            HideModalityBubble("Headgaze");
         }
 
         private void DeActivateHeadGazeModality()
@@ -279,7 +267,7 @@ namespace UI
             LeftHand.GetComponent<SkinnedMeshRenderer>().material = shiningTouchMaterial;
             
             //Disappear the Bubble of the modality
-            HideModalitiesBubble("Touch");
+            HideModalityBubble("Touch");
             
             //Microgesture listener
             /*
@@ -303,7 +291,7 @@ namespace UI
             leftHandLaserPointerLineRenderer.material = shiningLaserMaterial;
 
             //Disappear the Bubble of the modality
-            HideModalitiesBubble("Laser");
+            HideModalityBubble("Laser");
         }
         
         public void SetLaserPointLineWidth(float width)
@@ -332,7 +320,7 @@ namespace UI
         public void ActivateSpeechModality()
         {
             microphone.SetActive(true);
-            HideModalitiesBubble("Speech");
+            HideModalityBubble("Speech");
             generalUIController.SetDebugText("Speak to the microphone");
             
             // if not in unity editor, start the socket
@@ -369,11 +357,12 @@ namespace UI
             {
                 go.SetActive(false);
             }
+            bubblesVisible = false;
         }
         
-        public void HideModalitiesBubble(string modality)
+        public void HideModalityBubble(string modalityName)
         {
-            GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == modality);
+            GameObject go = modalitiesBubbles.FirstOrDefault(obj => obj.name == modalityName);
             go.SetActive(false);
         }
         
@@ -391,6 +380,7 @@ namespace UI
                     go.SetActive(true);
                 }
             }
+            bubblesVisible = true;
         }
         public void ShowBubblesExceptSelectedModality()
         {
@@ -429,54 +419,6 @@ namespace UI
             }
 
 
-        }
-
-        public void ActivateCombineRulesMode()
-        {
-            /*if (_modalityEvents.Count == 0 && _actionEvents.Count == 0)
-            {
-                generalUIController.SetDebugText("No recorded actions, please use the record button to record actions");
-                return;
-            }
-                
-            generalUIController.CombineRulesState();*/
-            
-            //Set the rule plate visible
-            ruleEditorPlate.SetActive(true);
-            
-            //Barrier to prevent the cubes from falling
-            removableBarrier.SetActive(true);
-
-            //Generate the cubes using the list of events
-            _originalPositions.Clear();
-            
-            //scenario
-            ECAEvent ecaEvent = new ECAEvent(GameObject.FindGameObjectWithTag("Bird"), Modalities.Proximity, "is near to", "Box");
-            
-            if(!_modalityEvents.Contains(ecaEvent)){ _modalityEvents.Add(ecaEvent);}
-            
-            _originalPositions = Utils.GenerateCubesFromEventList(_modalityEvents, _actionEvents, 
-                modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate, cubeCreatedEvents);
-
-            removableBarrier.SetActive(false);
-            
-            _ruleManager.InitializeVariables();
-            
-            //Add to the list of created cubes, the cubes that are already in the scene
-            cubeCreatedEvents.AddRange(_modalityEvents);
-            cubeCreatedEvents.AddRange(_actionEvents);
-        }
-
-        public void DeActivateRuleComposition()
-        { 
-            //Set the rule plate visible
-            ruleEditorPlate.SetActive(false);
-            
-            //Barrier to prevent the cubes from falling
-            removableBarrier.SetActive(false);
-            
-            generalUIController.UIstate = GeneralUIController.UIState.Default;
-            generalUIController.DefaultState();
         }
 
         public void StartRecording()
@@ -579,7 +521,6 @@ namespace UI
             }
         }
         
-
         public void DeActivateNewInteraction()
         {
             _modality = Modalities.None;
@@ -776,39 +717,7 @@ namespace UI
                 }
             }
         }
-
-        public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
-        {
-            HideModalitiesBubbles();
-            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-            _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
-            //ShowModalitiesBubblesExceptModality();
-            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
-
-        }
-
-        public void ResetCubePositions()
-        {
-            //Repositioning the plate in case the user has moved it
-            ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);
-            
-            // Using the original position of the cube, position it again there
-            foreach (var k in _originalPositions)
-            {
-                k.Key.transform.position = k.Value;
-            }
-            Utils.ClearTextDescription(whenText, thenText);
-
-            Utils.ResetCubeContainers();
-        }
-
-        public void PrepareForActionScreenShot(GameObject gameObject)
-        {
-            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-            _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
-            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
-        }
-
+        
         public void PrepareCategoryMenu(GameObject gameObject)
         {
             string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
@@ -833,66 +742,20 @@ namespace UI
                 
         }
 
-        public void AutomaticCubePosition()
+        public void PrepareForActionScreenShot(GameObject gameObject)
         {
-            //Modality events
-            //Find all the gameobjects with tag RuleCubes and save to modalityCubes if the name contains "Modality"
-            List<GameObject> modalityCubes = GameObject.FindGameObjectsWithTag("RuleCubes").Where(obj => obj.name.Contains("Modality")).ToList();
-            //Position of the first cube container
-            Vector3 firstCubeContainerWhenLocalPosition = new Vector3(144f, 18f,-18f);
-            //Lista con i gameobject e l'indice che ne determina l'ordine di creazione dei cubi
-            List<Tuple<int, GameObject>> modalityCubesTuple = new();
-            
-            foreach (ECAEvent modality in _modalityEvents)
-            {
-                foreach (GameObject cube in modalityCubes)
-                {
-                    if(modality.CubeID == cube.GetInstanceID().ToString())
-                        modalityCubesTuple.Add(new Tuple<int, GameObject>(modality.Index, cube));
-                }
-            }
-            
-            //Scorro la lista di tuple e ordino i cubi in base all'indice
-            modalityCubesTuple = modalityCubesTuple.OrderBy(x => x.Item1).ToList();
-            
-            float xOffsetBetweenCubes = 50f; // Distanza fissa tra i cubi lungo l'asse x
-
-            
-            //Posiziono il primo cubo in firstCubeContainerLocalPosition e i successivi in base alla posizione del precedente
-            for (int i = 0; i < modalityCubesTuple.Count; i++)
-            {
-                GameObject cube = modalityCubesTuple[i].Item2;
-                cube.transform.localPosition = firstCubeContainerWhenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
-            }
-            
-            //Action events
-            //Find all the gameobjects with tag RuleCubes and save to modalityCubes if the name contains "Action"
-            List<GameObject> actionCubes = GameObject.FindGameObjectsWithTag("ActionRuleCube").Where(obj => obj.name.Contains("Action")).ToList();
-            //Position of the first cube container
-            Vector3 firstCubeContainerThenLocalPosition = new Vector3(144f, -83f,-21f);
-            //Lista con i gameobject e l'indice che ne determina l'ordine di creazione dei cubi
-            List<Tuple<int, GameObject>> actionCubesTuple = new();
-            
-
-            foreach (ECAEvent action in _actionEvents)
-            {
-                foreach (GameObject cube in actionCubes)
-                {
-                    if(action.CubeID == cube.GetInstanceID().ToString())
-                        actionCubesTuple.Add(new Tuple<int, GameObject>(action.Index, cube));
-                }
-            }
-            
-            //Scorro la lista di tuple e ordino i cubi in base all'indice
-            actionCubesTuple = actionCubesTuple.OrderBy(x => x.Item1).ToList();
-            
-            //Posiziono il primo cubo in firstCubeContainerLocalPosition e i successivi in base alla posizione del precedente
-            for (int i = 0; i < actionCubesTuple.Count; i++)
-            {
-                GameObject cube = actionCubesTuple[i].Item2;
-                cube.transform.localPosition = firstCubeContainerThenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
-            }
+            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
+            _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
+            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
         }
-
+        
+        public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
+        {
+            if(bubblesVisible) HideModalitiesBubbles();
+            handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
+            _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
+            if(bubblesVisible) ShowBubblesExceptSelectedModality();
+            handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
+        }
     }
 }

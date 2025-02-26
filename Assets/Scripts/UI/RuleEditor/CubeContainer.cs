@@ -6,17 +6,32 @@ using UnityEngine;
 
 namespace UI.RuleEditor
 {
+    public class CubeContainerClass
+    {
+        public int id;
+        public CombineRulesController.ContainerType containerType;
+        public CubeContainer cubeContainer;
+        public GameObject containerGo, cubeGo;
+
+        public CubeContainerClass(int id, CubeContainer cubeContainer)
+        {
+            this.id = id;
+            this.containerType = cubeContainer.containerType;
+            containerGo = cubeContainer.gameObject;
+            cubeGo = cubeContainer.currentCube;
+        }
+    }
     public class CubeContainer:MonoBehaviour
     {
         public int id; // Unique identifier of the container
         private GameObject modalityContainerPrefab, actionContainerPrefab;  // Prefab of the cube container to be instantiated
         private bool isInstantiating, isRemoving;   // Flag to prevent multiple instantiations on collision
-        public RuleManager.RulePhase rulePhase;    // Indicates whether the container belongs to "when" or "then" branch
+        public CombineRulesController.RulePhase rulePhase;    // Indicates whether the container belongs to "when" or "then" branch
         private GameObject equivalenceCubeContainer;   // Reference to the equivalence container for each cube container
         private string whenString, thenString;  // Current text contents of the "when" and "then" text objects
-        public RuleManager.ContainerType containerType;    // Indicates whether the container is equivalence (OR) or sequential
+        public CombineRulesController.ContainerType containerType;    // Indicates whether the container is equivalence (OR) or sequential
         private GameObject sequenceInstantiated, equivalenceInstantiated; // References to the instantiated containers
-        private RuleManager ruleManager;        // Reference to the RuleManager script
+        private CombineRulesController _combineRulesController;        // Reference to the CombineRulesController script
         public GameObject currentCube=null; //reference to the cube the gameobject contains
         
         private void Start()
@@ -24,7 +39,7 @@ namespace UI.RuleEditor
             //find if this instance is a child of a then or when
             Transform parent = gameObject.transform.parent;
 
-            if (rulePhase == RuleManager.RulePhase.None)
+            if (rulePhase == CombineRulesController.RulePhase.None)
             {
                 FindRulePhase(parent);
             }
@@ -40,26 +55,26 @@ namespace UI.RuleEditor
             containerType = transform.parent.name switch
             {
                 //Check if the parent of collision.gameobject is an equivalence or sequential container
-                "EquivalenceRow" => RuleManager.ContainerType.Equivalence,
-                "SequentialRow" => RuleManager.ContainerType.Sequential,
+                "EquivalenceRow" => CombineRulesController.ContainerType.Equivalence,
+                "SequentialRow" => CombineRulesController.ContainerType.Sequential,
                 _ => containerType
             };
 
-            ruleManager = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<RuleManager>();
+            _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
             
-            modalityContainerPrefab = ruleManager.modalityContainerPrefab;
-            actionContainerPrefab = ruleManager.actionContainerPrefab;
+            modalityContainerPrefab = _combineRulesController.modalityContainerPrefab;
+            actionContainerPrefab = _combineRulesController.actionContainerPrefab;
         }
 
         private void OnCollisionEnter(Collision collision)
         {
             //if the cube is a action cube and the container is a when container, return and viceversa
-            if (collision.gameObject.CompareTag("ActionRuleCube") && rulePhase == RuleManager.RulePhase.When)
+            if (collision.gameObject.CompareTag("ActionRuleCube") && rulePhase == CombineRulesController.RulePhase.When)
             {
                 return;
             }
             
-            if (collision.gameObject.CompareTag("RuleCubes") && rulePhase == RuleManager.RulePhase.Then)
+            if (collision.gameObject.CompareTag("RuleCubes") && rulePhase == CombineRulesController.RulePhase.Then)
             {
                 return;
             }
@@ -69,15 +84,15 @@ namespace UI.RuleEditor
             if ((collision.gameObject.CompareTag("RuleCubes") || collision.gameObject.CompareTag("ActionRuleCube")) && !isInstantiating)
             {
                 isInstantiating = true;
-                ruleManager.DeactivateRuleDebugText();
+                _combineRulesController.DeactivateRuleDebugText();
                 PositionGameObjectInContainer(collision);
                 CreateSequenceContainer();
-                ruleManager.AddContainer(rulePhase, this.gameObject);
+                _combineRulesController.AddContainer(rulePhase, this.gameObject);
 
-                if (rulePhase != RuleManager.RulePhase.Then)
+                if (rulePhase != CombineRulesController.RulePhase.Then)
                 {
                     CreateEquivalenceContainer();
-                    ruleManager.AddContainer(rulePhase, gameObject);
+                    _combineRulesController.AddContainer(rulePhase, gameObject);
                 }
                 
                 currentCube = collision.gameObject;
@@ -85,7 +100,7 @@ namespace UI.RuleEditor
                 collision.gameObject.GetComponent<ObjectManipulator>().enabled = true;
                 
                 //Update text
-                ruleManager.CalculateRuleText(collision.gameObject, rulePhase, true, containerType, id );
+                _combineRulesController.CalculateRuleText(collision.gameObject, rulePhase, true, containerType, id );
                 StartCoroutine(ResetInstantiation());
             }
         }
@@ -96,11 +111,11 @@ namespace UI.RuleEditor
             {
                 if (parent.name == "When")
                 {
-                    rulePhase = RuleManager.RulePhase.When;
+                    rulePhase = CombineRulesController.RulePhase.When;
                     break;
                 } if (parent.name == "Then")
                 {
-                    rulePhase = RuleManager.RulePhase.Then; 
+                    rulePhase = CombineRulesController.RulePhase.Then; 
                 }
                 parent = parent.parent;
             }
@@ -123,10 +138,10 @@ namespace UI.RuleEditor
                 isRemoving = true;
                 Destroy(equivalenceInstantiated);
                 Destroy(sequenceInstantiated);
-                ruleManager.RemoveContainer(rulePhase);
-                ruleManager.RemoveContainer(rulePhase);
+                _combineRulesController.RemoveContainer(rulePhase);
+                _combineRulesController.RemoveContainer(rulePhase);
                 currentCube = null;
-                ruleManager.CalculateRuleText(collision.gameObject, rulePhase, false, containerType, id);
+                _combineRulesController.CalculateRuleText(collision.gameObject, rulePhase, false, containerType, id);
             }
 
             StartCoroutine(ResetInstantiation());
@@ -152,7 +167,7 @@ namespace UI.RuleEditor
         private void CreateSequenceContainer()
         {
             //Modality or action container
-            GameObject containerPrefab = rulePhase == RuleManager.RulePhase.When ? modalityContainerPrefab : actionContainerPrefab;
+            GameObject containerPrefab = rulePhase == CombineRulesController.RulePhase.When ? modalityContainerPrefab : actionContainerPrefab;
             //Create a new instance of the container in the sequence position
             sequenceInstantiated = Instantiate(containerPrefab);
             sequenceInstantiated.transform.parent = transform.parent;
@@ -165,7 +180,7 @@ namespace UI.RuleEditor
         private void CreateEquivalenceContainer()
         {
             //Modality or action container
-            GameObject containerPrefab = rulePhase == RuleManager.RulePhase.When ? modalityContainerPrefab : actionContainerPrefab;
+            GameObject containerPrefab = rulePhase == CombineRulesController.RulePhase.When ? modalityContainerPrefab : actionContainerPrefab;
             //Create a new instance of the container in the equivalence position
             equivalenceInstantiated = Instantiate(containerPrefab);
             equivalenceInstantiated.transform.parent = equivalenceCubeContainer.transform;

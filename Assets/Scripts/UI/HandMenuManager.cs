@@ -110,7 +110,6 @@ namespace UI.RuleEditor
         
         public void ShowRuleCompositionMenu()
         {
-            rulePlateMenu.SetActive(true);
             debugPanel.SetActive(false);
             menuContentCanvas.SetActive(false);
         }

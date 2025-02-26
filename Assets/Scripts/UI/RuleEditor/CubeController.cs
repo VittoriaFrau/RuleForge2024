@@ -31,13 +31,13 @@ public class CubeController : MonoBehaviour
     public float minimumJoinTime = 2.0f; // Minimum time (in seconds) for the cubes to stay attached
     private float joinStartTime;
     public GameObject mergedCubePrefab;
-    private RuleManager _ruleManager;
+    private CombineRulesController _combineRulesController;
     public GameObject scenarioMergedCubePrefab;
     private TextMeshProUGUI ruleDebugText;
     
     private void Start()
     {
-        _ruleManager = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<RuleManager>();
+        _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
         
         GameObject debugTextObject = GameObject.FindGameObjectWithTag("debugText");
         // Verifica se l'oggetto è stato trovato e non è null
@@ -92,7 +92,7 @@ public class CubeController : MonoBehaviour
         {
             // Reset the countdown if the cubes are no longer colliding
             timerStarted = false;
-            _ruleManager.DeactivateRuleDebugText();
+            _combineRulesController.DeactivateRuleDebugText();
         }
     }
 
@@ -115,7 +115,7 @@ public class CubeController : MonoBehaviour
         while (countdownTime > 0)
         {
             // Update the UI Text to show the countdown
-            _ruleManager.ActivateDebugTextWithMessage("Merging in " + Mathf.CeilToInt(countdownTime) + " seconds");
+            _combineRulesController.ActivateDebugTextWithMessage("Merging in " + Mathf.CeilToInt(countdownTime) + " seconds");
             ruleDebugText.text = "Merging in " + Mathf.CeilToInt(countdownTime) + " seconds";
             yield return null;
             countdownTime -= Time.deltaTime;
@@ -123,7 +123,7 @@ public class CubeController : MonoBehaviour
 
         // Reset the countdown
         timerStarted = false;
-        _ruleManager.DeactivateRuleDebugText();
+        _combineRulesController.DeactivateRuleDebugText();
     }
 
     private void MergeCubes(GameObject otherCube)
@@ -158,7 +158,7 @@ public class CubeController : MonoBehaviour
             mergedCube.transform.localPosition = mergedPosition;
             mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);
 
-            _ruleManager.DeactivateRuleDebugText();
+            _combineRulesController.DeactivateRuleDebugText();
             
             Destroy(gameObject);
             Destroy(otherCube);
@@ -182,7 +182,7 @@ public class CubeController : MonoBehaviour
         ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);
         
         Utils.FillTextLabelsInMergedCubes(cube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
-        _ruleManager.DeactivateRuleDebugText();
+        _combineRulesController.DeactivateRuleDebugText();
         
         // Destroy both original cubes 
         Destroy(gameObject);

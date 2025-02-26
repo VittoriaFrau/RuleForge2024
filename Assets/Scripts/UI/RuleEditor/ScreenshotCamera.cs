@@ -38,9 +38,8 @@ namespace UI.RuleEditor
                 case InteractionCreationController.Modalities.Touch:
                     CaptureImageFromCamera(secondaryCamera, ecaEvent);
                     break;
+                //TODO: add proximity modality
             }
-
-            //TEST --> disattivato per il test perchè mostro un gameobject alla volta
             ShowGameobjects(gameObject);
         }
 

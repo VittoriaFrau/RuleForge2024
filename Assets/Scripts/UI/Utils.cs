@@ -162,7 +162,7 @@ namespace UI
                 {
                     if (e.Texture == null)
                     {
-                        e.Texture = LoadTextureFromFile("C:\\Users\\Contar\\RiderProjects\\RuleForge2024\\Assets\\Resources\\birdCollisionNear.PNG");
+                        Debug.LogError("Texture is null for event: " + e);
                     }
                     cube = InstantiateRuleCube(modalityCubePrefab, 1, 
                         staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
@@ -521,28 +521,31 @@ namespace UI
             {
                 labelTexts[1] = e.Event + " " + e.Verb;
             }
-            if (e.Modality == InteractionCreationController.Modalities.Microgesture)
+
+            switch (e.Modality)
             {
-                labelTexts[1] = e.Verb + " " + e.Event;
-                labelTexts[2] = "microgesture";
-            }else if (e.Modality == InteractionCreationController.Modalities.Touch)
-            {
-                labelTexts[1] = "touches"; //3rd person for reading
-            }
-            else if (e.Modality == InteractionCreationController.Modalities.Speech)
-            {
-                labelTexts[1] = "says"; //3rd person for reading
-                labelTexts[2] = "\""  + e.Event + "\""; //keyword
-            }
-            else if (e.Modality == InteractionCreationController.Modalities.Proximity)
-            {
-                labelTexts[0] = e.Subject;
-                labelTexts[1] = "is near to"; //3rd person for reading
-                labelTexts[2] = e.Object; 
-            }
-            else if (e.Modality == InteractionCreationController.Modalities.Laser)
-            {
-                labelTexts[1] = "points"; //3rd person for reading
+                case InteractionCreationController.Modalities.Microgesture:
+                    labelTexts[1] = e.Verb + " " + e.Event;
+                    labelTexts[2] = "microgesture";
+                    break;
+                case InteractionCreationController.Modalities.Touch:
+                    labelTexts[1] = "touches"; //3rd person for reading
+                    break;
+                case InteractionCreationController.Modalities.Speech:
+                    labelTexts[1] = "says"; //3rd person for reading
+                    labelTexts[2] = "\""  + e.Event + "\""; //keyword
+                    break; 
+                case InteractionCreationController.Modalities.Proximity:
+                    labelTexts[0] = e.Subject;
+                    labelTexts[1] = "is near to"; //3rd person for reading
+                    labelTexts[2] = e.Object;
+                    break;
+                case InteractionCreationController.Modalities.Laser:
+                    labelTexts[1] = "points"; //3rd person for reading
+                    break;
+                case InteractionCreationController.Modalities.Headgaze:
+                    labelTexts[1] = "looks at"; //3rd person for reading
+                    break;
             }
 
             // Loop through each face and fill the text labels
@@ -559,32 +562,6 @@ namespace UI
                 }
             }
         }
-
-        /*public static void FillTextLabelsInActionCubes(ECAEvent e, GameObject cube)
-        {
-            // Define the face names and text labels
-            string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
-            string[] labelTexts = { e.Subject, e.Verb + e.Object };
-
-            if (e.Object.Equals(String.Empty))
-            {
-                // Loop through each face and fill the text labels
-                foreach (string faceName in faceNames)
-                {
-                    TextMeshProUGUI[] faceLabels = GetTextLabelsInCube(cube, faceName);
-
-                    // Fill the text labels with the appropriate text
-                    for (int i = 0; i < faceLabels.Length; i++)
-                    {
-                        faceLabels[i].text = labelTexts[i];
-                    }
-                }
-            }
-            else
-            {
-                
-            }
-        }*/
 
         public static TextMeshProUGUI[] GetTextLabelsInCube(GameObject cube, string face)
         {
@@ -714,18 +691,6 @@ namespace UI
             {
                 if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
             }
-        }
-
-        //TODO: capire dove lo metto
-        public static ECAEvent GetActionFromButton(GameObject button, GameObject selectedGameobject)
-        {
-            //TODO add new Gador actions
-            
-            Action action = GetActionFromString(button.name, selectedGameobject);
-            
-            ECAEvent e = ConvertActionToECAEvent(action);
-            
-            return e;
         }
 
         //Returns the category of each gameobject. E.g. cube --> shape, cheese --> food
@@ -916,130 +881,7 @@ namespace UI
             return null;
         }
 
-        public static Action GetActionFromStringSliders(string s, GameObject SelectedObject, Slider volumeSlider, 
-            Slider lightSlider, Slider effectSlider,GameObject plane, GameObject _skybox, Light _mainlight)
-        {
-            switch (s)
-            {
-                case "Show":
-                   return new Action(SelectedObject, "shows");
-                
-                case "Hide":
-                    return (new Action(SelectedObject, "hides"));
-                
-                case "Delete":
-                    return (new Action(SelectedObject, "deleted"));
-                
-                case "GravityON":
-                    return (new Action(SelectedObject, "gravityON"));
-                
-                case "GravityOFF":
-                    return (new Action(SelectedObject, "gravityOFF"));
-                
-                case "red":
-                    ECAColor red = new ECAColor("red");
-                    return (new Action(SelectedObject, "changes", "color", "to", red));
-                
-                case "blue":
-                    ECAColor blue = new ECAColor("blue");
-                    return (new Action(SelectedObject, "changes", "color", "to", blue));
-                    
-                case "green":
-                    ECAColor green = new ECAColor("green");
-                    return (new Action(SelectedObject, "changes", "color", "to", green));
-                    
-                case "purple":
-                    ECAColor purple = new ECAColor("purple");
-                    return (new Action(SelectedObject, "changes", "color", "to", purple));
-                
-                //case "gray":
-                case "grey":
-                    ECAColor gray = new ECAColor("gray");
-                    return (new Action(SelectedObject, "changes", "color", "to", gray));                    
-                    
-                case "yellow":
-                    ECAColor yellow = new ECAColor("yellow");
-                    return (new Action(SelectedObject, "changes", "color", "to", yellow));
-                    
-                case "cyan":
-                    ECAColor cyan = new ECAColor("cyan");
-                    return (new Action(SelectedObject, "changes", "color", "to", cyan));                    
-                    
-                case "white":
-                    ECAColor white = new ECAColor("white");
-                    return (new Action(SelectedObject, "changes", "color", "to", white));
-                    
-                case "black":
-                    ECAColor black = new ECAColor("black");
-                    return (new Action(SelectedObject, "changes", "color", "to", black));
-                
-                case "WaveHand":
-                    return (new Action(SelectedObject, "waves hand"));
-                
-                case "Dance":
-                    return (new Action(SelectedObject, "dances"));
-                
-                case "TurnOnOff":
-                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
-
-                case "Volume":
-                    float volumeValue =  volumeSlider.Value;
-                    return (new Action(SelectedObject, "changes", "volume", "to", volumeValue));
-                
-                case "TurnOnLight":
-                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
-                
-                case "TurnOffLight":
-                    return (new Action(SelectedObject, "turns", ECABoolean.OFF));
-
-                case "Brightness":
-                    float lightValue =  lightSlider.Value;
-                    if (SelectedObject != null)
-                    {
-                        return (new Action(SelectedObject, "changes", "intensity", "to", lightValue));
-                    }
-                    else
-                    {
-                        return (new Action(_mainlight.gameObject, "changes", "intensity", "to", lightValue));
-                    }
-                
-                case "Floor_Grass":
-                    return (new Action(plane, "changes", "floor", "to", "Grass"));
-                
-                case "Floor_Rocks":
-                    return (new Action(plane, "changes", "floor", "to", "Rocks"));
-                
-                case "Floor_Wood":
-                    return (new Action(plane, "changes", "floor", "to", "Wood"));
-                
-                case "Floor_Sand":
-                    return (new Action(plane, "changes", "floor", "to", "Sand"));
-                
-                case "Skybox_Day":
-                    return (new Action(_skybox, "changes skybox","Day"));
-                
-                case "Skybox_Sunset":
-                    return (new Action(_skybox, "changes skybox", "Sunset"));
-                
-                case "Skybox_Night":
-                    return (new Action(_skybox, "changes skybox", "Night"));
-                
-                case "Skybox_Storm":
-                    return (new Action(_skybox, "changes skybox","Storm"));
-                
-                case "Intensity":
-                    float intensityValue =  effectSlider.Value;
-                    return (new Action(SelectedObject, "changes intensity", intensityValue));
-                
-                case "OpenDoor":
-                    return (new Action(SelectedObject, "opens"));
-                case "CloseDoor":
-                    return (new Action(SelectedObject, "closes"));
-
-            }
-
-            return null;
-        }
+        
 
 
         public static void SetStatusButton(bool active, GameObject button)
