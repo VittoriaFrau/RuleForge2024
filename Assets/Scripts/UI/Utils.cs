@@ -435,6 +435,18 @@ namespace UI
                     textLabel.text = input;
                 }
             }
+            
+            // Rimuove eventuale operatore logico rimasto all'inizio della stringa
+            if (input.StartsWith(locution, StringComparison.OrdinalIgnoreCase))
+            {
+                input = input.Substring(locution.Length).TrimStart(' ');
+            }
+            // Rimuove eventuale operatore logico rimasto alla fine della stringa
+            if (input.EndsWith(locution, StringComparison.OrdinalIgnoreCase))
+            {
+                input = input.Substring(0,input.Length-locution.Length).TrimEnd(' ');
+            }
+            textLabel.text = input;
         }
 
         public static void FillTextLabelsInCube(ECAEvent e, GameObject cube)

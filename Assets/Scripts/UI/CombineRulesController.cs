@@ -227,13 +227,20 @@ namespace UI
                         CubeContainerClass whenContainer = FindContainerById(id, whenContainers);
                         //Look in the when text for the cube description and remove it
                         Utils.RemoveTextFromCubePosition(whenText, formattedCubeDescription, logicalOperator);
+                        if (string.IsNullOrWhiteSpace(whenText.text) || whenText.text == logicalOperator)
+                        {
+                            whenText.text = "...";
+                        }
                         break;
                     case RulePhase.Then:
                         CubeContainerClass thenContainer = FindContainerById(id, thenContainers);
                         Utils.RemoveTextFromCubePosition(thenText, formattedCubeDescription, logicalOperator);
+                        if (string.IsNullOrWhiteSpace(thenText.text) || whenText.text == logicalOperator)
+                        {
+                            thenText.text = "...";
+                        }
                         break;
                 }
-                /*string ruleToRemove = */
             }
         }
         
