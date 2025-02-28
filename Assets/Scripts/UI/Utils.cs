@@ -383,7 +383,6 @@ namespace UI
 
             return cube;
         }
-        
 
         public static Vector3 CalculatePositionInPlate(float previousZ, int eventIndex)
         {
@@ -534,12 +533,29 @@ namespace UI
             return secondVerbText != null ? new[] { subject, verb, secondVerbText } : new[] { subject, verb };
         }
 
+        public static TextMeshProUGUI[] GetOrderedTextLabels(GameObject cube, string face)
+        {
+            TextMeshProUGUI[] faceLabels = GetTextLabelsInCube(cube, face);
+
+            return faceLabels.OrderBy(label =>
+            {
+                switch (label.text.ToLower())
+                {
+                    case "subject": return 0;
+                    case "verb": return 1;
+                    case "meanwhile": return 2;
+                    case "secondverb": return 3;
+                    case "object": return 4;
+                    default: return 5;
+                }
+            }).ToArray();
+        }
         
         public static void FillTextLabelsInMergedCubes(GameObject newCube, ECAEvent [] events)
         {
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
-            //string[] labelTexts = { events[0].Subject, events[0].Verb + " " + events[0].Event, events[0].Object, events[1].Verb + " " + events[1].Event, events[1].Object };
+            
             if (events[0].EventStr == null)
             {
                 events[0].EventStr = events[0].Verb;
@@ -552,18 +568,20 @@ namespace UI
                 if(events[1].EventStr == "says") events[1].EventStr = "is saying";
                 else if (events[1].EventStr == "points") events[1].EventStr = "is pointing";
             }
-            string[] labelTexts = { events[0].Subject,  events[0].EventStr + " " + events[0].ObjectStr, "meanwhile", events[1].EventStr + " " + events[1].ObjectStr };
+            
+            string[] labelTexts = { events[0].Subject, events[0].EventStr + " " + events[0].ObjectStr, "meanwhile", events[1].EventStr + " ", events[1].ObjectStr };
 
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
             {
-                TextMeshProUGUI[] faceLabels = GetTextLabelsInCube(newCube, faceName);
-
+                TextMeshProUGUI[] faceLabels = GetOrderedTextLabels(newCube, faceName);
+                
                 // Fill the text labels with the appropriate text
                 for (int i = 0; i < faceLabels.Length; i++)
                 {
                     faceLabels[i].text = labelTexts[i];
                 }
+                
             }
         }
 
@@ -807,10 +825,7 @@ namespace UI
 
             return null;
         }
-
         
-
-
         public static void SetStatusButton(bool active, GameObject button)
         {
             GameObject frontPlate = button.transform.Find("Frontplate").gameObject;

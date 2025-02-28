@@ -114,18 +114,22 @@ public class CubeController : MonoBehaviour
         // Finding the cubeplate by tag and then filtering the results by name
         GameObject cubePlate = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "CubePlate");
         
+        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject);
+        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);
+        
         if(mergedCubePrefab != null)
         {
             // Mark the other cube as attached to prevent double merge
             otherCube.GetComponent<CubeController>().isAttached = true;
             
-            GameObject mergedCube = Object.Instantiate(mergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
-            // set z to -36.8
+            GameObject mergedCube = Instantiate(mergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
+            
             mergedCube.transform.rotation = Quaternion.identity;
             mergedCube.transform.localScale = new Vector3(25, 25, 25);
             mergedCube.transform.localPosition = mergedPosition;
             mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);
-
+           
+            Utils.FillTextLabelsInMergedCubes(mergedCube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
             _combineRulesController.DeactivateRuleDebugText();
             
             Destroy(gameObject);
@@ -144,10 +148,9 @@ public class CubeController : MonoBehaviour
         otherCube.GetComponent<CubeController>().isAttached = true;
         
         GameObject cube = Utils.InstantiateRuleCube(mergedCubePrefab, 2, mergedPosition, cubePlate.transform, new []{copyTextureLeftCube, copyTextureRightCube});
-        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject);
-        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);
-        
+
         Utils.FillTextLabelsInMergedCubes(cube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
+
         _combineRulesController.DeactivateRuleDebugText();
         
         // Destroy both original cubes 
