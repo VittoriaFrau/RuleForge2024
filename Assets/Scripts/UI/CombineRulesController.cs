@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ECAPrototyping.RuleEngine;
+using MixedReality.Toolkit.SpatialManipulation;
 using TMPro;
 using UI.RuleEditor;
+using Unity.VisualScripting;
 using UnityEngine;
+using Action = ECAPrototyping.RuleEngine.Action;
+using EventBus = ECAPrototyping.RuleEngine.EventBus;
 
 namespace UI
 {
@@ -18,14 +23,14 @@ namespace UI
         private InteractionCreationController interactionCreationController;
         private GeneralUIController generalUIController;
         public GameObject cubePlate, modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
-        private GameObject whenSequentialRow, whenEquivalenceRow;
-        private GameObject thenSequentialRow;
+        public GameObject whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
         public enum ContainerType { Equivalence, Sequential }
         public enum RulePhase { When, Then, None }
         private List<CubeContainerClass> whenContainers;
         private List<CubeContainerClass> thenContainers;
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         public GameObject ruleDebugText, cubeHelp;
+        public GameObject interactables;
 
         
         private void Start()
@@ -166,25 +171,13 @@ namespace UI
                 .ToList().Find(x=>x.name=="WhenText").GetComponent<TextMeshProUGUI>();
             thenText = GameObject.FindGameObjectsWithTag("RuleText")
                 .ToList().Find(x=>x.name=="ThenText").GetComponent<TextMeshProUGUI>();
-
-            Transform when = GameObject.FindGameObjectsWithTag("RuleUtils").ToList()
-                .Find(x => x.name == "When").transform.Find("Frontplate").transform;
-            whenSequentialRow = when.Find("SequentialRow").gameObject;
-            whenEquivalenceRow = when.Find("EquivalenceRow").gameObject;
-            
-            Transform then = GameObject.FindGameObjectsWithTag("RuleUtils").ToList()
-                .Find(x => x.name == "Then").transform.Find("Frontplate").transform;
-            thenSequentialRow = then.Find("SequentialRow").gameObject;
-            
             
             //Adds the default containers
             whenContainers = new List<CubeContainerClass>();
             GameObject firstWhenContainer = whenSequentialRow.transform.Find("CubeContainer").gameObject;
-            //GameObject firstWhenCube = firstWhenContainer.GetComponent<CubeContainer>().currentCube;
             AddContainer(RulePhase.When, firstWhenContainer);
             thenContainers = new List<CubeContainerClass>();
             GameObject firstThenContainer = thenSequentialRow.transform.Find("ActionCubeContainer").gameObject;
-            //GameObject firstThenCube = firstThenContainer.GetComponent<CubeContainer>().currentCube;
             AddContainer(RulePhase.Then, firstThenContainer );
         }
 
@@ -287,6 +280,130 @@ namespace UI
             ruleDebugText.SetActive(false);
         }
     
+        
+        //WORK IN PROGRESS
+        public void CalculateRule()
+        {
+            Action eventRule = new Action();
+            eventRule.SetSubject(GameObject.FindGameObjectWithTag("Player"));
+            eventRule.SetActionMethod("points");
+            eventRule.SetObject(GameObject.Find("Cube"));
+            List<Action> actionRule = new List<Action>();
+            EventBus eventBus = EventBus.GetInstance();
+            
+            RuleEngine ruleEngine = RuleEngine.GetInstance();
+            
+            // Find all the gameobjects called CubeContainer and select those with the Current cube not null
+            //TODO check transform.Find for null reference exceptions
+            CubeContainer[] whenContainers = whenSequentialRow.transform.Find("CubeContainer").gameObject.GetComponentsInChildren<CubeContainer>()
+                .Where(x => x.currentCube != null).ToArray();
+            whenContainers.AddRange(whenSequentialRow.transform.Find("CubeContainer(Clone)").gameObject.GetComponentsInChildren<CubeContainer>()
+                .Where(x => x.currentCube != null).ToArray());
+            CubeContainer [] equivalenceContainer = whenEquivalenceRow.transform.Find("CubeContainer(Clone)").gameObject.GetComponentsInChildren<CubeContainer>()
+                .Where(x => x.currentCube != null).ToArray();
+            CubeContainer[] thenContainers = thenSequentialRow.transform.Find("ActionCubeContainer").gameObject.GetComponentsInChildren<CubeContainer>()
+                .Where(x => x.currentCube != null).ToArray();
+
+            ECAEvent[] whenEvents = new ECAEvent[whenContainers.Length];
+            for (int i = 0; i < whenContainers.Length; i++)
+            {
+                ECAEvent ecaEvent = Utils.GetEventFromCube(whenContainers[i].currentCube, interactables);
+                whenEvents[i] = ecaEvent;
+            }
+            
+            ECAEvent[] equivalenceEvents = new ECAEvent[equivalenceContainer.Length];
+            for (int i = 0; i < equivalenceContainer.Length; i++)
+            {
+                ECAEvent ecaEvent = Utils.GetEventFromCube(equivalenceContainer[i].currentCube, interactables);
+                equivalenceEvents[i] = ecaEvent;
+            }
+            
+            ECAEvent[] thenEvents = new ECAEvent[thenContainers.Length];
+            for (int i = 0; i < thenContainers.Length; i++)
+            {
+                ECAEvent ecaEvent = Utils.GetEventFromCube(thenContainers[i].currentCube, interactables);
+                thenEvents[i] = ecaEvent;
+            }
+            
+            //let's imagine we only have one sequential event
+            ECAEvent whenEvent = whenEvents[0];
+            GameObject whenGameObject = whenEvent.GameObjectRef;
+            Action action1 = new Action(whenGameObject, "hides");
+            Action newAction = new Action(whenGameObject, "changes", "color", "to", "red");
+            Action newAction2 = new Action(whenGameObject, "changes", "color", "to", Color.yellow);
+
+
+            if (whenEvent.Modality == InteractionCreationController.Modalities.Touch)
+            {
+                ObjectManipulator manipulator = whenGameObject.GetComponent<ObjectManipulator>();
+                if(whenEvent.Verb.ToLower().Equals("clicks"))
+                {
+                    manipulator.OnClicked.AddListener (() =>
+                    {
+                        Debug.Log("Click event, publishing action");
+                        //eventBus.Publish(newAction);
+                        ruleEngine.ExecuteAction(action1);
+                        ruleEngine.ExecuteAction(newAction2);
+                        ruleEngine.ExecuteAction(newAction);
+                    });
+                }
+                else if(whenEvent.Verb.ToLower().Equals("selects"))
+                {
+                    manipulator.selectEntered.AddListener((interactor) =>
+                    {
+                        Debug.Log("Select entered, publishing action");
+                        ruleEngine.ExecuteAction(action1);
+                        ruleEngine.ExecuteAction(newAction2);
+                        ruleEngine.ExecuteAction(newAction);
+                    });
+                }
+                else if(whenEvent.Verb.ToLower().Equals("deselects"))
+                {
+                    manipulator.selectExited.AddListener((interactor) =>
+                    {
+                        Debug.Log("Select exited, publishing action");
+                        ruleEngine.ExecuteAction(action1);
+                        ruleEngine.ExecuteAction(newAction2);
+                        ruleEngine.ExecuteAction(newAction);
+                    });
+                }
+            }
+            
+            //ruleEngine.Add(ecaRule);
+            
+        }
+        
+        public void CreateListenerForEvent(ECAEvent ecaEvent)
+        {
+            switch (ecaEvent.Modality)
+            {
+                case InteractionCreationController.Modalities.None:
+                    return;
+                case InteractionCreationController.Modalities.Touch:
+                    // Filter which type of touch event
+                    string eventStrLower = ecaEvent.EventStr.ToLower();
+                    if (eventStrLower.StartsWith("clicks"))
+                    {
+                        //TODO
+                    }
+                    else if (eventStrLower.StartsWith("selects"))
+                    {
+                        //TODO
+                    }
+                    else // deselects
+                    {
+                        
+                    }
+                    break;
+                case InteractionCreationController.Modalities.Speech:
+                    //TODO
+                    break;
+                case InteractionCreationController.Modalities.Laser:
+                    break;
+                case InteractionCreationController.Modalities.Headgaze:
+                    break;
+            }
+        }
 
     }
 }

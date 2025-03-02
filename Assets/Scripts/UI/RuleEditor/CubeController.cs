@@ -20,10 +20,12 @@ public class CubeController : MonoBehaviour
     private float joinStartTime;
     public GameObject mergedCubePrefab;
     private CombineRulesController _combineRulesController;
+    private GameObject interactables;
     
     private void Start()
     {
         _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
+        interactables = _combineRulesController.interactables;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -114,8 +116,8 @@ public class CubeController : MonoBehaviour
         // Finding the cubeplate by tag and then filtering the results by name
         GameObject cubePlate = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "CubePlate");
         
-        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject);
-        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);
+        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject, interactables);
+        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube, interactables);
                 
         // Get the texture of a gameobject
         Texture textureLeftCube = gameObject.GetComponent<Renderer>().material.mainTexture;

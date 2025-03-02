@@ -306,7 +306,7 @@ namespace UI
             return go;
         }
 
-        public static ECAEvent GetEventFromCube(GameObject cube)
+        public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
         {
             ECAEvent e = new ECAEvent(cube);
             
@@ -331,8 +331,35 @@ namespace UI
             e.ObjectStr = objectFront.text;
             
             e.Texture = (Texture2D)cube.GetComponent<Renderer>().material.mainTexture;
+            
+            e.Modality = GetModalityFromVerb(e.Verb);
+            
+            e.GameObjectRef = interactables.transform.Find(e.ObjectStr).gameObject;
 
             return e;
+        }
+
+        public static InteractionCreationController.Modalities GetModalityFromVerb(string verb)
+        {
+            switch (verb)
+            {
+                case "says":
+                    return InteractionCreationController.Modalities.Speech;
+                case "is near to":
+                    return InteractionCreationController.Modalities.Proximity;
+                case "selects":
+                case "deselects":
+                case "clicks":
+                    return InteractionCreationController.Modalities.Touch;
+                case "points":
+                case "stops pointing": 
+                    return InteractionCreationController.Modalities.Laser;
+                case "looks":
+                case "stops looking":
+                    return InteractionCreationController.Modalities.Headgaze;
+            }
+
+            return InteractionCreationController.Modalities.None;
         }
 
         /*
@@ -595,9 +622,7 @@ namespace UI
         if (string.IsNullOrEmpty(verb)) return verb;
         
         // Handle special phrase cases
-        if (verb.ToLower() == "is") return "is being";
-
-        if (verb.StartsWith("stops")) return verb; //already an ing form
+        if (verb.StartsWith("stops") || verb.StartsWith("is")) return verb; //already an ing form
         
         // Handle common irregular cases
         Dictionary<string, string> irregularVerbs = new Dictionary<string, string>
