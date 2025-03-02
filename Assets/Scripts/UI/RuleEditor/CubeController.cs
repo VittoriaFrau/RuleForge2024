@@ -116,26 +116,6 @@ public class CubeController : MonoBehaviour
         
         ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject);
         ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube);
-        
-        if(mergedCubePrefab != null)
-        {
-            // Mark the other cube as attached to prevent double merge
-            otherCube.GetComponent<CubeController>().isAttached = true;
-            
-            GameObject mergedCube = Instantiate(mergedCubePrefab, mergedPosition, Quaternion.Euler(0f,0f,0f), cubePlate.transform);
-            
-            mergedCube.transform.rotation = Quaternion.identity;
-            mergedCube.transform.localScale = new Vector3(25, 25, 25);
-            mergedCube.transform.localPosition = mergedPosition;
-            mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);
-           
-            Utils.FillTextLabelsInMergedCubes(mergedCube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
-            _combineRulesController.DeactivateRuleDebugText();
-            
-            Destroy(gameObject);
-            Destroy(otherCube);
-            return;
-        }
                 
         // Get the texture of a gameobject
         Texture textureLeftCube = gameObject.GetComponent<Renderer>().material.mainTexture;
@@ -147,9 +127,14 @@ public class CubeController : MonoBehaviour
         // Mark the other cube as attached to prevent double merge
         otherCube.GetComponent<CubeController>().isAttached = true;
         
-        GameObject cube = Utils.InstantiateRuleCube(mergedCubePrefab, 2, mergedPosition, cubePlate.transform, new []{copyTextureLeftCube, copyTextureRightCube});
+        GameObject mergedCube = Utils.InstantiateRuleCube(mergedCubePrefab, 2, mergedPosition, cubePlate.transform, new []{copyTextureLeftCube, copyTextureRightCube});
 
-        Utils.FillTextLabelsInMergedCubes(cube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
+        mergedCube.transform.rotation = Quaternion.identity;
+        mergedCube.transform.localScale = new Vector3(25, 25, 25);
+        mergedCube.transform.localPosition = mergedPosition;
+        mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);
+
+        Utils.FillTextLabelsInMergedCubes(mergedCube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
 
         _combineRulesController.DeactivateRuleDebugText();
         
