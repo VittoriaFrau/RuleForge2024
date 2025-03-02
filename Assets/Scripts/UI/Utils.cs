@@ -323,7 +323,7 @@ namespace UI
             e.Verb = verbAndEvent[0];
             if (verbAndEvent.Length > 1)
             {
-                e.EventStr = verbAndEvent[1];
+                e.EventStr = verbAndEvent[0] + " " + verbAndEvent[1];
             }
             
                 

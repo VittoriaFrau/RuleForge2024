@@ -115,6 +115,7 @@
                 if(_modality != Modalities.None) DeActivateCurrentModality();
                 
                 _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
+                ShowModalitiesBubbles();
                 generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                        + " use your modality to interact with any object in the scene");
                     switch (_modality)
@@ -241,7 +242,6 @@
                     RemoveListener(go);
                 }
                 
-                ShowModalitiesBubbles();
                 generalUIController.SetDebugText("Selected modality: " + _modality 
                                                                        + " use your modality to interact with any object in the scene");
                 if(categoryMenu!=null) categoryMenu.SetActive(false);
@@ -629,7 +629,7 @@
                     if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                     
                     //Note: event should be added before starting the coroutine
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicked", null);
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicks", null);
                     if (!_modalityEvents.Contains(ecaEvent))
                     {
                         _modalityEvents.Add(ecaEvent);
