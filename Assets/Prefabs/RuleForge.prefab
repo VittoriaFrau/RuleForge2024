@@ -95233,6 +95233,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: 3771d9041bd68134287e4a1697cc77d0, type: 2}
+  recordMaterial: {fileID: 2100000, guid: 9fb2f9cbcdc06fc47a3a347705aa2f7d, type: 2}
+  proximityMaterial: {fileID: 2100000, guid: b1064f1a1c822b9458273217619a7e33, type: 2}
   _generalUIController: {fileID: 4290745511058819159}
   screenshotCamera: {fileID: 2871904776004708331}
   proximityScreenshot: {fileID: 0}

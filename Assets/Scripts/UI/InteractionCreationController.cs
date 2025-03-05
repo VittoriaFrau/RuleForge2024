@@ -159,15 +159,12 @@
                 //Show proximity cube
                 proximityCube.SetActive(true);
                 
-                // add istrigger to the box
                 // loop to the objects in the interactables
                 foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
-                    if (go.gameObject.name.Contains("Box"))
-                    {
-                        go.gameObject.GetComponent<BoxCollider>().isTrigger = true;
-                        Physics.SyncTransforms();
-                    }
+                    go.gameObject.GetComponent<BoxCollider>().isTrigger = false;
+                    Physics.SyncTransforms();
+                    
                 }
             }
             
@@ -463,6 +460,22 @@
                 {
                     generalUIController.SetDebugText("Recording started. Please, speak to the microphone");
                 }
+                if(_modality == Modalities.Proximity)
+                {
+                    //check if the proximity cube's isTrigger is true
+                    if (proximityCube.GetComponentsInChildren<BoxCollider>().FirstOrDefault().isTrigger)
+                    {
+                        //change the material of the proximity cube
+                        proximityCube.GetComponentsInChildren<ProximityCubeCollision>().FirstOrDefault()?.ChangeMaterial("record");
+                        generalUIController.SetDebugText("Recording started. Please, interact with the proximity cube");
+                    }
+                    else
+                    {
+                        generalUIController.SetDebugText("Please, set the proximity cube as trigger");
+                        return;
+                    }
+
+                }
                 else generalUIController.SetDebugText("Recording started. Please, interact with an object");
                 
                 if (_modality == Modalities.None)
@@ -496,6 +509,10 @@
                         break;
                     case Modalities.Speech:
                         AddSpeechListener();
+                        break;
+                    case Modalities.Proximity:
+                        AddProximityListener(manipulator);
+                        Debug.Log("Proximity listener added");
                         break;
                 }
                 
@@ -698,6 +715,11 @@
                         
                     }
                 }
+            }
+
+            private void AddProximityListener(ObjectManipulator manipulator)
+            {
+                //TODO add proximity listener
             }
             
             public void PrepareCategoryMenu(GameObject gameObject)
