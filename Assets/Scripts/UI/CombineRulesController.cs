@@ -31,12 +31,14 @@ namespace UI
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         public GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
+        private HandMenuManager handMenuManager;
 
         
         private void Start()
         {
             interactionCreationController = this.gameObject.GetComponent<InteractionCreationController>();
             generalUIController = this.gameObject.GetComponent<GeneralUIController>();
+            handMenuManager = generalUIController.handMenuManager;
         }
 
 
@@ -48,7 +50,9 @@ namespace UI
             if (_modalityEvents.Count == 0 && _actionEvents.Count == 0)
             {
                 generalUIController.SetDebugText("No recorded actions, please use the record button to record actions");
-                DeActivateRuleComposition();
+                handMenuManager.menuContentCanvas.SetActive(true);
+                handMenuManager.debugPanel.SetActive(true);
+                handMenuManager.mainMenu.SetActive(true);
                 return;
             }
             
