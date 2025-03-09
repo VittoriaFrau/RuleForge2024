@@ -8,6 +8,8 @@ namespace UI
 {
     public class GeneralUIController: MonoBehaviour
     {
+        public static GeneralUIController Instance;
+
         private GameObject textGo;
         public GameObject eventHandler;
         private EditModeController _editModeController;
@@ -38,6 +40,12 @@ namespace UI
         {
             get => _interactionCreationController;
             set => _interactionCreationController = value;
+        }
+        
+        void Awake()
+        {
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
         }
         
         private void Start()

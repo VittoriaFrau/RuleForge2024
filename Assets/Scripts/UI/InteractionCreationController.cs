@@ -138,7 +138,7 @@
                     }
                 
                 //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
-                if (generalUIController.isRecording)
+                if (GeneralUIController.Instance.isRecording)
                 {
                     RecordInteraction();
                 }
@@ -162,9 +162,18 @@
                 // loop to the objects in the interactables
                 foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
-                    go.gameObject.GetComponent<BoxCollider>().isTrigger = false;
-                    Physics.SyncTransforms();
-                    
+                    //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
+                    if (go.gameObject.GetComponent<Collider>() != null)
+                    {
+                        go.gameObject.GetComponent<Collider>().isTrigger = true;
+                        // block the object in the position otherwise it will fall
+                        Rigidbody rb = go.gameObject.GetComponent<Rigidbody>();
+                        rb.isKinematic = true;
+                        rb.useGravity = false;
+                        rb.constraints = RigidbodyConstraints.FreezeRotation;
+                        
+                        Physics.SyncTransforms();
+                    }
                 }
             }
             
@@ -391,7 +400,7 @@
 
             public void StopRecording()
             {
-                generalUIController.isRecording = false;
+                GeneralUIController.Instance.isRecording = false;
                 screenshotCamera.SetActive(false);
 
                 generalUIController.SetDebugText("Recording stopped.");
@@ -420,7 +429,7 @@
 
             public void StartRecording()
             {
-                generalUIController.isRecording = true;
+                GeneralUIController.Instance.isRecording = true;
                 
                 switch (generalUIController.UIstate)
                 {
@@ -462,7 +471,9 @@
                 }
                 if(_modality == Modalities.Proximity)
                 {
-                    //check if the proximity cube's isTrigger is true
+                    generalUIController.SetDebugText("Recording started. Please, use the proximity cube as trigger");
+
+                    /*//check if the proximity cube's isTrigger is true
                     if (proximityCube.GetComponentsInChildren<BoxCollider>().FirstOrDefault().isTrigger)
                     {
                         //change the material of the proximity cube
@@ -473,7 +484,7 @@
                     {
                         generalUIController.SetDebugText("Please, set the proximity cube as trigger");
                         return;
-                    }
+                    }*/
 
                 }
                 else generalUIController.SetDebugText("Recording started. Please, interact with an object");
@@ -512,7 +523,6 @@
                         break;
                     case Modalities.Proximity:
                         AddProximityListener(manipulator);
-                        Debug.Log("Proximity listener added");
                         break;
                 }
                 
@@ -585,14 +595,6 @@
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
                     }
                 });
-            }
-
-            public void ProximityEvent(ECAEvent ecaEvent)
-            {
-                if (!_modalityEvents.Contains(ecaEvent))
-                {
-                    _modalityEvents.Add(ecaEvent);
-                }
             }
             
             private void AddLaserListener(ObjectManipulator manipulator)
@@ -704,7 +706,7 @@
                             AddListener(() =>
                             {
                                 generalUIController.SetDebugText("You said " + keyword);
-                                if (generalUIController.isRecording)
+                                if (GeneralUIController.Instance.isRecording)
                                 {
                                     //Generate ecaevent
                                     ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, keyword, 
@@ -719,7 +721,23 @@
 
             private void AddProximityListener(ObjectManipulator manipulator)
             {
-                //TODO add proximity listener
+                proximityCube.GetComponentInChildren<ObjectManipulator>().enabled = false;
+                
+                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
+                    if (go.gameObject.GetComponent<Collider>() != null)
+                    {
+                        go.gameObject.GetComponent<Collider>().isTrigger = false;
+                        // block the object in the position otherwise it will fall
+                        Rigidbody rb = go.gameObject.GetComponent<Rigidbody>();
+                        rb.isKinematic = false;
+                        rb.useGravity = true;
+                        rb.constraints = RigidbodyConstraints.None;
+                        
+                        Physics.SyncTransforms();
+                    }
+                }
             }
             
             public void PrepareCategoryMenu(GameObject gameObject)

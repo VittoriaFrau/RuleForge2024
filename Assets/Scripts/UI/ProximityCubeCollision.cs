@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace UI
 {
+    // Component attached to the proximity cube
     public class ProximityCubeCollision : MonoBehaviour
     {
         private Material currentMaterial;
@@ -23,12 +24,12 @@ namespace UI
         private GameObject eventHandler;
         private InteractionCreationController _interactionCreationController;
         public List<GameObject> interactingObjects;
+        private GameObject ProximityGameObject1, ProximityGameObject2;
 
         private void Start()
         {
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
-            _generalUIController = eventHandler.GetComponent<GeneralUIController>();
             rend = GetComponent<Renderer>();
             currentMaterial = rend.material;
         
@@ -56,51 +57,38 @@ namespace UI
                     break;
             }
         }
+        
 
-        private void OnCollisionEnter(Collision other)
-        {
-            Debug.Log(other.gameObject.name);
-        }
-
-        private void OnCollisionExit(Collision other)
-        {
-            Debug.Log(other.gameObject.name);
-        }
-
-        //TODO
         void OnTriggerEnter(Collider other)
         {
             //add to the list of interacting objects only if the object is an interactable object
+            //TODO: add tag?
             if (other.transform.IsChildOf(_interactionCreationController.interactables.transform))
             {
-                interactingObjects.Add(other.gameObject);
-                string material = interactingObjects.Count == 1 ? "highlight" :"proximity";
-                ChangeMaterial(material);
-                if (interactingObjects.Count > 1)
+                Debug.Log("isrecording: " + GeneralUIController.Instance.isRecording);
+                //TODO capire perchè è false
+                if (GeneralUIController.Instance.isRecording)
                 {
-                    _generalUIController.SetDebugText("The " + interactingObjects[1].name + " is near to the " + interactingObjects[0].name);
-                    string screenshotName = interactingObjects[1].name + interactingObjects[0].name + "collision";
-                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
-                }
-            }
-            
-            /*
-            if (other.gameObject.CompareTag("Bird"))
-            {
-                if(gameObject.name.Equals("Box"))
-                {
-                    other.gameObject.SetActive(false);
+                    if (other.gameObject != ProximityGameObject1)
+                    {
+                        ProximityGameObject2 = other.gameObject; //set the object to be used in the rule creation
+                        string screenshotName = interactingObjects[1].name + interactingObjects[0].name + "collision";
+                        _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
+                        Debug.Log("ProximityGameObject2: " + ProximityGameObject2.name);
+                        ChangeMaterial("highlight");
+                        _generalUIController.SetDebugText("The " + ProximityGameObject1.name + " is near to the " + ProximityGameObject2.name);
+                    }
                 }
                 else
                 {
-                    //Change the material with highlight material
-                    rend.material = highlightMaterial;
-                    _generalUIController.SetDebugText("The Bird is near to the Box");
-                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), "birdcollision");
+                    if (ProximityGameObject1 != null) return;
+                    ProximityGameObject1 = other.gameObject; //set the object to be used in the rule creation
+                    Debug.Log("ProximityGameObject1: " + ProximityGameObject1.name);
+                    ChangeMaterial("record");
+
                 }
-           
+                
             }
-            */
         }
 
         void OnTriggerExit(Collider other)

@@ -64,7 +64,7 @@ namespace ECAPrototyping.RuleEngine
                     {
                         GameObject eventHandler = GameObject.FindWithTag("EventHandler");
                         GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
-                        if (generalUIController.isRecording)
+                        if (GeneralUIController.Instance.isRecording)
                         {
                             Action action = new Action(this.gameObject, "opens");
                             generalUIController.InteractionCreationController.SaveRecordedAction(action);
@@ -91,7 +91,7 @@ namespace ECAPrototyping.RuleEngine
                 {
                     GameObject eventHandler = GameObject.FindWithTag("EventHandler");
                     GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
-                    if (generalUIController.isRecording)
+                    if (GeneralUIController.Instance.isRecording)
                     {
                         Action action = new Action(this.gameObject, "closes");
                         generalUIController.InteractionCreationController.SaveRecordedAction(action);

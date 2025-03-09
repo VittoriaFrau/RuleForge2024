@@ -81,7 +81,7 @@ namespace UI
             _ruleEngine.ExecuteAction(action);
             
             // If I'm recording, I need to save the action
-            if (generalUIController.isRecording)
+            if (GeneralUIController.Instance.isRecording)
             {
                 generalUIController.InteractionCreationController.SaveRecordedAction(action);
             }
