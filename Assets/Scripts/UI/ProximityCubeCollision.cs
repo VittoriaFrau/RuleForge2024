@@ -62,21 +62,20 @@ namespace UI
         void OnTriggerEnter(Collider other)
         {
             //add to the list of interacting objects only if the object is an interactable object
-            //TODO: add tag?
-            if (other.transform.IsChildOf(_interactionCreationController.interactables.transform))
+            if (other.CompareTag("Interactable"))
             {
                 Debug.Log("isrecording: " + GeneralUIController.Instance.isRecording);
-                //TODO capire perchè è false
                 if (GeneralUIController.Instance.isRecording)
                 {
+                    ChangeMaterial("record");
                     if (other.gameObject != ProximityGameObject1)
                     {
                         ProximityGameObject2 = other.gameObject; //set the object to be used in the rule creation
-                        string screenshotName = interactingObjects[1].name + interactingObjects[0].name + "collision";
+                        string screenshotName = ProximityGameObject1.name + ProximityGameObject2.name + "collision";
                         _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
                         Debug.Log("ProximityGameObject2: " + ProximityGameObject2.name);
-                        ChangeMaterial("highlight");
-                        _generalUIController.SetDebugText("The " + ProximityGameObject1.name + " is near to the " + ProximityGameObject2.name);
+                        ChangeMaterial("proximity");
+                        _generalUIController.SetDebugText("The " + ProximityGameObject2.name + " is near to the " + ProximityGameObject1.name);
                     }
                 }
                 else
@@ -84,7 +83,7 @@ namespace UI
                     if (ProximityGameObject1 != null) return;
                     ProximityGameObject1 = other.gameObject; //set the object to be used in the rule creation
                     Debug.Log("ProximityGameObject1: " + ProximityGameObject1.name);
-                    ChangeMaterial("record");
+                    ChangeMaterial("highlight");
 
                 }
                 
@@ -93,7 +92,7 @@ namespace UI
 
         void OnTriggerExit(Collider other)
         {
-            if (other.transform.IsChildOf(_interactionCreationController.interactables.transform))
+            if (other.CompareTag("Interactable"))
             {
                 ChangeMaterial("current");
             }

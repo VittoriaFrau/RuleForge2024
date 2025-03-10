@@ -34612,7 +34612,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 6679534885180054317}
         m_TargetAssemblyTypeName: UI.InteractionCreationController, Assembly-CSharp
-        m_MethodName: RecordInteraction
+        m_MethodName: StartRecording
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -95238,6 +95238,7 @@ MonoBehaviour:
   _generalUIController: {fileID: 4290745511058819159}
   screenshotCamera: {fileID: 2871904776004708331}
   proximityScreenshot: {fileID: 0}
+  interactingObjects: []
 --- !u!1 &6623025650087665186
 GameObject:
   m_ObjectHideFlags: 0

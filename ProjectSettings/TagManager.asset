@@ -18,6 +18,7 @@ TagManager:
   - Laser
   - Speech
   - Proximity
+  - Interactable
   layers:
   - Default
   - TransparentFX

@@ -297,6 +297,8 @@ namespace UI
             rigidbody.useGravity = true;
             
             go.name = prefabType;
+            
+            go.tag = "Interactable";
 
             ECAObject ecaObject = go.GetComponent<ECAObject>();
             ecaObject.isUsingGravity = ECABoolean.YES;
