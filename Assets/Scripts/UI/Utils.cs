@@ -296,7 +296,13 @@ namespace UI
             
             rigidbody.useGravity = true;
             
-            go.name = prefabType;
+            // Rename the istantiated object 
+            int sameTypeCount = 0;
+            foreach (Transform child in interactableTransform)
+            {
+                if (child.name.StartsWith(prefabType)) sameTypeCount++;
+            }
+            go.name = prefabType + sameTypeCount;
             
             go.tag = "Interactable";
 
