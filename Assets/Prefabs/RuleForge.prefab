@@ -95657,6 +95657,7 @@ MonoBehaviour:
   colorPalette: {fileID: 4608038252871778716}
   debugPanel: {fileID: 2274138254633824154}
   menuContentCanvas: {fileID: 6651988460665923547}
+  isUsingOculusLink: 0
 --- !u!1 &6651988460665923547
 GameObject:
   m_ObjectHideFlags: 0

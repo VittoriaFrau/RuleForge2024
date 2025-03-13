@@ -23,6 +23,11 @@ namespace UI.RuleEditor
         private GameObject eventHandler;
         private GeneralUIController generalUIController;
         public GameObject menuContentCanvas;
+        // Manual flag to detect the use of Oculus Link / Air Link during tests in the Editor.
+        // While running in Play mode inside the Editor, `Application.platform` always returns WindowsEditor,
+        // and the XRDisplaySubsystem is not immediately "running" in Start(), making it difficult to
+        // determine when the headset is actually active.
+        public bool isUsingOculusLink; 
         
         void Start()
         {
@@ -33,12 +38,17 @@ namespace UI.RuleEditor
             generalUIController = eventHandler.GetComponent<GeneralUIController>();
 
             //if in unity editor, move the menu closer to the camera
-            #if UNITY_EDITOR
-                GetComponent<HandConstraintPalmUp>().enabled = false;
-                Vector3 forwardOffset = _mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
-                Vector3 leftOffset = -_mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
-                transform.position = _mainCamera.transform.position + forwardOffset + leftOffset;
-            #endif
+            if ( Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                if (!isUsingOculusLink)
+                {
+                    GetComponent<HandConstraintPalmUp>().enabled = false;
+                    Vector3 forwardOffset = _mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
+                    Vector3 leftOffset = -_mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
+                    transform.position = _mainCamera.transform.position + forwardOffset + leftOffset;
+                }
+                
+            }
         }
 
         /// <summary>
