@@ -223,96 +223,123 @@ namespace UI
             return new Vector3(-5.3f, 0.0f, -16.3f);
         }
 
-        public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
+    public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
+    {
+        // Validation checks
+        if (string.IsNullOrEmpty(prefabType))
         {
-            // obtain prefab
-            GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+            Debug.LogError("PrefabType is null or empty!");
+            return null;
+        }
 
-            if (prefab == null)
+        if (mainCamera == null)
+        {
+            Debug.LogError("MainCamera is null!");
+            mainCamera = Camera.main;
+            if (mainCamera == null)
             {
-                Debug.LogError("Prefab not found!");
+                Debug.LogError("Cannot find main camera!");
                 return null;
             }
+        }
 
-            // instantiate prefab
-            // Find a floor object
+        if (interactableTransform == null)
+        {
+            Debug.LogError("InteractableTransform is null!");
+            return null;
+        }
+
+        // Get prefab
+        GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+        if (prefab == null)
+        {
+            Debug.LogError($"Prefab not found for type: {prefabType}");
+            return null;
+        }
+
+        // Calculate spawn position
+        Vector3 spawnPosition;
+        try
+        {
             GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
-
-            Vector3 spawnPosition;
-
-            // Determine spawn position
             if (floor != null)
             {
-                // Spawn the object 1 meter above the floor and 2 meters in front of the camera
-                Vector3 upwardOffset = Vector3.up * 1f; // 1 meter above the floor
-                Vector3 forwardOffset = mainCamera.transform.forward * 2f; // 2 meters in front of the camera
+                Vector3 upwardOffset = Vector3.up * 1f;
+                Vector3 forwardOffset = mainCamera.transform.forward * 2f;
                 spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
             }
             else
             {
-                // Spawn the object 2 meters in front of the camera
                 spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
+                Debug.LogWarning("Floor not found, using camera position as reference");
             }
-            
-            // Instantiate the object at the calculated position
-            GameObject go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error calculating spawn position: {e.Message}");
+            return null;
+        }
 
-            /*var transform1 = mainCamera.transform;
-            var go = Object.Instantiate(GetPrefabFromString(prefabType, prefabList),
-                transform1.position + transform1.forward * 2,
-                Quaternion.identity);
-            if (go.name.Contains("Cube"))
+        // Instantiate object
+        GameObject go = null;
+        try
+        {
+            go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            if (go == null)
             {
-                var localPosition = go.transform.localPosition;
-                localPosition = new Vector3(localPosition.x, 1.0011f, localPosition.z);
-                go.transform.localPosition = localPosition;
+                Debug.LogError("Failed to instantiate object!");
+                return null;
             }
 
-            if (go.name.Equals("Bird"))
-            {
-                go.transform.localRotation = new Quaternion.Euler(-90.0f, 0.0f, 180.0f);
-            }*/
-    
+            // Set parent
             go.transform.parent = interactableTransform;
-            
-            // Exceptions for some prefabs
-            /*if (go.name.Contains("Cube"))
-            { 
-                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 0.0011f, go.transform.localPosition.z);
-            }
-            else if (go.name.Contains("Bird"))
+
+            // Setup Rigidbody
+            Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
+            if (rigidbody == null)
             {
-                //go.transform.localRotation = Quaternion.Euler(-0.180f, 0.0f, 180.0f);
-                go.transform.localPosition = new Vector3(go.transform.localPosition.x, 0.0011f, -5.21f);
-                go.transform.Rotate(new Vector3(-90.0f, 0.0f, 180.0f));
+                rigidbody = go.AddComponent<Rigidbody>();
+                Debug.Log($"Added Rigidbody to {go.name}");
             }
-            else if (go.name.Contains("Box"))
-            {
-                go.transform.localPosition = new Vector3(0.69f, 0.194f, -5.21f);
-            }*/
-    
-            Rigidbody rigidbody = go.GetComponent<Rigidbody>();
-            if(rigidbody == null) rigidbody = go.GetComponentInChildren<Rigidbody>();
-            
+
             rigidbody.useGravity = true;
-            
-            // Rename the istantiated object 
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+
+            // Rename object
             int sameTypeCount = 0;
             foreach (Transform child in interactableTransform)
             {
                 if (child.name.StartsWith(prefabType)) sameTypeCount++;
             }
             go.name = prefabType + sameTypeCount;
-            
-            go.tag = "Interactable";
 
+            // Set tag and ECAObject component
+            go.tag = "Interactable";
             ECAObject ecaObject = go.GetComponent<ECAObject>();
-            ecaObject.isUsingGravity = ECABoolean.YES;
-            
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
-            return go;
+            if (ecaObject != null)
+            {
+                ecaObject.isUsingGravity = ECABoolean.YES;
+            }
+            else
+            {
+                Debug.LogWarning($"ECAObject component not found on {go.name}");
+                ecaObject = go.AddComponent<ECAObject>();
+                ecaObject.isUsingGravity = ECABoolean.YES;
+            }
         }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error during object instantiation: {e.Message}");
+            if (go != null)
+            {
+                Object.Destroy(go);
+            }
+            return null;
+        }
+
+        return go;
+    }
 
         public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
         {
