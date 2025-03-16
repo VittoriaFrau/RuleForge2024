@@ -133,33 +133,22 @@ namespace UI
             return result;
         }*/
         
-        public static Dictionary<GameObject, Vector3> GenerateCubesFromEventList(List<ECAEvent> _modalityEvents, 
-            List<ECAEvent> _actionEvents, GameObject modalityCubePrefab, GameObject actionCubePrefab, 
-            GameObject actionCubePrefabVariant, GameObject cubePlate, List<ECAEvent> cubeCreatedEvents)
+        public static void GenerateCubesFromEventList(List<ECAEvent> recordedEvents, 
+            GameObject modalityCubePrefab, GameObject actionCubePrefab, 
+            GameObject actionCubePrefabVariant, GameObject cubePlate)
         {
-            Dictionary<GameObject, Vector3> result = new Dictionary<GameObject, Vector3>();
-
-            // Combine the two lists
-            List<ECAEvent> allEvents = _modalityEvents
-                .Union(_actionEvents)
-                .Distinct()
-                .ToList();
-
 
             // Generate cubes for all events
             float previousZ = 1.41f;
             int i = 0;
-            foreach (var e in allEvents)
+            foreach (var e in recordedEvents)
             { 
-                if(cubeCreatedEvents.Contains(e)) continue;
                 //Vector3 position = CalculatePositionInPlate(previousZ, allEvents.IndexOf(e));
                 //previousZ = position.z;
                 Vector3 staticLocalPosition = CalculateStaticLocalPosition(i);
                 GameObject cube;
-
-                bool isModality = e.EventStr != null;
-
-                if (isModality)
+                
+                if (!e.IsActionEvent)
                 {
                     if (e.Texture == null)
                     {
@@ -171,13 +160,12 @@ namespace UI
                 else cube = InstantiateRuleCube(e.ObjectStr == null ? actionCubePrefabVariant : actionCubePrefab, 1, 
                     staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
 
-                result.Add(cube, staticLocalPosition);
-                e.CubeID = cube.GetInstanceID().ToString();
+                e.CubeID = cube.GetComponent<CubeController>().cubeID;
+                e.CubeInitialPosition = staticLocalPosition;
                 FillTextLabelsInCube(e, cube);
                 i++;
             }
 
-            return result;
         }
         
         public static Texture2D LoadTextureFromFile(string filename)
@@ -369,7 +357,7 @@ namespace UI
             
             e.Modality = GetModalityFromVerb(e.Verb);
             
-            e.GameObjectRef = interactables.transform.Find(e.ObjectStr).gameObject;
+            e.ObjectRef = interactables.transform.Find(e.ObjectStr).gameObject;
 
             return e;
         }
@@ -443,6 +431,8 @@ namespace UI
                 materialRight.mainTextureOffset = new Vector2(0.25f, 0.25f);
 
             }
+            
+            cube.GetComponent<CubeController>().cubeID = cube.GetInstanceID();
 
             return cube;
         }
@@ -825,6 +815,7 @@ namespace UI
         {
             ECAEvent e = new ECAEvent(action.GetSubject(), action.GetActionMethod());
             e.Action = action;
+            e.IsActionEvent = true;
             switch (action.GetActionType())
             {
                 case Action.ActionType.INVALID:

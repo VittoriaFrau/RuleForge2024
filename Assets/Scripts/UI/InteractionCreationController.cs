@@ -41,7 +41,6 @@
             }
             
             private Modalities _modality;
-            private GeneralUIController generalUIController;
             public List<GameObject> modalitiesBubbles;
             private bool bubblesVisible = true;
             public GameObject recordInteractionButton, stopInteractionButton;
@@ -72,14 +71,9 @@
             
             
             //Recording
-            private List<ECAEvent> _modalityEvents = new();
-            private List<ECAEvent> _actionEvents = new();
-            // Create getters for modality and action events
-            public List<ECAEvent> ModalityEvents => _modalityEvents;
-            public List<ECAEvent> ActionEvents => _actionEvents;
-            
             //Opposite action events are used to revert the action when we go back to the previous state
             private List<Action> _oppositeActionEvents = new();
+            
             public GameObject screenshotCamera;
             private ScreenshotCamera _screenshotCamera;
             public HandMenuManager handMenuManager;
@@ -101,8 +95,6 @@
 
             private void Start()
             {
-                generalUIController = this.gameObject.GetComponent<GeneralUIController>();
-                
                 if(screenshotCamera != null) 
                     _screenshotCamera =screenshotCamera.GetComponent<ScreenshotCamera>();
                 if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
@@ -116,7 +108,7 @@
                 
                 _modality = (Modalities) Enum.Parse(typeof(Modalities), modality);
                 ShowModalitiesBubbles();
-                generalUIController.SetDebugText("Selected modality: " + _modality 
+                GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality 
                                                                        + " use your modality to interact with any object in the scene");
                     switch (_modality)
                     {
@@ -143,13 +135,6 @@
                     RecordInteraction();
                 }
                 
-            }
-
-            public void ClearEventLists()
-            {
-                _modalityEvents.Clear();
-                _actionEvents.Clear();
-                _oppositeActionEvents.Clear();
             }
 
             private void ActivateProximityModality()
@@ -248,7 +233,7 @@
                     RemoveListener(go);
                 }
                 
-                generalUIController.SetDebugText("Selected modality: " + _modality 
+                GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality 
                                                                        + " use your modality to interact with any object in the scene");
                 if(categoryMenu!=null) categoryMenu.SetActive(false);
             }
@@ -327,7 +312,7 @@
             {
                 microphone.SetActive(true);
                 HideModalityBubble("Speech");
-                generalUIController.SetDebugText("Speak to the microphone");
+                GeneralUIController.Instance.SetDebugText("Speak to the microphone");
                 
                 // if not in unity editor, start the socket
                 #if !UNITY_EDITOR
@@ -403,7 +388,7 @@
                 GeneralUIController.Instance.isRecording = false;
                 screenshotCamera.SetActive(false);
 
-                generalUIController.SetDebugText("Recording stopped.");
+                GeneralUIController.Instance.SetDebugText("Recording stopped.");
                 
                if (categoryMenu != null)
                {
@@ -411,11 +396,11 @@
                        categoryMenu.SetActive(false);
                }
                
-                if (generalUIController.UIstate == GeneralUIController.UIState.NewInteraction)
+                if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.NewInteraction)
                 {
                     DeActivateCurrentModality();
                     HideModalitiesBubbles();
-                } else if (generalUIController.UIstate == GeneralUIController.UIState.EditMode)
+                } else if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.EditMode)
                 {
                     //The changes during the recording have to be reverted
                     foreach (var action in _oppositeActionEvents)
@@ -431,7 +416,7 @@
             {
                 GeneralUIController.Instance.isRecording = true;
                 
-                switch (generalUIController.UIstate)
+                switch (GeneralUIController.Instance.UIstate)
                 {
                     case GeneralUIController.UIState.NewInteraction:
                         RecordInteraction();
@@ -444,21 +429,22 @@
 
             public void RecordAction()
             {
-                generalUIController.SetDebugText("Recording started.");
-                ClearEventLists();
+                GeneralUIController.Instance.SetDebugText("Recording started.");
+                GeneralUIController.Instance.ClearRecordedEvents();
+                _oppositeActionEvents.Clear();
             }
             
             public void SaveRecordedAction(Action action)
             {
                 ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
-                GameObject selectedObject = generalUIController.GetSelectedObject();
-                if (!_actionEvents.Contains(ecaEvent))
+                GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
+                if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 {
                     Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
                     _oppositeActionEvents.Add(oppositeAction);
-                    _actionEvents.Add(ecaEvent);
+                    GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                     Debug.Log("Saved action: " + ecaEvent);
-                    generalUIController.SetDebugText(ecaEvent.ToString());
+                    GeneralUIController.Instance.SetDebugText(ecaEvent.ToString());
                     PrepareForActionScreenShot(selectedObject);
                 }
             }
@@ -467,11 +453,11 @@
             {
                 if (_modality == Modalities.Speech)
                 {
-                    generalUIController.SetDebugText("Recording started. Please, speak to the microphone");
+                    GeneralUIController.Instance.SetDebugText("Recording started. Please, speak to the microphone");
                 }
                 if(_modality == Modalities.Proximity)
                 {
-                    generalUIController.SetDebugText("Recording started. Please, use the proximity cube as trigger");
+                    GeneralUIController.Instance.SetDebugText("Recording started. Please, use the proximity cube as trigger");
 
                     /*//check if the proximity cube's isTrigger is true
                     if (proximityCube.GetComponentsInChildren<BoxCollider>().FirstOrDefault().isTrigger)
@@ -487,12 +473,12 @@
                     }*/
 
                 }
-                else generalUIController.SetDebugText("Recording started. Please, interact with an object");
+                else GeneralUIController.Instance.SetDebugText("Recording started. Please, interact with an object");
                 
                 if (_modality == Modalities.None)
                 {
                     Debug.Log("No modality selected");
-                    generalUIController.SetDebugText("No modality selected, please select one");
+                    GeneralUIController.Instance.SetDebugText("No modality selected, please select one");
                     return;
                 }
                 
@@ -570,14 +556,14 @@
                 gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
                 {
                     Debug.Log(gameObject.name + " Hover entered");
-                    generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
+                    GeneralUIController.Instance.SetDebugText("You are pointing " + manipulator.gameObject.name);
 
                     
                     //Note: event should be added before starting the coroutine
-                    ECAEvent ecaEvent = new ECAEvent(gameObject, Modalities.Headgaze, "looks", null);
-                    if (!_modalityEvents.Contains(ecaEvent))
+                    ECAEvent ecaEvent = new ECAEvent(gameObject, Modalities.Headgaze, "looks", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
-                        _modalityEvents.Add(ecaEvent);
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(gameObject, Modalities.Headgaze);
                     }
 
@@ -587,11 +573,11 @@
                 gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
                 {
                     Debug.Log(manipulator.gameObject.name + " Hover exited");
-                    generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "stops looking", null);
-                    if (!_modalityEvents.Contains(ecaEvent))
+                    GeneralUIController.Instance.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Headgaze, "stops looking", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
-                        _modalityEvents.Add(ecaEvent);
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
                     }
                 });
@@ -603,17 +589,17 @@
                 manipulator.hoverEntered.AddListener(interactor =>
                 {
                     Debug.Log("Hover entered");
-                    generalUIController.SetDebugText("You are pointing " + manipulator.gameObject.name);
+                    GeneralUIController.Instance.SetDebugText("You are pointing " + manipulator.gameObject.name);
                     
                     //Set the laser pointer line width for the screenshot
                     SetLaserPointLineWidth(30.0f);
                     
                     //Note: event should be added before starting the coroutine
                     
-                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points", null);
-                        if (!_modalityEvents.Contains(ecaEvent))
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "points", null,false);
+                        if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
-                            _modalityEvents.Add(ecaEvent);
+                            GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                             PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
                         }
                     if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
@@ -622,14 +608,14 @@
                 manipulator.hoverExited.AddListener(interactor =>
                     {
                         Debug.Log(manipulator.gameObject.name +" Hover exited"); 
-                        generalUIController.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
+                        GeneralUIController.Instance.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
                         
                         //Note: event should be added before starting the coroutine
                         //ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "Hover Exited");
-                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "stops pointing", null);
-                        if (!_modalityEvents.Contains(ecaEvent))
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Laser, "stops pointing", null, false);
+                        if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
-                            _modalityEvents.Add(ecaEvent);
+                            GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                             PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
                         }
                     });
@@ -643,15 +629,15 @@
                 manipulator.OnClicked.AddListener (() =>
                 {
                     Debug.Log(manipulator.gameObject.name + " On clicked");
-                    generalUIController.SetDebugText("You clicked on " + manipulator.gameObject.name);
+                    GeneralUIController.Instance.SetDebugText("You clicked on " + manipulator.gameObject.name);
                     
                     if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                     
                     //Note: event should be added before starting the coroutine
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicks", null);
-                    if (!_modalityEvents.Contains(ecaEvent))
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicks", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
-                        _modalityEvents.Add(ecaEvent);
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                     }
 
@@ -662,15 +648,15 @@
                 manipulator.selectEntered.AddListener(interactor =>
                 {
                     Debug.Log(manipulator.gameObject.name + " Select entered");
-                    generalUIController.SetDebugText("You selected " + manipulator.gameObject.name);
+                    GeneralUIController.Instance.SetDebugText("You selected " + manipulator.gameObject.name);
                     
                     if(categoryMenu != null) PrepareCategoryMenu(gameObject);
                     
                     //Note: event should be added before starting the coroutine
-                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects", null);
-                    if (!_modalityEvents.Contains(ecaEvent))
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
-                        _modalityEvents.Add(ecaEvent);
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                     }
 
@@ -679,13 +665,13 @@
                 manipulator.selectExited.AddListener(interactor =>
                     {
                         Debug.Log(manipulator.gameObject.name + " Select exited");
-                        generalUIController.SetDebugText("You deselected " + manipulator.gameObject.name);
+                        GeneralUIController.Instance.SetDebugText("You deselected " + manipulator.gameObject.name);
                         //Note: event should be added before starting the coroutine
                         //Add the event only if it doesn't exist already
-                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "deselects", null);
-                        if (!_modalityEvents.Contains(ecaEvent))
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "deselects", null, false);
+                        if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
-                            _modalityEvents.Add(ecaEvent);
+                            GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                             PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
                         }
                     });
@@ -705,13 +691,13 @@
                         keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
                             AddListener(() =>
                             {
-                                generalUIController.SetDebugText("You said " + keyword);
+                                GeneralUIController.Instance.SetDebugText("You said " + keyword);
                                 if (GeneralUIController.Instance.isRecording)
                                 {
                                     //Generate ecaevent
                                     ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, keyword, 
-                                        Utils.LoadPNG("Assets/Resources/Icons/microphone.png"));
-                                    if(!_modalityEvents.Contains(ecaEvent)) _modalityEvents.Add(ecaEvent);    
+                                        Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
+                                    if(!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent)) GeneralUIController.Instance.recordedEvents.Add(ecaEvent);    
                                 }
                             });
                         
@@ -745,7 +731,7 @@
                 string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
                 if(gameObject.name.Contains("Box"))
                     objectCategory = "Furniture"; 
-                generalUIController.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
+                GeneralUIController.Instance.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
                 categoryMenu.SetActive(true);
                 
                 CategoryLabel.text = objectCategory;
@@ -767,7 +753,7 @@
             public void PrepareForActionScreenShot(GameObject gameObject)
             {
                 handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-                _screenshotCamera.TakeActionScreenshot(gameObject, _actionEvents.Last());
+                _screenshotCamera.TakeActionScreenshot(gameObject, GeneralUIController.Instance.recordedEvents.Last());
                 handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
             }
             
@@ -775,7 +761,7 @@
             {
                 if(bubblesVisible) HideModalitiesBubbles();
                 handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-                _screenshotCamera.TakeModalityScreenshot(gameObject, modality, _modalityEvents.Last());
+                _screenshotCamera.TakeModalityScreenshot(gameObject, modality, GeneralUIController.Instance.recordedEvents.Last());
                 if(bubblesVisible) ShowBubblesExceptSelectedModality();
                 handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
             }

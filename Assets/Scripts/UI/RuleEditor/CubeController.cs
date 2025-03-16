@@ -21,6 +21,7 @@ public class CubeController : MonoBehaviour
     public GameObject mergedCubePrefab;
     private CombineRulesController _combineRulesController;
     private GameObject interactables;
+    public int cubeID;
     
     private void Start()
     {

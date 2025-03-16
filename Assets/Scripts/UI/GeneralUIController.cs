@@ -19,6 +19,7 @@ namespace UI
         private Prototypation _prototypation;
         public bool isRecording = false;
         private GameObject _selectedObject;
+        public List<ECAEvent> recordedEvents = new();
         
         public enum UIState
         {
@@ -57,6 +58,11 @@ namespace UI
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
             if(_combineRulesController.ruleEditorPlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlate.gameObject.SetActive(false);
             DefaultState();
+        }
+        
+        public void ClearRecordedEvents()
+        {
+            recordedEvents.Clear();
         }
 
         public void DeActivatePreviousState(UIState newState)

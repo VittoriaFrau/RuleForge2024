@@ -14,40 +14,40 @@ namespace UI
         public string Subject { get; set; }
         public string Verb { get; set; }
         public string ObjectStr{ get; set; }
-        public GameObject GameObjectRef{ get; set; }
+        public GameObject ObjectRef{ get; set; } // reference to the gameobject of the object part of the rule
         public Texture2D Texture{ get; set; }
-        public string EventStr{ get; set; }
-        public string CubeID{ get; set; }
-        public int Index{ get; set; }
-        public Action Action { get; set; }
+        public string EventStr{ get; set; } //string of the event in natural language
+        public int CubeID{ get; set; } //ID of the cube, same of the CubeController
+        public Action Action { get; set; } // Only for action cubes
         
-        public ECAEvent(GameObject gameObject, InteractionCreationController.Modalities modality, string _event, 
-            [CanBeNull] Texture2D screenshot)
+        public Vector3 CubeInitialPosition { get; set; }
+        public bool IsActionEvent { get; set; }
+        
+        public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event, 
+            [CanBeNull] Texture2D screenshot, bool isActionEvent)
         {
-            this.GameObjectRef = gameObject;
+            this.ObjectRef = @object;
             this.modality = modality;
             this.EventStr = _event;
             typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
+            IsActionEvent = isActionEvent;
             SetModalityRule();
-            Index = _counter;
             _counter++;
         }
         
-        public ECAEvent(GameObject gameObject)
+        public ECAEvent(GameObject @object)
         {
-            GameObjectRef = gameObject;
-            Index = _counter;
+            ObjectRef = @object;
             _counter++;
         }
         
-        public ECAEvent(GameObject gameObject, string verb)
+        public ECAEvent(GameObject @object, string verb)
         {
-            GameObjectRef = gameObject;
+            ObjectRef = @object;
             Verb = verb;
-            Subject = gameObject.name;
-            Index = _counter;
+            Subject = @object.name;
             _counter++;
         }
 
@@ -70,7 +70,7 @@ namespace UI
                 return false;
             }
 
-            if (!ReferenceEquals(GameObjectRef, e.GameObjectRef))
+            if (!ReferenceEquals(ObjectRef, e.ObjectRef))
             {
                 return false;
             }
@@ -91,7 +91,7 @@ namespace UI
             }
 
             // ModalityEvent:
-            return GameObjectRef == e.GameObjectRef && modality == e.modality && EventStr == e.EventStr;
+            return ObjectRef == e.ObjectRef && modality == e.modality && EventStr == e.EventStr;
         }
 
 
@@ -110,14 +110,14 @@ namespace UI
             {
                 if (EventStr != null && Verb != null && EventStr != null)
                 {
-                    return "The user " + EventStr + " " + Verb + " the " + GameObjectRef.name + " object";
+                    return "The user " + EventStr + " " + Verb + " the " + ObjectRef.name + " object";
                 }
-                if (Verb != null) return "The user " + Verb + " the " + GameObjectRef.name + " object";
-                if(EventStr == null && Verb == null) return "The user " + modality + " the " + GameObjectRef.name + " object";
+                if (Verb != null) return "The user " + Verb + " the " + ObjectRef.name + " object";
+                if(EventStr == null && Verb == null) return "The user " + modality + " the " + ObjectRef.name + " object";
             }
-            if(ObjectStr == null) return GameObjectRef.name + " " + Verb;
+            if(ObjectStr == null) return ObjectRef.name + " " + Verb;
             
-            return GameObjectRef.name + " " + Verb + " " + ObjectStr;
+            return ObjectRef.name + " " + Verb + " " + ObjectStr;
         }
 
         private void SetModalityRule()
@@ -135,7 +135,7 @@ namespace UI
                     break;
                 default:   
                     Verb = modality.ToString();
-                    ObjectStr = GameObjectRef.name;
+                    ObjectStr = ObjectRef.name;
                     break;
             }
         }

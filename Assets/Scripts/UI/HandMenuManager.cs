@@ -38,17 +38,14 @@ namespace UI.RuleEditor
             generalUIController = eventHandler.GetComponent<GeneralUIController>();
 
             //if in unity editor, move the menu closer to the camera
-            if ( Application.platform == RuntimePlatform.WindowsEditor)
+            if (!isUsingOculusLink)
             {
-                if (!isUsingOculusLink)
-                {
-                    GetComponent<HandConstraintPalmUp>().enabled = false;
-                    Vector3 forwardOffset = _mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
-                    Vector3 leftOffset = -_mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
-                    transform.position = _mainCamera.transform.position + forwardOffset + leftOffset;
-                }
-                
+                GetComponent<HandConstraintPalmUp>().enabled = false;
+                Vector3 forwardOffset = _mainCamera.transform.forward * 0.7f; // 0.5 unità in avanti
+                Vector3 leftOffset = -_mainCamera.transform.right * 0.1f; // 0.1 unità a sinistra
+                transform.position = _mainCamera.transform.position + forwardOffset + leftOffset;
             }
+            
         }
 
         /// <summary>
