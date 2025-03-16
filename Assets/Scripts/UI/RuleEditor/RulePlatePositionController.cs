@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using MixedReality.Toolkit.SpatialManipulation;
-using TMPro;
-using UI;
-using UI.RuleEditor;
 using UnityEngine;
 
-public class RepositionRulePlate : MonoBehaviour
+namespace UI.RuleEditor
+{
+    public class RulePlatePositionController : MonoBehaviour
 {
     public enum PlateState
     {
@@ -79,4 +76,6 @@ public class RepositionRulePlate : MonoBehaviour
             Utils.SetStatusButton(active, button);
         }
     }
+}
+
 }

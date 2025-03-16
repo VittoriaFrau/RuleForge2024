@@ -114,7 +114,7 @@ namespace UI
             List<GameObject> modalityCubes = GameObject.FindGameObjectsWithTag("RuleCubes")
                 .Where(obj => obj.name.Contains("Modality")).ToList();
             //Position of the first cube container
-            Vector3 firstCubeContainerWhenLocalPosition = new Vector3(144f, 18f, -18f);
+            Vector3 firstCubeContainerWhenLocalPosition = new Vector3(144f, -50f, -18f);
             //Lista con i gameobject e l'indice che ne determina l'ordine di creazione dei cubi
             List<Tuple<int, GameObject>> modalityCubesTuple = new();
 
