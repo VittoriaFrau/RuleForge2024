@@ -436,7 +436,6 @@
             public void RecordAction()
             {
                 GeneralUIController.Instance.SetDebugText("Recording started.");
-                GeneralUIController.Instance.ClearRecordedEvents();
                 _oppositeActionEvents.Clear();
             }
             
