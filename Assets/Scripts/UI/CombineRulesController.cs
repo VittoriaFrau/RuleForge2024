@@ -312,49 +312,32 @@ namespace UI
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
                 new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
-            if (whenEvents.Length == 0)
+            if (whenEvents.Length == 0 && equivalenceEvents.Length == 0)
             {
-                Debug.LogWarning("No 'when' events found!");
+                Debug.LogWarning("No 'when' or 'equivalence' events found!");
                 return;
             }
 
-            // Inizializziamo il tracker con la sequenza di eventi
             EventSequenceTracker tracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
 
-            // Per ogni evento nella sequenza, bindiamo il listener appropriato
+            // Bind dei whenEvents normali
             foreach (var whenEvent in whenEvents)
             {
                 GameObject whenGameObject = whenEvent.ObjectRef;
+                BindEvent(whenGameObject, whenEvent, tracker, false);
+            }
 
-                switch (whenEvent.Modality)
-                {
-                    case InteractionCreationController.Modalities.Touch:
-                        BindTouchEvent(whenGameObject, whenEvent, tracker);
-                        break;
-
-                    case InteractionCreationController.Modalities.Speech:
-                        BindSpeechEvent(whenEvent, tracker);
-                        break;
-
-                    case InteractionCreationController.Modalities.Laser:
-                        BindLaserEvent(whenGameObject, whenEvent, tracker);
-                        break;
-
-                    case InteractionCreationController.Modalities.Headgaze:
-                        BindHeadGazeEvent(whenGameObject, whenEvent, tracker);
-                        break;
-
-                    case InteractionCreationController.Modalities.Proximity:
-                        BindProximityEvent(whenGameObject, whenEvent, tracker);
-                        break;
-
-                    default:
-                        Debug.LogWarning($"Unknown modality: {whenEvent.Modality}");
-                        break;
-                }
+            // Bind dell'equivalenceEvent (ne gestiamo uno solo per ora)
+            if (equivalenceEvents.Length > 0)
+            {
+                ECAEvent equivalenceEvent = equivalenceEvents[0];
+                GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
+                BindEvent(equivalenceGameObject, equivalenceEvent, tracker, true);
             }
         }
-    
+
+
+
 
         private ECAEvent[] GetEventsFromContainers(GameObject row, string[] containerNames)
         {
@@ -376,11 +359,48 @@ namespace UI
             }
 
             return allContainers
-                .Select(container => Utils.GetEventFromCube(container.currentCube, GeneralUIController.Instance.recordedEvents))
+                .Select(container =>
+                    Utils.GetEventFromCube(container.currentCube, GeneralUIController.Instance.recordedEvents))
                 .ToArray();
         }
 
-        private void BindTouchEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
+        private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
+            bool isEquivalence)
+        {
+            Action<ECAEvent> triggerAction = isEquivalence
+                ? (evt) => tracker.TriggerActionsDirectly(evt)
+                : (evt) => tracker.EventTriggered(evt);
+
+            switch (eventToBind.Modality)
+            {
+                case InteractionCreationController.Modalities.Touch:
+                    BindTouchEvent(target, eventToBind, triggerAction);
+                    break;
+
+                case InteractionCreationController.Modalities.Speech:
+                    BindSpeechEvent(eventToBind, triggerAction);
+                    break;
+
+                case InteractionCreationController.Modalities.Laser:
+                    BindLaserEvent(target, eventToBind, triggerAction);
+                    break;
+
+                case InteractionCreationController.Modalities.Headgaze:
+                    BindHeadGazeEvent(target, eventToBind, triggerAction);
+                    break;
+
+                case InteractionCreationController.Modalities.Proximity:
+                    BindProximityEvent(target, eventToBind, triggerAction);
+                    break;
+
+                default:
+                    Debug.LogWarning($"Unknown modality: {eventToBind.Modality}");
+                    break;
+            }
+        }
+
+
+        private void BindTouchEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
             var manipulator = target.GetComponent<ObjectManipulator>();
             if (manipulator == null)
@@ -389,24 +409,23 @@ namespace UI
                 return;
             }
 
-            string verb = whenEvent.EventStr.ToLower();
+            string verb = ecaEvent.EventStr.ToLower();
 
             if (verb.Contains("clicks"))
             {
-                manipulator.OnClicked.AddListener(() => tracker.EventTriggered(whenEvent));
+                manipulator.OnClicked.AddListener(() => triggerAction(ecaEvent));
             }
             else if (verb.Contains("selects"))
             {
-                manipulator.selectEntered.AddListener(interactor => tracker.EventTriggered(whenEvent));
+                manipulator.selectEntered.AddListener(interactor => triggerAction(ecaEvent));
             }
             else if (verb.Contains("deselects"))
             {
-                manipulator.selectExited.AddListener(interactor => tracker.EventTriggered(whenEvent));
+                manipulator.selectExited.AddListener(interactor => triggerAction(ecaEvent));
             }
         }
 
-
-        private void BindSpeechEvent(ECAEvent whenEvent, EventSequenceTracker tracker)
+        private void BindSpeechEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
 #if !UNITY_EDITOR
     MRTKSpeech.SetActive(true);
@@ -418,16 +437,15 @@ namespace UI
         return;
     }
 
-    string keyword = whenEvent.EventStr; // Assumendo che sia il comando da riconoscere
+    string keyword = ecaEvent.EventStr; // comando di attivazione
     keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword)
-        .AddListener(() => tracker.EventTriggered(whenEvent));
+        .AddListener(() => triggerAction(ecaEvent));
 #else
             Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
 #endif
         }
 
-
-        private void BindLaserEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
+        private void BindLaserEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
             var manipulator = target.GetComponent<ObjectManipulator>();
             if (manipulator == null)
@@ -436,56 +454,56 @@ namespace UI
                 return;
             }
 
-            string verb = whenEvent.EventStr.ToLower();
+            string verb = ecaEvent.EventStr.ToLower();
 
             if (verb.Contains("points"))
             {
-                manipulator.hoverEntered.AddListener(interactor => tracker.EventTriggered(whenEvent));
+                manipulator.hoverEntered.AddListener(interactor => triggerAction(ecaEvent));
             }
             else if (verb.Contains("stops pointing"))
             {
-                manipulator.hoverExited.AddListener(interactor => tracker.EventTriggered(whenEvent));
+                manipulator.hoverExited.AddListener(interactor => triggerAction(ecaEvent));
             }
         }
 
-
-        private void BindHeadGazeEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
+        private void BindHeadGazeEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
             interactionCreationController.InstantiateHeadGazePointer();
-            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
 
+            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
             if (gazeInteractor == null)
             {
-                Debug.LogWarning("FuzzyGazeInteractor not found");
+                Debug.LogWarning($"FuzzyGazeInteractor not found");
                 return;
             }
 
-            if (whenEvent.EventStr.Contains("looks"))
+            string verb = ecaEvent.EventStr.ToLower();
+
+            if (verb.Contains("looks"))
             {
                 gazeInteractor.hoverEntered.AddListener(eventArgs =>
                 {
                     var hoveredObject = eventArgs.interactableObject.transform.gameObject;
                     if (hoveredObject == target)
                     {
-                        tracker.EventTriggered(whenEvent);
+                        triggerAction(ecaEvent);
                     }
                 });
             }
-            else
+            else if (verb.Contains("stops looking"))
             {
                 gazeInteractor.hoverExited.AddListener(eventArgs =>
                 {
                     var hoveredObject = eventArgs.interactableObject.transform.gameObject;
                     if (hoveredObject == target)
                     {
-                        tracker.EventTriggered(whenEvent);
+                        triggerAction(ecaEvent);
                     }
                 });
             }
         }
 
-        
-        private void BindProximityEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
+        private void BindProximityEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
             var collider = target.GetComponent<Collider>();
             if (collider == null)
@@ -496,7 +514,8 @@ namespace UI
 
             if (!collider.isTrigger)
             {
-                Debug.LogWarning($"Collider on {target.name} is not set as a trigger. Proximity works best with 'isTrigger' enabled.");
+                Debug.LogWarning(
+                    $"Collider on {target.name} is not set as a trigger. Proximity works best with 'isTrigger' enabled.");
             }
 
             ProximityTriggerListener listener = target.GetComponent<ProximityTriggerListener>();
@@ -507,23 +526,9 @@ namespace UI
 
             listener.OnProximityEnter += (other) =>
             {
-                Debug.Log($"Proximity detected with {other.name}, publishing actions.");
-                tracker.EventTriggered(whenEvent);
+                Debug.Log($"Proximity detected with {other.name}, triggering action.");
+                triggerAction(ecaEvent);
             };
         }
-
-
-
-        private void ExecuteActions(string debugMessage, ECAEvent[] thenEvents, RuleEngine ruleEngine)
-        {
-            Debug.Log($"{debugMessage}, publishing actions");
-
-            foreach (var thenEvent in thenEvents)
-            {
-                ruleEngine.ExecuteAction(thenEvent.Action);
-            }
-        }
-        
-
     }
 }

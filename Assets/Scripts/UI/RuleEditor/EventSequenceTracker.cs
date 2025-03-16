@@ -9,6 +9,7 @@ namespace UI
         private readonly ECAEvent[] sequence;
         private readonly ECAEvent[] thenEvents;
         private readonly RuleEngine ruleEngine;
+        private bool hasCompleted = false;
 
         public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] thenEvents, RuleEngine ruleEngine)
         {
@@ -19,6 +20,8 @@ namespace UI
 
         public void EventTriggered(ECAEvent triggeredEvent)
         {
+            if (hasCompleted) return;
+
             if (sequence.Length == 0) return;
 
             var expectedEvent = sequence[CurrentIndex];
@@ -32,12 +35,7 @@ namespace UI
                 if (CurrentIndex >= sequence.Length)
                 {
                     Debug.Log($"[Tracker] Sequence complete! Executing actions.");
-                    foreach (var thenEvent in thenEvents)
-                    {
-                        ruleEngine.ExecuteAction(thenEvent.Action);
-                    }
-
-                    CurrentIndex = 0; // resetta se vuoi che la sequenza si ripeta
+                    ExecuteActions();
                 }
             }
             else
@@ -46,6 +44,26 @@ namespace UI
                 CurrentIndex = 0;
             }
         }
+
+        public void TriggerActionsDirectly(ECAEvent equivalenceEvent)
+        {
+            if (hasCompleted) return;
+
+            Debug.Log($"[Tracker] Equivalence event '{equivalenceEvent.EventStr}' triggered! Executing actions immediately.");
+            ExecuteActions();
+        }
+
+        private void ExecuteActions()
+        {
+            foreach (var thenEvent in thenEvents)
+            {
+                ruleEngine.ExecuteAction(thenEvent.Action);
+            }
+
+            hasCompleted = true;
+            CurrentIndex = 0;
+        }
     }
+
 
 }
