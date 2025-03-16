@@ -14,7 +14,6 @@ namespace UI
     {
         //Rule composition
         public GameObject removableBarrier;
-        private Dictionary<GameObject, Vector3> _originalPositions = new(); //positions of the cubes to easily revert it
         public TextMeshProUGUI whenText, thenText;
         public GameObject ruleEditorPlate;
         public GameObject cubePlate, modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
@@ -27,11 +26,13 @@ namespace UI
         public GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
         private HandMenuManager handMenuManager;
+        private InteractionCreationController interactionCreationController;
         public GameObject MRTKSpeech;
                     
         private void Start()
         {
             handMenuManager = GeneralUIController.Instance.handMenuManager;
+            interactionCreationController = GetComponent<InteractionCreationController>();
         }
 
 
@@ -52,11 +53,7 @@ namespace UI
                         
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(true);
-
-            //Generate the cubes using the list of events
-            _originalPositions.Clear();
-                        
-                        
+            
             Utils.GenerateCubesFromEventList(GeneralUIController.Instance.recordedEvents, 
                 modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate);
 
@@ -84,10 +81,12 @@ namespace UI
             ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);
                         
             // Using the original position of the cube, position it again there
-            foreach (var k in _originalPositions)
+            foreach (var recordedEvent in GeneralUIController.Instance.recordedEvents)
             {
-                k.Key.transform.position = k.Value;
+                GameObject cube = recordedEvent.ObjectRef;
+                cube.transform.localPosition = recordedEvent.CubeInitialPosition;
             }
+            
             Utils.ClearTextDescription(whenText, thenText);
 
             Utils.ResetCubeContainers();
@@ -348,7 +347,7 @@ namespace UI
             }
 
             return allContainers
-                .Select(container => Utils.GetEventFromCube(container.currentCube, interactables))
+                .Select(container => Utils.GetEventFromCube(container.currentCube, GeneralUIController.Instance.recordedEvents))
                 .ToArray();
         }
 
@@ -361,17 +360,17 @@ namespace UI
                 return;
             }
 
-            string verb = whenEvent.Verb.ToLower();
+            string verb = whenEvent.EventStr.ToLower();
 
-            if (verb == "clicks")
+            if (verb.Contains("clicks"))
             {
                 manipulator.OnClicked.AddListener(() => ExecuteActions("Click event", thenEvents, ruleEngine));
             }
-            else if (verb == "selects")
+            else if (verb.Contains("selects"))
             {
                 manipulator.selectEntered.AddListener(interactor => ExecuteActions("Select entered", thenEvents, ruleEngine));
             }
-            else if (verb == "deselects")
+            else if (verb.Contains("deselects"))
             {
                 manipulator.selectExited.AddListener(interactor => ExecuteActions("Select exited", thenEvents, ruleEngine));
             }
@@ -408,13 +407,12 @@ namespace UI
                 return;
             }
 
-            string verb = whenEvent.Verb.ToLower();
-
-            if (verb == "laser points")
+            string verb = whenEvent.EventStr.ToLower();
+            if (verb.Contains("points"))
             {
                 manipulator.hoverEntered.AddListener(interactor => ExecuteActions("Laser hover entered", thenEvents, ruleEngine));
             }
-            else if (verb == "stops pointing")
+            else if (verb.Contains("stops pointing"))
             {
                 manipulator.hoverExited.AddListener(interactor => ExecuteActions("Laser hover exited", thenEvents, ruleEngine));
             }
@@ -422,22 +420,31 @@ namespace UI
 
         private void BindHeadGazeEvent(GameObject target, ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
         {
-            var gazeInteractor = target.GetComponent<FuzzyGazeInteractor>();
+            interactionCreationController.InstantiateHeadGazePointer();
+            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
             if (gazeInteractor == null)
             {
-                Debug.LogWarning($"FuzzyGazeInteractor not found on {target.name}");
+                Debug.LogWarning($"FuzzyGazeInteractor not found");
                 return;
             }
-
-            string verb = whenEvent.Verb.ToLower();
-
-            if (verb == "looks")
+            
+            if (whenEvent.EventStr.Contains("looks"))
             {
-                gazeInteractor.hoverEntered.AddListener(interactor => ExecuteActions("Gaze hover entered", thenEvents, ruleEngine));
+                gazeInteractor.hoverEntered.AddListener(eventArgs =>
+                {
+                    var hoveredObject = eventArgs.interactableObject.transform.gameObject;
+                    if (hoveredObject == target)
+                        ExecuteActions("Gaze hover entered", thenEvents, ruleEngine);
+                });
             }
-            else if (verb == "stops looking")
+            else 
             {
-                gazeInteractor.hoverExited.AddListener(interactor => ExecuteActions("Gaze hover exited", thenEvents, ruleEngine));
+                gazeInteractor.hoverExited.AddListener(eventArgs =>
+                {
+                    var hoveredObject = eventArgs.interactableObject.transform.gameObject;
+                    if (hoveredObject == target) 
+                        ExecuteActions("Gaze hover exited", thenEvents, ruleEngine);
+                });
             }
         }
         

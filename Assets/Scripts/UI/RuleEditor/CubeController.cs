@@ -117,8 +117,8 @@ public class CubeController : MonoBehaviour
         // Finding the cubeplate by tag and then filtering the results by name
         GameObject cubePlate = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "CubePlate");
         
-        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject, interactables);
-        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube, interactables);
+        ECAEvent cubeLeftEcaEvent = Utils.GetEventFromCube(gameObject, GeneralUIController.Instance.recordedEvents);
+        ECAEvent cubeRightEcaEvent = Utils.GetEventFromCube(otherCube, GeneralUIController.Instance.recordedEvents);
                 
         // Get the texture of a gameobject
         Texture textureLeftCube = gameObject.GetComponent<Renderer>().material.mainTexture;

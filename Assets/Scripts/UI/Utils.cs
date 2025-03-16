@@ -329,7 +329,7 @@ namespace UI
         return go;
     }
 
-        public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
+        /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
         {
             ECAEvent e = new ECAEvent(cube);
             
@@ -358,6 +358,18 @@ namespace UI
             e.Modality = GetModalityFromVerb(e.Verb);
             
             e.ObjectRef = interactables.transform.Find(e.ObjectStr).gameObject;
+
+            return e;
+        }*/
+
+        public static ECAEvent GetEventFromCube(GameObject cube, List<ECAEvent> recordedEvents)
+        {
+            int cubeID = cube.GetComponent<CubeController>().cubeID;
+            ECAEvent e = recordedEvents.Find(ev => ev.CubeID == cubeID);
+            if (e == null)
+            {
+                Debug.LogError($"Event not found for cube ID {cubeID}");
+            }
 
             return e;
         }
@@ -431,8 +443,12 @@ namespace UI
                 materialRight.mainTextureOffset = new Vector2(0.25f, 0.25f);
 
             }
-            
-            cube.GetComponent<CubeController>().cubeID = cube.GetInstanceID();
+            //if this is a cube level2, we don't need the cubeId. This will most likely change in the future
+            CubeController cubeController = cube.GetComponent<CubeController>();
+            if (cubeController !=null )
+            {
+                cubeController.cubeID = cube.GetInstanceID();
+            }
 
             return cube;
         }

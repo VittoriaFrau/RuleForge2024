@@ -179,10 +179,8 @@
             
             private void ActivateHeadGazeModality()
             {
-                //Instantiate the headgaze pointer inside the gaze interactor object
-                headGazePointerInstance = Instantiate(headGazePointer, gazeInteractor.transform);
-                //Set z axes to 0.33
-                headGazePointerInstance.transform.localPosition = new Vector3(0,0,0.33f);
+                
+                InstantiateHeadGazePointer();
                 
                 //Change the material of the gaze pointer everytime the user looks at an object
                 gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverEntered.AddListener((GameObject) =>
@@ -197,6 +195,14 @@
                 
                 //Disappear the Bubble of the modality
                 HideModalityBubble("Headgaze");
+            }
+            
+            public void InstantiateHeadGazePointer()
+            {
+                //Instantiate the headgaze pointer inside the gaze interactor object
+                headGazePointerInstance = Instantiate(headGazePointer, gazeInteractor.transform);
+                //Set z axes to 0.33
+                headGazePointerInstance.transform.localPosition = new Vector3(0,0,0.33f);            
             }
 
             private void DeActivateHeadGazeModality()
