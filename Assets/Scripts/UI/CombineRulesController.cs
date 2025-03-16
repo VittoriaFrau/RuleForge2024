@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace UI
 {
-    public class CombineRulesController:MonoBehaviour
+    public class CombineRulesController : MonoBehaviour
     {
         //Rule composition
         public GameObject removableBarrier;
@@ -18,8 +18,20 @@ namespace UI
         public GameObject ruleEditorPlate;
         public GameObject cubePlate, modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
         public GameObject whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
-        public enum ContainerType { Equivalence, Sequential }
-        public enum RulePhase { When, Then, None }
+
+        public enum ContainerType
+        {
+            Equivalence,
+            Sequential
+        }
+
+        public enum RulePhase
+        {
+            When,
+            Then,
+            None
+        }
+
         private List<CubeContainerClass> whenContainers;
         private List<CubeContainerClass> thenContainers;
         public GameObject modalityContainerPrefab, actionContainerPrefab;
@@ -28,7 +40,7 @@ namespace UI
         private HandMenuManager handMenuManager;
         private InteractionCreationController interactionCreationController;
         public GameObject MRTKSpeech;
-                    
+
         private void Start()
         {
             handMenuManager = GeneralUIController.Instance.handMenuManager;
@@ -38,105 +50,109 @@ namespace UI
 
         public void ActivateCombineRules()
         {
-                        
+
             if (GeneralUIController.Instance.recordedEvents.Count == 0)
             {
-                GeneralUIController.Instance.SetDebugText("No recorded actions, please use the record button to record actions");
+                GeneralUIController.Instance.SetDebugText(
+                    "No recorded actions, please use the record button to record actions");
                 handMenuManager.menuContentCanvas.SetActive(true);
                 handMenuManager.debugPanel.SetActive(true);
                 handMenuManager.mainMenu.SetActive(true);
                 return;
             }
-                        
+
             //Set the rule plate visible
             ruleEditorPlate.SetActive(true);
-                        
+
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(true);
-            
-            Utils.GenerateCubesFromEventList(GeneralUIController.Instance.recordedEvents, 
+
+            Utils.GenerateCubesFromEventList(GeneralUIController.Instance.recordedEvents,
                 modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate);
 
             removableBarrier.SetActive(false);
-                        
+
             InitializeVariables();
         }
 
-                    
+
         public void DeActivateRuleComposition()
-        { 
+        {
             //Set the rule plate visible
             ruleEditorPlate.SetActive(false);
-                        
+
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(false);
-                        
+
             GeneralUIController.Instance.UIstate = GeneralUIController.UIState.Default;
             GeneralUIController.Instance.DefaultState();
         }
-                    
+
         public void ResetCubePositions()
         {
             //Repositioning the plate in case the user has moved it
-            ruleEditorPlate.transform.localPosition= new Vector3(-14.4f, -119.0f, 774.0f);
-                        
+            ruleEditorPlate.transform.localPosition = new Vector3(-14.4f, -119.0f, 774.0f);
+
             // Using the original position of the cube, position it again there
             foreach (var recordedEvent in GeneralUIController.Instance.recordedEvents)
             {
                 GameObject cube = recordedEvent.ObjectRef;
                 cube.transform.localPosition = recordedEvent.CubeInitialPosition;
             }
-            
+
             Utils.ClearTextDescription(whenText, thenText);
 
             Utils.ResetCubeContainers();
         }
 
-                    
-                    
+
+
         public void AutomaticCubePosition()
         {
             //Modality events
             //Find all the gameobjects with tag RuleCubes and save to modalityCubes if the name contains "Modality"
-            List<GameObject> modalityCubes = GameObject.FindGameObjectsWithTag("RuleCubes").Where(obj => obj.name.Contains("Modality")).ToList();
+            List<GameObject> modalityCubes = GameObject.FindGameObjectsWithTag("RuleCubes")
+                .Where(obj => obj.name.Contains("Modality")).ToList();
             //Position of the first cube container
-            Vector3 firstCubeContainerWhenLocalPosition = new Vector3(144f, 18f,-18f);
+            Vector3 firstCubeContainerWhenLocalPosition = new Vector3(144f, 18f, -18f);
             //Lista con i gameobject e l'indice che ne determina l'ordine di creazione dei cubi
             List<Tuple<int, GameObject>> modalityCubesTuple = new();
-                        
+
             foreach (ECAEvent ecaEvent in GeneralUIController.Instance.recordedEvents)
             {
                 if (!ecaEvent.IsActionEvent)
                 {
                     foreach (GameObject cube in modalityCubes)
                     {
-                        if(ecaEvent.CubeID == cube.GetComponent<CubeController>().cubeID)
+                        if (ecaEvent.CubeID == cube.GetComponent<CubeController>().cubeID)
                             modalityCubesTuple.Add(new Tuple<int, GameObject>(ecaEvent.CubeID, cube));
                     }
                 }
             }
-                        
+
             //Scorro la lista di tuple e ordino i cubi in base all'indice
             modalityCubesTuple = modalityCubesTuple.OrderBy(x => x.Item1).ToList();
-                        
+
             float xOffsetBetweenCubes = 50f; // Distanza fissa tra i cubi lungo l'asse x
 
-                        
+
             //Posiziono il primo cubo in firstCubeContainerLocalPosition e i successivi in base alla posizione del precedente
             for (int i = 0; i < modalityCubesTuple.Count; i++)
             {
                 GameObject cube = modalityCubesTuple[i].Item2;
-                cube.transform.localPosition = firstCubeContainerWhenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
+                cube.transform.localPosition =
+                    firstCubeContainerWhenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
             }
-                        
+
             //Action events
             //Find all the gameobjects with tag RuleCubes and save to modalityCubes if the name contains "Action"
-            List<GameObject> actionCubes = GameObject.FindGameObjectsWithTag("ActionRuleCube").Where(obj => obj.name.Contains("Action")).ToList();
+            List<GameObject> actionCubes = GameObject.FindGameObjectsWithTag("ActionRuleCube")
+                .Where(obj => obj.name.Contains("Action")).ToList();
             //Position of the first cube container
-            Vector3 firstCubeContainerThenLocalPosition = new Vector3(144f, -83f,-21f);
+            Vector3 firstCubeContainerThenLocalPosition = new Vector3(144f, -83f, -21f);
             //Lista con i gameobject e l'indice che ne determina l'ordine di creazione dei cubi
             List<Tuple<int, GameObject>> actionCubesTuple = new();
-                        
+
 
             foreach (ECAEvent action in GeneralUIController.Instance.recordedEvents)
             {
@@ -144,38 +160,40 @@ namespace UI
                 {
                     foreach (GameObject cube in actionCubes)
                     {
-                        if(action.CubeID == cube.GetComponent<CubeController>().cubeID)
+                        if (action.CubeID == cube.GetComponent<CubeController>().cubeID)
                             actionCubesTuple.Add(new Tuple<int, GameObject>(action.CubeID, cube));
                     }
                 }
-                
+
             }
-                        
+
             //Scorro la lista di tuple e ordino i cubi in base all'indice
             actionCubesTuple = actionCubesTuple.OrderBy(x => x.Item1).ToList();
-                        
+
             //Posiziono il primo cubo in firstCubeContainerLocalPosition e i successivi in base alla posizione del precedente
             for (int i = 0; i < actionCubesTuple.Count; i++)
             {
                 GameObject cube = actionCubesTuple[i].Item2;
-                cube.transform.localPosition = firstCubeContainerThenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
+                cube.transform.localPosition =
+                    firstCubeContainerThenLocalPosition + new Vector3(i * xOffsetBetweenCubes, 0, 0);
             }
         }
+
         //I need a function since it will be called as soon as the rule mode is on
         public void InitializeVariables()
         {
             whenText = GameObject.FindGameObjectsWithTag("RuleText")
-                .ToList().Find(x=>x.name=="WhenText").GetComponent<TextMeshProUGUI>();
+                .ToList().Find(x => x.name == "WhenText").GetComponent<TextMeshProUGUI>();
             thenText = GameObject.FindGameObjectsWithTag("RuleText")
-                .ToList().Find(x=>x.name=="ThenText").GetComponent<TextMeshProUGUI>();
-                        
+                .ToList().Find(x => x.name == "ThenText").GetComponent<TextMeshProUGUI>();
+
             //Adds the default containers
             whenContainers = new List<CubeContainerClass>();
             GameObject firstWhenContainer = whenSequentialRow.transform.Find("CubeContainer").gameObject;
             AddContainer(RulePhase.When, firstWhenContainer);
             thenContainers = new List<CubeContainerClass>();
             GameObject firstThenContainer = thenSequentialRow.transform.Find("ActionCubeContainer").gameObject;
-            AddContainer(RulePhase.Then, firstThenContainer );
+            AddContainer(RulePhase.Then, firstThenContainer);
         }
 
         public void AddContainer(RulePhase rulePhase, GameObject containerGo)
@@ -191,26 +209,28 @@ namespace UI
                 thenContainers.Add(new CubeContainerClass(thenContainers.Count, cubeContainer));
                 cubeContainer.id = thenContainers.Count;
             }
-                       
+
         }
-                    
+
 
         /**
          * cube: the cube that has been moved (in or out)
          */
-        public void CalculateRuleText(GameObject cube, RulePhase rulePhase, bool isAdded, ContainerType containerType, int id)
+        public void CalculateRuleText(GameObject cube, RulePhase rulePhase, bool isAdded, ContainerType containerType,
+            int id)
         {
             UpdatePresentRule(); //Updates the textmeshpro variables with the current rule text
             string cubeDescription = Utils.GetRuleDescriptionFromCubePrefab(cube.gameObject);
             string formattedCubeDescription = cubeDescription.Replace("\n", " ");
             if (isAdded)
             {
-                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : ",";
-                Utils.GenerateTextFromCubePosition(rulePhase == RulePhase.When ? whenText : thenText, formattedCubeDescription, logicalOperator);
+                string logicalOperator = containerType == ContainerType.Equivalence ? "OR" : ",";
+                Utils.GenerateTextFromCubePosition(rulePhase == RulePhase.When ? whenText : thenText,
+                    formattedCubeDescription, logicalOperator);
             }
             else
             {
-                string logicalOperator= containerType == ContainerType.Equivalence ? "OR" : ",";
+                string logicalOperator = containerType == ContainerType.Equivalence ? "OR" : ",";
                 switch (rulePhase)
                 {
                     case RulePhase.When:
@@ -221,6 +241,7 @@ namespace UI
                         {
                             whenText.text = "...";
                         }
+
                         break;
                     case RulePhase.Then:
                         CubeContainerClass thenContainer = FindContainerById(id, thenContainers);
@@ -229,11 +250,12 @@ namespace UI
                         {
                             thenText.text = "...";
                         }
+
                         break;
                 }
             }
         }
-                    
+
         private void UpdatePresentRule()
         {
             whenText = whenText.GetComponent<TextMeshProUGUI>();
@@ -250,7 +272,7 @@ namespace UI
             else
             {
                 CubeContainerClass container = FindContainerById(thenContainers.Count, thenContainers);
-                if(container!=null) thenContainers.Remove(container);
+                if (container != null) thenContainers.Remove(container);
             }
         }
 
@@ -258,7 +280,7 @@ namespace UI
         {
             foreach (var cont in list)
             {
-                if(cont.id == id) return cont;
+                if (cont.id == id) return cont;
             }
 
             return null;
@@ -270,22 +292,25 @@ namespace UI
             ruleDebugText.SetActive(true);
             ruleDebugText.GetComponent<TextMeshProUGUI>().text = message;
         }
-                    
+
         public void DeactivateRuleDebugText()
         {
             cubeHelp.SetActive(true);
             ruleDebugText.SetActive(false);
         }
-                
-                    
+
+
         //WORK IN PROGRESS
-        public void CalculateRule(){
+        public void CalculateRule()
+        {
             RuleEngine ruleEngine = RuleEngine.GetInstance();
 
-            // Retrieve all events for "when" (sequential + equivalence) and "then"
-            ECAEvent[] whenEvents = GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
-            ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
-            ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
+            ECAEvent[] whenEvents =
+                GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            ECAEvent[] equivalenceEvents =
+                GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+            ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
+                new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
             if (whenEvents.Length == 0)
             {
@@ -293,39 +318,43 @@ namespace UI
                 return;
             }
 
-            // We currently assume there is only one sequential "when" event
-            ECAEvent whenEvent = whenEvents[0];
-            GameObject whenGameObject = whenEvent.ObjectRef;
+            // Inizializziamo il tracker con la sequenza di eventi
+            EventSequenceTracker tracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
 
-            Debug.Log($"when event verb {whenEvent.Verb.ToLower()}");
-
-            switch (whenEvent.Modality)
+            // Per ogni evento nella sequenza, bindiamo il listener appropriato
+            foreach (var whenEvent in whenEvents)
             {
-                case InteractionCreationController.Modalities.Touch:
-                    BindTouchEvent(whenGameObject, whenEvent, thenEvents, ruleEngine);
-                    break;
+                GameObject whenGameObject = whenEvent.ObjectRef;
 
-                case InteractionCreationController.Modalities.Speech:
-                    BindSpeechEvent(whenEvent, thenEvents, ruleEngine);
-                    break;
+                switch (whenEvent.Modality)
+                {
+                    case InteractionCreationController.Modalities.Touch:
+                        BindTouchEvent(whenGameObject, whenEvent, tracker);
+                        break;
 
-                case InteractionCreationController.Modalities.Laser:
-                    BindLaserEvent(whenGameObject, whenEvent, thenEvents, ruleEngine);
-                    break;
+                    case InteractionCreationController.Modalities.Speech:
+                        BindSpeechEvent(whenEvent, tracker);
+                        break;
 
-                case InteractionCreationController.Modalities.Headgaze:
-                    BindHeadGazeEvent(whenGameObject, whenEvent, thenEvents, ruleEngine);
-                    break;
-                
-                case InteractionCreationController.Modalities.Proximity:
-                    BindProximityEvent(whenGameObject, whenEvent, thenEvents, ruleEngine);
-                    break;
+                    case InteractionCreationController.Modalities.Laser:
+                        BindLaserEvent(whenGameObject, whenEvent, tracker);
+                        break;
 
-                default:
-                    Debug.LogWarning($"Unknown modality: {whenEvent.Modality}");
-                    break;
+                    case InteractionCreationController.Modalities.Headgaze:
+                        BindHeadGazeEvent(whenGameObject, whenEvent, tracker);
+                        break;
+
+                    case InteractionCreationController.Modalities.Proximity:
+                        BindProximityEvent(whenGameObject, whenEvent, tracker);
+                        break;
+
+                    default:
+                        Debug.LogWarning($"Unknown modality: {whenEvent.Modality}");
+                        break;
+                }
             }
         }
+    
 
         private ECAEvent[] GetEventsFromContainers(GameObject row, string[] containerNames)
         {
@@ -351,7 +380,7 @@ namespace UI
                 .ToArray();
         }
 
-        private void BindTouchEvent(GameObject target, ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+        private void BindTouchEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
         {
             var manipulator = target.GetComponent<ObjectManipulator>();
             if (manipulator == null)
@@ -364,41 +393,41 @@ namespace UI
 
             if (verb.Contains("clicks"))
             {
-                manipulator.OnClicked.AddListener(() => ExecuteActions("Click event", thenEvents, ruleEngine));
+                manipulator.OnClicked.AddListener(() => tracker.EventTriggered(whenEvent));
             }
             else if (verb.Contains("selects"))
             {
-                manipulator.selectEntered.AddListener(interactor => ExecuteActions("Select entered", thenEvents, ruleEngine));
+                manipulator.selectEntered.AddListener(interactor => tracker.EventTriggered(whenEvent));
             }
             else if (verb.Contains("deselects"))
             {
-                manipulator.selectExited.AddListener(interactor => ExecuteActions("Select exited", thenEvents, ruleEngine));
+                manipulator.selectExited.AddListener(interactor => tracker.EventTriggered(whenEvent));
             }
         }
 
-        private void BindSpeechEvent(ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+
+        private void BindSpeechEvent(ECAEvent whenEvent, EventSequenceTracker tracker)
         {
 #if !UNITY_EDITOR
-            MRTKSpeech.SetActive(true);
+    MRTKSpeech.SetActive(true);
 
-            var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
-            if (keywordRecognitionSubsystem == null)
-            {
-                Debug.LogWarning("No running KeywordRecognitionSubsystem found");
-                return;
-            }
+    var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+    if (keywordRecognitionSubsystem == null)
+    {
+        Debug.LogWarning("No running KeywordRecognitionSubsystem found");
+        return;
+    }
 
-            foreach (var keyword in keywords)
-            {
-                keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword)
-                    .AddListener(() => ExecuteActions($"Speech keyword '{keyword}' detected", thenEvents, ruleEngine));
-            }
+    string keyword = whenEvent.EventStr; // Assumendo che sia il comando da riconoscere
+    keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword)
+        .AddListener(() => tracker.EventTriggered(whenEvent));
 #else
             Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
 #endif
         }
 
-        private void BindLaserEvent(GameObject target, ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+
+        private void BindLaserEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
         {
             var manipulator = target.GetComponent<ObjectManipulator>();
             if (manipulator == null)
@@ -408,49 +437,56 @@ namespace UI
             }
 
             string verb = whenEvent.EventStr.ToLower();
+
             if (verb.Contains("points"))
             {
-                manipulator.hoverEntered.AddListener(interactor => ExecuteActions("Laser hover entered", thenEvents, ruleEngine));
+                manipulator.hoverEntered.AddListener(interactor => tracker.EventTriggered(whenEvent));
             }
             else if (verb.Contains("stops pointing"))
             {
-                manipulator.hoverExited.AddListener(interactor => ExecuteActions("Laser hover exited", thenEvents, ruleEngine));
+                manipulator.hoverExited.AddListener(interactor => tracker.EventTriggered(whenEvent));
             }
         }
 
-        private void BindHeadGazeEvent(GameObject target, ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+
+        private void BindHeadGazeEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
         {
             interactionCreationController.InstantiateHeadGazePointer();
             var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+
             if (gazeInteractor == null)
             {
-                Debug.LogWarning($"FuzzyGazeInteractor not found");
+                Debug.LogWarning("FuzzyGazeInteractor not found");
                 return;
             }
-            
+
             if (whenEvent.EventStr.Contains("looks"))
             {
                 gazeInteractor.hoverEntered.AddListener(eventArgs =>
                 {
                     var hoveredObject = eventArgs.interactableObject.transform.gameObject;
                     if (hoveredObject == target)
-                        ExecuteActions("Gaze hover entered", thenEvents, ruleEngine);
+                    {
+                        tracker.EventTriggered(whenEvent);
+                    }
                 });
             }
-            else 
+            else
             {
                 gazeInteractor.hoverExited.AddListener(eventArgs =>
                 {
                     var hoveredObject = eventArgs.interactableObject.transform.gameObject;
-                    if (hoveredObject == target) 
-                        ExecuteActions("Gaze hover exited", thenEvents, ruleEngine);
+                    if (hoveredObject == target)
+                    {
+                        tracker.EventTriggered(whenEvent);
+                    }
                 });
             }
         }
+
         
-        private void BindProximityEvent(GameObject target, ECAEvent whenEvent, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+        private void BindProximityEvent(GameObject target, ECAEvent whenEvent, EventSequenceTracker tracker)
         {
-            // Make sure the target has a Collider (ideally set as trigger)
             var collider = target.GetComponent<Collider>();
             if (collider == null)
             {
@@ -458,26 +494,24 @@ namespace UI
                 return;
             }
 
-            // Ensure it's a trigger to detect proximity without physics collision
             if (!collider.isTrigger)
             {
                 Debug.LogWarning($"Collider on {target.name} is not set as a trigger. Proximity works best with 'isTrigger' enabled.");
             }
 
-            // Attach the helper component that listens for trigger enter
             ProximityTriggerListener listener = target.GetComponent<ProximityTriggerListener>();
             if (listener == null)
             {
                 listener = target.AddComponent<ProximityTriggerListener>();
             }
 
-            // Register the proximity event
             listener.OnProximityEnter += (other) =>
             {
                 Debug.Log($"Proximity detected with {other.name}, publishing actions.");
-                ExecuteActions("Proximity event triggered", thenEvents, ruleEngine);
+                tracker.EventTriggered(whenEvent);
             };
         }
+
 
 
         private void ExecuteActions(string debugMessage, ECAEvent[] thenEvents, RuleEngine ruleEngine)
