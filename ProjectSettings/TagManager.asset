@@ -19,6 +19,7 @@ TagManager:
   - Speech
   - Proximity
   - Interactable
+  - Room
   layers:
   - Default
   - TransparentFX

@@ -328,8 +328,129 @@ namespace UI
 
         return go;
     }
+    
+    
+    public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, 
+        Transform interactableTransform, Vector3 position)
+    {
+        // Validation checks
+        if (string.IsNullOrEmpty(prefabType))
+        {
+            Debug.LogError("PrefabType is null or empty!");
+            return null;
+        }
 
-        /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
+        if (mainCamera == null)
+        {
+            Debug.LogError("MainCamera is null!");
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogError("Cannot find main camera!");
+                return null;
+            }
+        }
+
+        if (interactableTransform == null)
+        {
+            Debug.LogError("InteractableTransform is null!");
+            return null;
+        }
+
+        // Get prefab
+        GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+        if (prefab == null)
+        {
+            Debug.LogError($"Prefab not found for type: {prefabType}");
+            return null;
+        }
+
+        // Calculate spawn position
+        Vector3 spawnPosition;
+        try
+        {
+            GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
+            if (floor != null)
+            {
+                Vector3 upwardOffset = Vector3.up * 1f;
+                Vector3 forwardOffset = mainCamera.transform.forward * 2f;
+                spawnPosition = position + upwardOffset + forwardOffset;
+            }
+            else
+            {
+                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
+                Debug.LogWarning("Floor not found, using camera position as reference");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error calculating spawn position: {e.Message}");
+            return null;
+        }
+
+        // Instantiate object
+        GameObject go = null;
+        try
+        {
+            go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            if (go == null)
+            {
+                Debug.LogError("Failed to instantiate object!");
+                return null;
+            }
+
+            // Set parent
+            go.transform.parent = interactableTransform;
+
+            // Setup Rigidbody
+            Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
+            if (rigidbody == null)
+            {
+                rigidbody = go.AddComponent<Rigidbody>();
+                Debug.Log($"Added Rigidbody to {go.name}");
+            }
+
+            rigidbody.useGravity = true;
+            rigidbody.velocity = Vector3.zero;
+            rigidbody.angularVelocity = Vector3.zero;
+
+            // Rename object
+            int sameTypeCount = 0;
+            foreach (Transform child in interactableTransform)
+            {
+                if (child.name.StartsWith(prefabType)) sameTypeCount++;
+            }
+            go.name = prefabType + sameTypeCount;
+
+            // Set tag and ECAObject component
+            go.tag = "Interactable";
+            ECAObject ecaObject = go.GetComponent<ECAObject>();
+            if (ecaObject != null)
+            {
+                ecaObject.isUsingGravity = ECABoolean.YES;
+            }
+            else
+            {
+                Debug.LogWarning($"ECAObject component not found on {go.name}");
+                ecaObject = go.AddComponent<ECAObject>();
+                ecaObject.isUsingGravity = ECABoolean.YES;
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error during object instantiation: {e.Message}");
+            if (go != null)
+            {
+                Object.Destroy(go);
+            }
+            return null;
+        }
+
+        return go;
+    }
+        
+    
+    /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
         {
             ECAEvent e = new ECAEvent(cube);
             
@@ -881,6 +1002,8 @@ namespace UI
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
+                case "spawn":
+                    return new Action(action.GetSubject(), "delete_duplicates");
             }
 
             return null;
@@ -963,6 +1086,9 @@ namespace UI
                     return (new Action(SelectedObject, "opens"));
                 case "CloseDoor":
                     return (new Action(SelectedObject, "closes"));
+                
+                case "Spawn":
+                    return (new Action(SelectedObject, "spawn"));
 
             }
 

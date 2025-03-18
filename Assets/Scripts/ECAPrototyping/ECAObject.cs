@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.UX;
@@ -40,7 +41,7 @@ namespace ECAPrototyping.RuleEngine
         [StateVariable("gravity", ECARules4AllType.Boolean)] 
         public ECABoolean isUsingGravity = new(ECABoolean.BoolType.YES);
         
-        
+        private ObjectsMenuController _objectsMenuController;
 
         private void Awake()
         {
@@ -48,6 +49,9 @@ namespace ECAPrototyping.RuleEngine
             if(gameRenderer == null)
                 gameRenderer = this.gameObject.AddComponent<MeshRenderer>();
             color = gameRenderer.material.color;
+            
+            var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
+            _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
         }
         
 
@@ -77,6 +81,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "hides")]
         public void Hides()
         {
+            Debug.Log("hides");
             isVisible.Assign(ECABoolean.BoolType.NO);
             UpdateVisibility();
         }
@@ -95,7 +100,6 @@ namespace ECAPrototyping.RuleEngine
         
         private void UpdateVisibility()
         {
-           
             this.gameObject.SetActive(isVisible);
         }
         
@@ -182,6 +186,64 @@ namespace ECAPrototyping.RuleEngine
         {
             Destroy(this.gameObject);
             
+        }
+        
+        /// <summary>
+        /// <b>SpawnObject</b> spawns a new object in the scene.
+        /// </summary>
+        ///
+        [Action(typeof(ECAObject), "spawn")]
+        public void SpawnObjects()
+        {
+            Transform roomTransform = GameObject.Find("Room").transform;
+            Transform floorTransform = roomTransform.Find("Floor");
+            Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
+            if (floorRenderer == null)
+            {
+                Debug.LogError("Il Floor non ha un Renderer, impossibile determinare i limiti!");
+                return;
+            }
+
+            Bounds floorBounds = floorRenderer.bounds;
+            float minX = floorBounds.min.x;
+            float maxX = floorBounds.max.x;
+            float minZ = floorBounds.min.z;
+            float maxZ = floorBounds.max.z;
+
+            int spawnCount = 4;
+            for (int i = 0; i < spawnCount; i++)
+            {
+                string baseName = this.name.Substring(0, this.name.Length - 1);
+
+                float margin = 2.0f; // Margine per evitare spawn fuori dalle pareti
+                float randomX = UnityEngine.Random.Range(minX + margin, maxX - margin);
+                float randomZ = UnityEngine.Random.Range(minZ + margin, maxZ - margin);
+                Vector3 spawnPosition = new Vector3(randomX, this.transform.position.y, randomZ);
+                
+                //check the object's category and spawn it
+                if (_objectsMenuController.shapePrefabs.Find(obj => obj.name == baseName))
+                {
+                    _objectsMenuController.SpawnShape(baseName, spawnPosition);
+                }
+                else if (_objectsMenuController.animalPrefabs.Find(obj => obj.name == baseName))
+                {
+                    _objectsMenuController.SpawnAnimal(baseName, spawnPosition);
+                }
+                else if (_objectsMenuController.furniturePrefabs.Find(obj => obj.name == baseName))
+                {
+                    _objectsMenuController.SpawnForniture(baseName, spawnPosition);
+                }
+            }
+        }
+        
+        
+        [Action(typeof(ECAObject), "delete_duplicates")]
+        public void DeleteDuplicate()
+        {
+            foreach (var obj in _objectsMenuController.spawnedObjects)
+            {
+                Destroy(obj);
+            }
         }
     }
 }

@@ -14,8 +14,8 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> shapePrefabs;
     public List<GameObject> animalPrefabs;
     public List<GameObject> furniturePrefabs;
-
-
+    //List of all the objects that have been spawned
+    public List<GameObject> spawnedObjects; 
     private Camera mainCamera;
     // Start is called before the first frame update
     void Start()
@@ -39,4 +39,18 @@ public class ObjectsMenuController : MonoBehaviour
         Utils.InstantiateObject(type, furniturePrefabs, mainCamera, interactables.transform);
     }
     
+    public void SpawnShape(string type, Vector3 position)
+    {
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, shapePrefabs, mainCamera, interactables.transform, position));
+    }
+    
+    public void SpawnAnimal(string type, Vector3 position)
+    {
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, animalPrefabs, mainCamera, interactables.transform, position));
+    }
+    
+    public void SpawnForniture(string type, Vector3 position)
+    {
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, furniturePrefabs, mainCamera, interactables.transform, position));
+    }
 }
