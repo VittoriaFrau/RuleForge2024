@@ -20,17 +20,13 @@ namespace UI
         public GeneralUIController _generalUIController;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
-        public Texture2D proximityScreenshot;
-        private GameObject eventHandler;
-        private InteractionCreationController _interactionCreationController;
-        public List<GameObject> interactingObjects;
         private GameObject ProximityGameObject1, ProximityGameObject2;
+        public InteractionCreationController interactionCreationController;
 
         private void Start()
         {
-            eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
-            _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             rend = GetComponent<Renderer>();
+            interactionCreationController = GeneralUIController.Instance.InteractionCreationController;
             currentMaterial = rend.material;
         
             if (screenshotCamera != null)
@@ -76,6 +72,8 @@ namespace UI
                         Debug.Log("ProximityGameObject2: " + ProximityGameObject2.name);
                         ChangeMaterial("proximity");
                         _generalUIController.SetDebugText("The " + ProximityGameObject2.name + " is near to the " + ProximityGameObject1.name);
+                        interactionCreationController.CreateProximityCube(ProximityGameObject1, ProximityGameObject2);
+                       
                     }
                 }
                 else

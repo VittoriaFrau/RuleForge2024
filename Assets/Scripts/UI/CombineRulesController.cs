@@ -512,10 +512,10 @@ namespace UI
                 return;
             }
 
-            if (!collider.isTrigger)
+            // We don't need isTrigger true
+            if (collider.isTrigger)
             {
-                Debug.LogWarning(
-                    $"Collider on {target.name} is not set as a trigger. Proximity works best with 'isTrigger' enabled.");
+                collider.isTrigger = false;
             }
 
             ProximityTriggerListener listener = target.GetComponent<ProximityTriggerListener>();

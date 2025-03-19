@@ -37,6 +37,24 @@ namespace UI
             _counter++;
         }
         
+        //Proximity
+        public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event, 
+            GameObject targetObject, [CanBeNull] Texture2D screenshot, bool isActionEvent)
+        {
+            this.ObjectRef = targetObject;
+            this.modality = modality;
+            this.EventStr = _event;
+            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
+            if(screenshot != null) Texture = screenshot;
+            else Texture = null;
+            IsActionEvent = isActionEvent;
+            Subject = @object.name;
+            Verb = "is near to";
+            ObjectStr = ObjectRef.name;
+            _counter++;
+        }
+        
+        
         public ECAEvent(GameObject @object)
         {
             ObjectRef = @object;

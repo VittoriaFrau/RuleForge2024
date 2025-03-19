@@ -730,6 +730,17 @@
                     }
                 }
             }
+
+            public void CreateProximityCube(GameObject proximityGameObject1, GameObject proximityGameObject2)
+            {
+                ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near", 
+                    proximityGameObject2, null, false);
+                if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                {
+                    GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                    PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch);
+                }
+            }
             
             public void PrepareCategoryMenu(GameObject gameObject)
             {
