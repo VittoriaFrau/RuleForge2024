@@ -75,6 +75,10 @@ namespace UI
             {
                 case UIState.EditMode:
                     _editModeController.UpdateAndRemoveListeners();
+                    if (Instance.isRecording)
+                    {
+                        _interactionCreationController.StopRecording();
+                    }
                     break;
                 case UIState.NewObject:
                     break;
