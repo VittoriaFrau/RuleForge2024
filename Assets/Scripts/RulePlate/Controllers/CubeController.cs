@@ -83,7 +83,7 @@ public class CubeController : MonoBehaviour
     {
         timerStarted = true;
         CubeController otherCubeController = otherCube.GetComponent<CubeController>();
-        if (otherCubeController == true) yield break;
+        if (otherCubeController != true) yield break;
         otherCube.GetComponent<CubeController>().timerStarted = true;
         float countdownTime = minimumJoinTime;
         while (countdownTime > 0)
