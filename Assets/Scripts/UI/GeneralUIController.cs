@@ -20,6 +20,7 @@ namespace UI
         public bool isRecording = false;
         private GameObject _selectedObject;
         public List<ECAEvent> recordedEvents = new();
+        public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         
         public enum UIState
         {

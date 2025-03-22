@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Diagnostics;
 using Utils = UI.Utils;
 
+//TODO cancel?
 public class MergedCubeController : MonoBehaviour
 {
     private static bool timerStarted = false;

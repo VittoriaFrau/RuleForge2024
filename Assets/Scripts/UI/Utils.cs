@@ -10,6 +10,7 @@ using MixedReality.Toolkit.UX;
 using TMPro;
 using UnityEngine;
 using UI;
+using UI.RuleEditor;
 using Action = ECAPrototyping.RuleEngine.Action;
 using Object = UnityEngine.Object;
 
@@ -485,7 +486,12 @@ namespace UI
 
         public static ECAEvent GetEventFromCube(GameObject cube, List<ECAEvent> recordedEvents)
         {
-            int cubeID = cube.GetComponent<CubeController>().cubeID;
+            CubeController cubeController = cube.GetComponent<CubeController>();
+            if (cubeController == null)
+            {
+                return null;
+            }
+            int cubeID = cubeController.cubeID;
             ECAEvent e = recordedEvents.Find(ev => ev.CubeID == cubeID);
             if (e == null)
             {
@@ -493,6 +499,23 @@ namespace UI
             }
 
             return e;
+        }
+
+        public static MeanwhileRule GetMeanwhileRuleFromCube(GameObject cube, List<MeanwhileRule> recordedMeanwhiles)
+        {
+            MeanwhileCubeController cubeController = cube.GetComponent<MeanwhileCubeController>();
+            if (cubeController == null)
+            {
+                return null;
+            }
+            int cubeID = cubeController.cubeID;
+            MeanwhileRule rule = recordedMeanwhiles.Find(m => m.CubeID == cubeID);
+            if (rule == null)
+            {
+                Debug.LogError($"MeanwhileRule not found for cube ID {cubeID}");
+            }
+
+            return rule;
         }
 
         public static InteractionCreationController.Modalities GetModalityFromVerb(string verb)
@@ -777,10 +800,9 @@ namespace UI
                 }
                 
             }
-        }
-
-       public static string ConvertToIngForm(string verb)
-    {
+        } 
+        
+        public static string ConvertToIngForm(string verb) {
         if (string.IsNullOrEmpty(verb)) return verb;
         
         // Handle special phrase cases
@@ -818,7 +840,7 @@ namespace UI
         return "is " + verb + "ing";
     }
 
-    public static string ConvertFromIngForm(string ingVerb)
+        public static string ConvertFromIngForm(string ingVerb)
     {
         if (string.IsNullOrEmpty(ingVerb)) return ingVerb;
         

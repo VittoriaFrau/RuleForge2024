@@ -18,6 +18,9 @@ namespace UI
         public GameObject ruleEditorPlate;
         public GameObject cubePlate, modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
         public GameObject whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
+        private List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
+        private ECAEvent[] currentThenEvents;
+
 
         public enum ContainerType
         {
@@ -46,6 +49,15 @@ namespace UI
             handMenuManager = GeneralUIController.Instance.handMenuManager;
             interactionCreationController = GetComponent<InteractionCreationController>();
         }
+        
+        private void Update()
+        {
+            foreach (var rule in activeMeanwhileRules)
+            {
+                rule.UpdateTimer(Time.deltaTime);
+            }
+        }
+
 
 
         public void ActivateCombineRules()
@@ -300,7 +312,6 @@ namespace UI
         }
 
 
-        //WORK IN PROGRESS
         public void CalculateRule()
         {
             RuleEngine ruleEngine = RuleEngine.GetInstance();
@@ -311,10 +322,13 @@ namespace UI
                 GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
                 new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
+            MeanwhileRule [] meanwhileEvents = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
 
-            if (whenEvents.Length == 0 && equivalenceEvents.Length == 0)
+            currentThenEvents = thenEvents;
+
+            if (whenEvents.Length == 0 && meanwhileEvents.Length == 0)
             {
-                Debug.LogWarning("No 'when' or 'equivalence' events found!");
+                Debug.LogWarning("No 'when' events found!");
                 return;
             }
 
@@ -326,6 +340,24 @@ namespace UI
                 GameObject whenGameObject = whenEvent.ObjectRef;
                 BindEvent(whenGameObject, whenEvent, tracker, false);
             }
+            
+            if (meanwhileEvents.Length > 0)
+            {
+                foreach (var meanwhileRule in meanwhileEvents)
+                {
+                    // Add the rule to activeMeanwhileRules 
+                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    {
+                        activeMeanwhileRules.Add(meanwhileRule);
+                    }
+                    foreach (var meanwhileEvent in meanwhileRule.events)
+                    {
+                        GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                        BindEvent(eventGameObject, meanwhileEvent, tracker, false, meanwhileRule);
+                    }
+                }
+            }
+
 
             // Bind dell'equivalenceEvent (ne gestiamo uno solo per ora)
             if (equivalenceEvents.Length > 0)
@@ -337,9 +369,30 @@ namespace UI
         }
 
 
+        private MeanwhileRule[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
+        {
+            var allContainers = GetAllCubeContainers(row, containerNames);
+
+            return allContainers
+            .Select(container =>
+                Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileRules))
+            .ToArray();
+        }
 
 
         private ECAEvent[] GetEventsFromContainers(GameObject row, string[] containerNames)
+        {
+            var allContainers = GetAllCubeContainers(row, containerNames);
+                new List<CubeContainer>();
+                
+            return allContainers
+                .Select(container =>
+                    Utils.GetEventFromCube(container.currentCube, GeneralUIController.Instance.recordedEvents))
+                .Where(e => e != null)
+                .ToArray();
+        }
+        
+        private List<CubeContainer> GetAllCubeContainers(GameObject row, string[] containerNames)
         {
             var allContainers = new List<CubeContainer>();
 
@@ -352,24 +405,66 @@ namespace UI
                     continue;
                 }
 
-                var containers = foundTransform.gameObject.GetComponentsInChildren<CubeContainer>()
+                var containers = foundTransform
+                    .gameObject
+                    .GetComponentsInChildren<CubeContainer>()
                     .Where(c => c.currentCube != null);
 
                 allContainers.AddRange(containers);
             }
 
-            return allContainers
-                .Select(container =>
-                    Utils.GetEventFromCube(container.currentCube, GeneralUIController.Instance.recordedEvents))
-                .ToArray();
+            return allContainers;
+        }
+        
+        private void OnMeanwhileEventTriggered(ECAEvent triggeredEvent, MeanwhileRule rule)
+        {
+            if (rule.HasTriggered(triggeredEvent))
+                return;
+
+            rule.RegisterTrigger(triggeredEvent);
+            Debug.Log($"Meanwhile event triggered: {triggeredEvent.EventStr}");
+
+            if (rule.IsComplete)
+            {
+                Debug.Log("All Meanwhile events triggered within time window! Executing actions...");
+                ExecuteMeanwhileAction();
+                rule.Reset();
+            }
+            else if (!rule.TimerRunning)
+            {
+                rule.StartTimer();
+                Debug.Log($"Started timer for MeanwhileRule: {rule.timer}s");
+            }
         }
 
-        private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
-            bool isEquivalence)
+        
+        private void ExecuteMeanwhileAction()
         {
-            Action<ECAEvent> triggerAction = isEquivalence
-                ? (evt) => tracker.TriggerActionsDirectly(evt)
-                : (evt) => tracker.EventTriggered(evt);
+
+            // Esegui gli eventi THEN collegati, o le azioni che hai previsto
+            foreach (var thenEvent in currentThenEvents)
+            {
+                RuleEngine.GetInstance().ExecuteAction(thenEvent.Action);
+            }
+        }
+
+
+
+        private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
+            bool isEquivalence, MeanwhileRule meanwhileRule = null)
+        {
+            Action<ECAEvent> triggerAction;
+            
+            if (meanwhileRule != null)
+            {
+                triggerAction = (evt) => OnMeanwhileEventTriggered(evt, meanwhileRule);
+            }
+            else
+            {
+                triggerAction = isEquivalence
+                    ? (evt) => tracker.TriggerActionsDirectly(evt)
+                    : (evt) => tracker.EventTriggered(evt);
+            }
 
             switch (eventToBind.Modality)
             {
@@ -411,15 +506,15 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
 
-            if (verb.Contains("clicks"))
+            if (verb.Contains("clicks") || verb.Contains("is clicking"))
             {
                 manipulator.OnClicked.AddListener(() => triggerAction(ecaEvent));
             }
-            else if (verb.Contains("selects"))
+            else if (verb.Contains("selects") || verb.Contains("is selecting"))
             {
                 manipulator.selectEntered.AddListener(interactor => triggerAction(ecaEvent));
             }
-            else if (verb.Contains("deselects"))
+            else if (verb.Contains("deselects") || verb.Contains("is deselecting"))
             {
                 manipulator.selectExited.AddListener(interactor => triggerAction(ecaEvent));
             }
@@ -456,7 +551,7 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
 
-            if (verb.Contains("points"))
+            if (verb.Contains("points") || verb.Contains("is pointing"))
             {
                 manipulator.hoverEntered.AddListener(interactor => triggerAction(ecaEvent));
             }
@@ -479,7 +574,7 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
 
-            if (verb.Contains("looks"))
+            if (verb.Contains("looks") || verb.Contains("is looking"))
             {
                 gazeInteractor.hoverEntered.AddListener(eventArgs =>
                 {

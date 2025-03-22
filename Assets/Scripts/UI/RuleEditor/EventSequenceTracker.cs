@@ -1,4 +1,5 @@
 using ECAPrototyping.RuleEngine;
+using UI.RuleEditor;
 using UnityEngine;
 
 namespace UI
@@ -62,6 +63,14 @@ namespace UI
 
             hasCompleted = true;
             CurrentIndex = 0;
+        }
+        
+        public void ExecuteMeanwhileAction(MeanwhileRule rule)
+        {
+            // Azione: scateni le azioni di THEN
+            // Ad esempio:
+            EventSequenceTracker tracker = new EventSequenceTracker(new ECAEvent[0], thenEvents, RuleEngine.GetInstance());
+            tracker.TriggerActionsDirectly(null); // oppure una logica più complessa
         }
     }
 

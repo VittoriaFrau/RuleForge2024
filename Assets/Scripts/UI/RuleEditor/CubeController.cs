@@ -82,6 +82,8 @@ public class CubeController : MonoBehaviour
     private IEnumerator StartCountdown(GameObject otherCube)
     {
         timerStarted = true;
+        CubeController otherCubeController = otherCube.GetComponent<CubeController>();
+        if (otherCubeController == true) yield break;
         otherCube.GetComponent<CubeController>().timerStarted = true;
         float countdownTime = minimumJoinTime;
         while (countdownTime > 0)
@@ -140,6 +142,13 @@ public class CubeController : MonoBehaviour
         Utils.FillTextLabelsInMergedCubes(mergedCube, new []{cubeLeftEcaEvent, cubeRightEcaEvent});
 
         _combineRulesController.DeactivateRuleDebugText();
+        
+        MeanwhileRule rule = new MeanwhileRule(new [] {cubeLeftEcaEvent, cubeRightEcaEvent});
+        rule.CubeID = mergedCube.GetInstanceID();
+        GeneralUIController.Instance.activeMeanwhileRules.Add(rule);
+
+        MeanwhileCubeController meanwhileCubeController = mergedCube.AddComponent<MeanwhileCubeController>();
+        meanwhileCubeController.cubeID = mergedCube.GetInstanceID();
         
         // Destroy both original cubes 
         Destroy(gameObject);

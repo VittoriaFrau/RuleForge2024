@@ -569,13 +569,13 @@
                     if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
                         GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(gameObject, Modalities.Headgaze);
+                        PrepareForModalityScreenshot(gameObject, Modalities.Headgaze, ecaEvent);
                     }
-
+                    
                     if(categoryMenu != null) PrepareCategoryMenu(gameObject);        
                 });
                 
-                gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
+               /* gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
                 {
                     Debug.Log(manipulator.gameObject.name + " Hover exited");
                     GeneralUIController.Instance.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
@@ -583,9 +583,9 @@
                     if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
                         GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Headgaze, ecaEvent);
                     }
-                });
+                });*/
             }
             
             private void AddLaserListener(ObjectManipulator manipulator)
@@ -605,7 +605,7 @@
                         if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
                             GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser, ecaEvent);
                         }
                     if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
                 });
@@ -621,7 +621,7 @@
                         if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
                             GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser, ecaEvent);
                         }
                     });
             }
@@ -643,7 +643,7 @@
                     if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
                         GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                     }
 
                     if(categoryMenu != null)
@@ -662,7 +662,7 @@
                     if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                     {
                         GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                     }
 
                 });
@@ -677,7 +677,7 @@
                         if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                         {
                             GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                         }
                     });
             }
@@ -738,7 +738,7 @@
                 if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 {
                     GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch);
+                    PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch, ecaEvent);
                 }
             }
             
@@ -773,11 +773,11 @@
                 handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
             }
             
-            public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality)
+            public void PrepareForModalityScreenshot(GameObject gameObject, Modalities modality, ECAEvent ecaEvent)
             {
                 if(bubblesVisible) HideModalitiesBubbles();
                 handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
-                _screenshotCamera.TakeModalityScreenshot(gameObject, modality, GeneralUIController.Instance.recordedEvents.Last());
+                _screenshotCamera.TakeModalityScreenshot(gameObject, modality, ecaEvent);
                 if(bubblesVisible) ShowBubblesExceptSelectedModality();
                 handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
             }
