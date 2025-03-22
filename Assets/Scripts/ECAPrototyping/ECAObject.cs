@@ -81,7 +81,6 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "hides")]
         public void Hides()
         {
-            Debug.Log("hides");
             isVisible.Assign(ECABoolean.BoolType.NO);
             UpdateVisibility();
         }
@@ -195,12 +194,11 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "spawn")]
         public void SpawnObjects()
         {
-            Transform roomTransform = GameObject.Find("Room").transform;
-            Transform floorTransform = roomTransform.Find("Floor");
+            Transform floorTransform = GameObject.FindWithTag("Floor").transform;
             Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
             if (floorRenderer == null)
             {
-                Debug.LogError("Il Floor non ha un Renderer, impossibile determinare i limiti!");
+                Debug.LogError("Il Floor non ha un Renderer.");
                 return;
             }
 
