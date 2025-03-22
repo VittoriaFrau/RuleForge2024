@@ -1,10 +1,7 @@
-using System;
 using UI;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
-public class ModalitiesCollision : MonoBehaviour
+public class SelectModalityWithHand : MonoBehaviour
 {
     private InteractionCreationController _interactionCreationController;
     // This prevents multiple unwanted OnTriggerEnter activations when bubbles redistribute.
