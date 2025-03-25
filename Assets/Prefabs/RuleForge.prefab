@@ -86502,7 +86502,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactablesParent: {fileID: 945898187552997983}
-  eventHandler: {fileID: 5876039117203238164}
 --- !u!114 &6679534885180054317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86566,6 +86565,7 @@ MonoBehaviour:
   - {fileID: 821046753060588197, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
   - {fileID: 7111704164466066223, guid: 23016d9688d1f5749b9d1ef53309e1af, type: 3}
   - {fileID: 7133046953667732310, guid: 5e875699ce3a69440a31d062f318b43f, type: 3}
+  spawnedObjects: []
 --- !u!114 &8716191333414450868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97473,8 +97473,7 @@ MonoBehaviour:
   proximityMaterial: {fileID: 2100000, guid: b1064f1a1c822b9458273217619a7e33, type: 2}
   _generalUIController: {fileID: 4290745511058819159}
   screenshotCamera: {fileID: 2871904776004708331}
-  proximityScreenshot: {fileID: 0}
-  interactingObjects: []
+  interactionCreationController: {fileID: 0}
 --- !u!1 &6623025650087665186
 GameObject:
   m_ObjectHideFlags: 0
@@ -137772,6 +137771,22 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5425207845909468075, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: model
+      value: 
+      objectReference: {fileID: 4935501542516651140, guid: 1102adc710b58ee45adb08bdd5d4767c, type: 3}
+    - target: {fileID: 5425207845909468075, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: modelPrefab
+      value: 
+      objectReference: {fileID: 4935501542516651140, guid: 1102adc710b58ee45adb08bdd5d4767c, type: 3}
+    - target: {fileID: 9106889285693841392, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: model
+      value: 
+      objectReference: {fileID: 4095732255266800568, guid: 3bd614f14cda63940b56faf0518b55f3, type: 3}
+    - target: {fileID: 9106889285693841392, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: modelPrefab
+      value: 
+      objectReference: {fileID: 4095732255266800568, guid: 3bd614f14cda63940b56faf0518b55f3, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
