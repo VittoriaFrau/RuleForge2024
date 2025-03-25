@@ -333,7 +333,7 @@
                     foreach (var keyword in keywords)
                     {
                         keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
-                            AddListener(() => { generalUIController.SetDebugText("You said " + keyword); });
+                            AddListener(() => { GeneralUIController.Instance.SetDebugText("You said " + keyword); });
                     }
                 }
                 #else 
