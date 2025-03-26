@@ -14,6 +14,8 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> shapePrefabs;
     public List<GameObject> animalPrefabs;
     public List<GameObject> furniturePrefabs;
+    public List<GameObject> propPrefabs;
+    public List<GameObject> vegetationPrefabs;
     //List of all the objects that have been spawned
     public List<GameObject> spawnedObjects; 
     private Camera mainCamera;
@@ -39,6 +41,16 @@ public class ObjectsMenuController : MonoBehaviour
         Utils.InstantiateObject(type, furniturePrefabs, mainCamera, interactables.transform);
     }
     
+    public void NewProp(string type)
+    {
+        Utils.InstantiateObject(type, propPrefabs, mainCamera, interactables.transform);
+    }
+    
+    public void NewVegetation(string type)
+    {
+        Utils.InstantiateObject(type, vegetationPrefabs, mainCamera, interactables.transform);
+    }
+    
     public void SpawnShape(string type, Vector3 position)
     {
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, shapePrefabs, mainCamera, interactables.transform, position));
@@ -52,5 +64,15 @@ public class ObjectsMenuController : MonoBehaviour
     public void SpawnForniture(string type, Vector3 position)
     {
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, furniturePrefabs, mainCamera, interactables.transform, position));
+    }
+    
+    public void SpawnProp(string type, Vector3 position)
+    {
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, propPrefabs, mainCamera, interactables.transform, position));
+    }
+    
+    public void SpawnVegetation(string type, Vector3 position)
+    {
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, vegetationPrefabs, mainCamera, interactables.transform, position));
     }
 }
