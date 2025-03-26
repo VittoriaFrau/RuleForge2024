@@ -243,5 +243,20 @@ namespace ECAPrototyping.RuleEngine
                 Destroy(obj);
             }
         }
+        
+        [Action(typeof(ECAObject), "follow")]
+        public void Follow()
+        {
+            //attach the object to the GrabInteractor of the Left Hand Controller
+            GameObject hand = GameObject.FindWithTag("GrabInteractor");
+            this.transform.SetParent(hand.transform);
+            this.transform.localPosition = Vector3.zero;
+        }
+        
+        [Action(typeof(ECAObject), "unfollow")]
+        public void Unfollow()
+        {
+            this.transform.SetParent(null);
+        }
     }
 }

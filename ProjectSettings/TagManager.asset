@@ -20,6 +20,7 @@ TagManager:
   - Proximity
   - Interactable
   - Floor
+  - GrabInteractor
   layers:
   - Default
   - TransparentFX

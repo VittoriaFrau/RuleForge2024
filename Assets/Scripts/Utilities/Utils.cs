@@ -1026,6 +1026,8 @@ namespace UI
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
                 case "spawn":
                     return new Action(action.GetSubject(), "delete_duplicates");
+                case "follow":
+                    return new Action(action.GetSubject(), "unfollow");
             }
 
             return null;
@@ -1111,6 +1113,11 @@ namespace UI
                 
                 case "Spawn":
                     return (new Action(SelectedObject, "spawn"));
+                
+                case "Follow":
+                    return (new Action(SelectedObject, "follow"));
+                case "Unfollow":
+                    return (new Action(SelectedObject, "unfollow"));
 
             }
 
