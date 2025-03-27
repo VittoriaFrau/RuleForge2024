@@ -31,7 +31,8 @@
                 Laser,
                 Microgesture,
                 Speech,
-                Proximity
+                Proximity,
+                Controller
             }
             
             private Modalities _modality;
@@ -39,46 +40,57 @@
             private bool bubblesVisible = true;
             public GameObject recordInteractionButton, stopInteractionButton;
             private RuleEngine _ruleEngine;
-            
-            //Touch modality attributes
-            public GameObject OpenXRRightHandController, OpenXRLeftHandController;
-            private GameObject RightHand, LeftHand;
-            private Material normalTouchMaterial;
-            public Material shiningTouchMaterial;
-            [FormerlySerializedAs("interactables")] public GameObject interactablesParent;
-            
-            //Microgesture
-            
-            
-            //Laser modality attributes
-            private GameObject rightHandLaserPointer, leftHandLaserPointer;
-            private LineRenderer rightHandLaserPointerLineRenderer, leftHandLaserPointerLineRenderer;
-            private Material normalLaserMaterial;
-            public Material shiningLaserMaterial;
-            
-            //Headgaze modality attributes
-            public GameObject headGazePointer;
-            public GameObject gazeInteractor;
-            private GameObject headGazePointerInstance;
-            public Material normalHeadGazeMaterial;
-            public Material shiningHeadGazeMaterial;
-            
-            
-            //Recording
             //Opposite action events are used to revert the action when we go back to the previous state
             private List<Action> _oppositeActionEvents = new();
             public GameObject screenshotCamera;
             private ScreenshotCamera _screenshotCamera;
             public HandMenuManager handMenuManager;
             private CategoryController _categoryController;
+            [FormerlySerializedAs("interactables")] public GameObject interactablesParent;
+            
+            //Touch modality attributes
+            [Header("Touch Modality")]
+            public GameObject OpenXRRightHandController;
+            public GameObject OpenXRLeftHandController;
+            private GameObject RightHand, LeftHand;
+            private Material normalTouchMaterial;
+            public Material shiningTouchMaterial;
+            
+            //Microgesture
+            
+            
+            //Laser modality attributes
+            [Header("Laser Modality")]
+            private GameObject rightHandLaserPointer, leftHandLaserPointer;
+            private LineRenderer rightHandLaserPointerLineRenderer, leftHandLaserPointerLineRenderer;
+            private Material normalLaserMaterial;
+            public Material shiningLaserMaterial;
+            
+            //Headgaze modality attributes
+            [Header("Headgaze Modality")]
+            public GameObject headGazePointer;
+            public GameObject gazeInteractor;
+            private GameObject headGazePointerInstance;
+            public Material normalHeadGazeMaterial;
+            public Material shiningHeadGazeMaterial;
 
             //Speech
+            [Header("Speech Modality")]
             public GameObject MRTKSpeech;
             public GameObject microphone;
             private List<string> keywords = new() { "fire", "leviosa", "change", "abracadabra" };
             
             // Proximity
+            [Header("Proximity Modality")]
             public GameObject proximityCube;
+            
+            [Header("Controller Modality")]
+            public GameObject controllerPrefabLeft;
+            public GameObject controllerPrefabRight;
+            public GameObject handPrefabLeft;
+            public GameObject handPrefabRight;
+            private HandModel handModelLeft;
+            private HandModel handModelRight;
 
             private void Start()
             {
@@ -88,6 +100,8 @@
                 if(microphone.activeSelf) microphone.SetActive(false);
                 _ruleEngine = RuleEngine.GetInstance();
                 _categoryController = GetComponent<CategoryController>();
+                handModelLeft = OpenXRLeftHandController.GetComponent<HandModel>();
+                handModelRight = OpenXRRightHandController.GetComponent<HandModel>();
             }
 
             public void SelectModality(string modality)
@@ -115,6 +129,9 @@
                         case Modalities.Proximity:
                             ActivateProximityModality();
                             break;
+                        case Modalities.Controller:
+                            ActivateControllerModality();
+                            break;
                     }
                 
                 //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
@@ -123,6 +140,45 @@
                     RecordInteraction();
                 }
                 
+            }
+            
+            private void ActivateControllerModality()
+            {
+                // Hides modality bubble
+                HideModalityBubble("Controller");
+
+                // Left hand
+                ReplaceHandModel(handModelLeft, controllerPrefabLeft.transform);
+    
+                // Right hand
+                ReplaceHandModel(handModelRight, controllerPrefabRight.transform);
+            }
+
+            private void ReplaceHandModel(HandModel handModel, Transform newPrefab)
+            {
+                if (handModel.Model != null)
+                {
+                    Destroy(handModel.Model.gameObject); // Destroy the old model
+                }
+
+                handModel.ModelPrefab = newPrefab;
+
+                // Create manually the new model
+                Transform newModel = Instantiate(newPrefab, handModel.ModelParent);
+    
+                // Connect SelectInput, if any
+                if (handModel.SelectInput != null && newModel.TryGetComponent(out ISelectInputVisualizer selectInputVisualizer))
+                {
+                    selectInputVisualizer.SelectInput = handModel.SelectInput;
+                }
+            }
+
+
+            private void DeActivateControllerModality()
+            {
+                //Hide the controllers
+                ReplaceHandModel(handModelLeft, handPrefabLeft.transform);
+                ReplaceHandModel(handModelRight, handPrefabRight.transform);
             }
 
             private void ActivateProximityModality()
@@ -219,6 +275,9 @@
                         break;
                     case Modalities.Proximity:
                         DeActivateProximityModality();
+                        break;
+                    case Modalities.Controller:
+                        DeActivateControllerModality();
                         break;
                 }
                 //Remove the listeners

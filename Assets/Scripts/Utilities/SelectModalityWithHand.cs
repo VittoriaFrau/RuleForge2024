@@ -43,6 +43,9 @@ public class SelectModalityWithHand : MonoBehaviour
                 case "Proximity":
                     _interactionCreationController.SelectModality("Proximity");
                     break;
+                case "GameController":
+                    _interactionCreationController.SelectModality("Controller");
+                    break;
             }
             StartRedistribution(); // Prevents new triggers until redistribution ends
         }
