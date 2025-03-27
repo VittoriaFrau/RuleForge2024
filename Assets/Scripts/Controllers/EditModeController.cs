@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Controllers;
 using ECAPrototyping.RuleEngine;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.SpatialManipulation;
@@ -19,11 +20,13 @@ namespace UI
         public GameObject interactablesParent;
         private List<GameObject> interactables;
         private GeneralUIController generalUIController;
+        private CategoryController _categoryController;
         private RuleEngine _ruleEngine;
        
         private void Start()
         {
-            generalUIController = this.gameObject.GetComponent<GeneralUIController>();
+            generalUIController = GetComponent<GeneralUIController>();
+            _categoryController = GetComponent<CategoryController>();
             _ruleEngine = RuleEngine.GetInstance();
         }
         
@@ -78,14 +81,24 @@ namespace UI
         {
             if (_ruleEngine == null) return;
             Action action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
-            _ruleEngine.ExecuteAction(action);
-            
             // If I'm recording, I need to save the action
             if (GeneralUIController.Instance.isRecording)
             {
                 generalUIController.InteractionCreationController.SaveRecordedAction(action);
             }
 
+            switch (_categoryController.categoryObjectSelected)
+            {
+                case CategoryController.CategoryObjectSelected.SingleObject:
+                    _ruleEngine.ExecuteAction(action);
+                    break;
+                case CategoryController.CategoryObjectSelected.Category:
+                    Utils.ExecuteActionOnCategory(_ruleEngine, action, interactablesParent);
+                    break;
+                case CategoryController.CategoryObjectSelected.AllObjects:
+                    Utils.ExecuteActionOnAllObjects(_ruleEngine, action, interactablesParent);
+                    break;
+            }
         }
 
     }

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 9065097236184367344}
   - component: {fileID: 730957635546057225}
   - component: {fileID: -5286553168547104795}
+  - component: {fileID: 2574977685988173495}
   m_Layer: 0
   m_Name: Cylinder
   m_TagString: Untagged
@@ -382,3 +383,15 @@ MonoBehaviour:
       reference: MixedReality.Toolkit.SpatialManipulation.RotateLogic, MixedReality.Toolkit.SpatialManipulation
     scaleLogicType:
       reference: MixedReality.Toolkit.SpatialManipulation.ScaleLogic, MixedReality.Toolkit.SpatialManipulation
+--- !u!114 &2574977685988173495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855169194666388880}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e21f84e12674b27863f695522b98b6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

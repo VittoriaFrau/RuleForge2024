@@ -2,6 +2,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using Controllers;
     using ECAPrototyping.RuleEngine;
     using JetBrains.Annotations;
     using MixedReality.Toolkit;
@@ -32,13 +33,6 @@
                 Speech,
                 Proximity
             }
-
-            public enum CategoryObjectSelected
-            {
-                GameObject,
-                Category,
-                AllObject
-            }
             
             private Modalities _modality;
             public List<GameObject> modalitiesBubbles;
@@ -51,7 +45,7 @@
             private GameObject RightHand, LeftHand;
             private Material normalTouchMaterial;
             public Material shiningTouchMaterial;
-            public GameObject interactables;
+            [FormerlySerializedAs("interactables")] public GameObject interactablesParent;
             
             //Microgesture
             
@@ -73,22 +67,15 @@
             //Recording
             //Opposite action events are used to revert the action when we go back to the previous state
             private List<Action> _oppositeActionEvents = new();
-            
             public GameObject screenshotCamera;
             private ScreenshotCamera _screenshotCamera;
             public HandMenuManager handMenuManager;
-
-            //Category choice
-            public GameObject categoryMenu;
-            public TextMeshProUGUI SingleObjectLabel;
-            public TextMeshProUGUI CategoryLabel;
-            public FontIconSelector CategoryIcon;
-            public Image CategoryImage;
+            private CategoryController _categoryController;
 
             //Speech
             public GameObject MRTKSpeech;
             public GameObject microphone;
-            private List<string> keywords = new() { "incendio", "leviosa", "change", "abracadabra" };
+            private List<string> keywords = new() { "fire", "leviosa", "change", "abracadabra" };
             
             // Proximity
             public GameObject proximityCube;
@@ -100,6 +87,7 @@
                 if(MRTKSpeech.activeSelf) MRTKSpeech.SetActive(false);
                 if(microphone.activeSelf) microphone.SetActive(false);
                 _ruleEngine = RuleEngine.GetInstance();
+                _categoryController = GetComponent<CategoryController>();
             }
 
             public void SelectModality(string modality)
@@ -144,8 +132,8 @@
                 //Show proximity cube
                 proximityCube.SetActive(true);
                 
-                // loop to the objects in the interactables
-                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                // loop to the objects in the interactablesParent
+                foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
                     //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
                     if (go.gameObject.GetComponent<Collider>() != null)
@@ -166,8 +154,8 @@
             {
                 //Hide proximity cube
                 proximityCube.SetActive(false);
-                // loop to the objects in the interactables
-                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                // loop to the objects in the interactablesParent
+                foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
                     if (go.gameObject.name.Contains("Box"))
                     {
@@ -234,14 +222,14 @@
                         break;
                 }
                 //Remove the listeners
-                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
                     RemoveListener(go);
                 }
                 
                 GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality 
                                                                        + " use your modality to interact with any object in the scene");
-                if(categoryMenu!=null) categoryMenu.SetActive(false);
+                _categoryController.ShowCategoryMenu();
             }
             
             private void ActivateTouchModality()
@@ -388,40 +376,84 @@
                         bubble.SetActive(true);
                 }
             }
-
+            
             public void StopRecording()
             {
-                GeneralUIController.Instance.isRecording = false;
+                var uiController = GeneralUIController.Instance;
+                uiController.isRecording = false;
                 screenshotCamera.SetActive(false);
+                uiController.SetDebugText("Recording stopped.");
 
-                GeneralUIController.Instance.SetDebugText("Recording stopped.");
-                
-               if (categoryMenu != null)
-               {
-                   if(categoryMenu.activeSelf)
-                       categoryMenu.SetActive(false);
-               }
-               
-                if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.NewInteraction)
+                if (uiController.UIstate == GeneralUIController.UIState.NewInteraction)
                 {
                     DeActivateCurrentModality();
                     HideModalitiesBubbles();
-                } else if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.EditMode)
-                {
-                    //The changes during the recording have to be reverted
-                    foreach (var action in _oppositeActionEvents)
-                    {
-                        _ruleEngine.ExecuteAction(action);
-                    }
+                    return;
                 }
 
+                if (uiController.UIstate == GeneralUIController.UIState.EditMode)
+                {
+                    _categoryController.HideCategoryMenu();
+                    HandleCategoryActions();
+                }
+                
+                _categoryController.ResetCategory();
+            }
 
+            private void HandleCategoryActions()
+            {
+                switch (_categoryController.categoryObjectSelected)
+                {
+                    case CategoryController.CategoryObjectSelected.SingleObject:
+                        ExecuteOppositeActions();
+                        break;
+
+                    case CategoryController.CategoryObjectSelected.Category:
+                    case CategoryController.CategoryObjectSelected.AllObjects:
+                        var lastEvent = GeneralUIController.Instance.recordedEvents.Last();
+                        lastEvent.ChangeObjectCategory(_categoryController.categoryObjectSelected);
+            
+                        if (_categoryController.categoryObjectSelected == CategoryController.CategoryObjectSelected.Category)
+                        {
+                            ExecuteActionOnCategory();
+                        }
+                        else
+                        {
+                            ExecuteActionOnAllObjects();
+                        }
+                        break;
+                }
+            }
+
+            private void ExecuteOppositeActions()
+            {
+                foreach (var action in _oppositeActionEvents)
+                {
+                    _ruleEngine.ExecuteAction(action);
+                }
+            }
+
+            private void ExecuteActionOnCategory()
+            {
+                foreach (var action in _oppositeActionEvents)
+                {
+                    Utils.ExecuteActionOnCategory(_ruleEngine, action, interactablesParent);
+                }
+            }
+
+            private void ExecuteActionOnAllObjects()
+            {
+                foreach (var action in _oppositeActionEvents)
+                {
+                    Utils.ExecuteActionOnAllObjects(_ruleEngine, action, interactablesParent);
+                }
             }
 
             public void StartRecording()
             {
                 GeneralUIController.Instance.isRecording = true;
-                
+                _categoryController.CustomizeCategoryMenu(GeneralUIController.Instance.GetSelectedObject());
+
                 switch (GeneralUIController.Instance.UIstate)
                 {
                     case GeneralUIController.UIState.NewInteraction:
@@ -490,7 +522,7 @@
                 recordInteractionButton.SetActive(false);
                 stopInteractionButton.SetActive(true);
 
-                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
                     AddListener(go);
                 }
@@ -572,7 +604,7 @@
                         PrepareForModalityScreenshot(gameObject, Modalities.Headgaze, ecaEvent);
                     }
                     
-                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);        
+                    _categoryController.CustomizeCategoryMenu(gameObject);      
                 });
                 
                /* gazeInteractor.GetComponent<FuzzyGazeInteractor>().hoverExited.AddListener((GameObject) =>
@@ -607,7 +639,7 @@
                             GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                             PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser, ecaEvent);
                         }
-                    if(categoryMenu != null ) PrepareCategoryMenu(gameObject);
+                    _categoryController.CustomizeCategoryMenu(gameObject);
                 });
 
                 manipulator.hoverExited.AddListener(interactor =>
@@ -636,8 +668,6 @@
                     Debug.Log(manipulator.gameObject.name + " On clicked");
                     GeneralUIController.Instance.SetDebugText("You clicked on " + manipulator.gameObject.name);
                     
-                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);
-                    
                     //Note: event should be added before starting the coroutine
                     ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "Clicks", null, false);
                     if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
@@ -646,8 +676,8 @@
                         PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                     }
 
-                    if(categoryMenu != null)
-                        PrepareCategoryMenu(gameObject);
+                    _categoryController.CustomizeCategoryMenu(gameObject);
+
                 });
                 
                 manipulator.selectEntered.AddListener(interactor =>
@@ -655,7 +685,7 @@
                     Debug.Log(manipulator.gameObject.name + " Select entered");
                     GeneralUIController.Instance.SetDebugText("You selected " + manipulator.gameObject.name);
                     
-                    if(categoryMenu != null) PrepareCategoryMenu(gameObject);
+                    _categoryController.CustomizeCategoryMenu(gameObject);
                     
                     //Note: event should be added before starting the coroutine
                     ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects", null, false);
@@ -714,7 +744,7 @@
             {
                 proximityCube.GetComponentInChildren<ObjectManipulator>().enabled = false;
                 
-                foreach (var go in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
                 {
                     //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
                     if (go.gameObject.GetComponent<Collider>() != null)
@@ -742,29 +772,7 @@
                 }
             }
             
-            public void PrepareCategoryMenu(GameObject gameObject)
-            {
-                string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
-                if(gameObject.name.Contains("Box"))
-                    objectCategory = "Furniture"; 
-                GeneralUIController.Instance.SetDebugText("Are you selecting the " + gameObject.name + ", any "+ objectCategory +" or any object?");
-                categoryMenu.SetActive(true);
-                
-                CategoryLabel.text = objectCategory;
-                SingleObjectLabel.text = gameObject.name;
-                string icon = Utils.GetIconForECACategory(objectCategory);
-                if (icon != null)
-                {
-                    if (icon.Contains("door"))
-                    {
-                        CategoryImage.sprite = Resources.Load<Sprite>(icon);
-                        CategoryImage.gameObject.SetActive(true);
-                        CategoryIcon.gameObject.SetActive(false);
-                    }
-                    else CategoryIcon.CurrentIconName = icon;
-                }
-                    
-            }
+            
 
             public void PrepareForActionScreenShot(GameObject gameObject)
             {

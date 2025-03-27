@@ -1,3 +1,4 @@
+using Controllers;
 using ECAPrototyping.RuleEngine;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -7,8 +8,7 @@ namespace UI
     public class ECAEvent
     {
         private InteractionCreationController.Modalities modality;
-        //TODO: sto selezionando cubo, shape o un qualsiasi oggetto?
-        private InteractionCreationController.CategoryObjectSelected typeOfObject;
+        private CategoryController.CategoryObjectSelected eventCategory;
         private static int _counter = 0;
         
         public string Subject { get; set; }
@@ -29,12 +29,17 @@ namespace UI
             this.ObjectRef = @object;
             this.modality = modality;
             this.EventStr = _event;
-            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
+            eventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
             SetModalityRule();
             _counter++;
+        }
+        
+        public void ChangeObjectCategory(CategoryController.CategoryObjectSelected category)
+        {
+            eventCategory = category;
         }
         
         //Proximity
@@ -44,7 +49,7 @@ namespace UI
             this.ObjectRef = targetObject;
             this.modality = modality;
             this.EventStr = _event;
-            typeOfObject = InteractionCreationController.CategoryObjectSelected.GameObject; //By default
+            eventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;

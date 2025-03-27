@@ -451,7 +451,7 @@ namespace UI
     }
         
     
-    /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactables)
+    /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactablesParent)
         {
             ECAEvent e = new ECAEvent(cube);
             
@@ -479,7 +479,7 @@ namespace UI
             
             e.Modality = GetModalityFromVerb(e.Verb);
             
-            e.ObjectRef = interactables.transform.Find(e.ObjectStr).gameObject;
+            e.ObjectRef = interactablesParent.transform.Find(e.ObjectStr).gameObject;
 
             return e;
         }*/
@@ -1124,19 +1124,71 @@ namespace UI
             return null;
         }
         
-        public static void SetStatusButton(bool active, GameObject button)
+        public static void ChangeButtonAppearance(bool active, GameObject button)
         {
             GameObject frontPlate = button.transform.Find("Frontplate").gameObject;
             GameObject animatedContent = frontPlate.transform.Find("AnimatedContent").gameObject;
-            TextMeshProUGUI textMeshProUGUI = animatedContent.transform.Find("Text").GetComponent<TextMeshProUGUI>();
+            var textMeshPro = animatedContent.transform.Find("Text");
+            var icon = animatedContent.transform.Find("Icon");
+            if(textMeshPro == null) textMeshPro = icon.transform.Find("Text");    
+            var textMeshProUGUI = textMeshPro.GetComponent<TextMeshProUGUI>();
             var color = textMeshProUGUI.color;
             color.a = active ? 1 : 0.2f;
             textMeshProUGUI.color = color;
-            TextMeshProUGUI icon = animatedContent.transform.Find("Icon").gameObject.transform.Find("UIButtonFontIcon").GetComponent<TextMeshProUGUI>();
-            var iconColor = icon.color;
+            TextMeshProUGUI fontIcon = icon.transform.Find("UIButtonFontIcon").GetComponent<TextMeshProUGUI>();
+            var iconColor = fontIcon.color;
             iconColor.a = active ? 1 : 0.2f;
-            icon.color = iconColor;
+            fontIcon.color = iconColor;
         }
-        
+
+        public static void TogglePressableButton(bool active, GameObject button)
+        {
+            PressableButton pressableButton = button.GetComponent<PressableButton>();
+            if(pressableButton){
+                pressableButton.enabled = active;
+            }
+        }
+
+        public static GameObject[] FindObjectsWithECAScript(GameObject parent, string scriptName)
+        {
+            List<GameObject> matchingObjects = new List<GameObject>();
+            string fullScriptName = "ECAPrototyping.RuleEngine." + scriptName;
+
+            foreach (Transform child in parent.transform)
+            {
+                Type scriptType = Type.GetType(fullScriptName);
+                if (scriptType != null && child.gameObject.GetComponent(scriptType) != null)
+                {
+                    matchingObjects.Add(child.gameObject);
+                }
+            }
+
+            return matchingObjects.ToArray();
+        }
+
+        public static void ExecuteActionOnCategory(RuleEngine _ruleEngine, Action action, GameObject parent)
+        {
+            GameObject mainGameObject = action.GetSubject();
+            string ecaLastScript = "ECA"+ GetECALastScriptFromECAObject(mainGameObject);
+            GameObject[] categoryGameObjects = FindObjectsWithECAScript(parent, ecaLastScript);
+            
+            foreach (GameObject categoryGameObject in categoryGameObjects)
+            {   
+                Action newAction = action;
+                newAction.SetSubject(categoryGameObject);
+                _ruleEngine.ExecuteAction(newAction);
+            }
+        }
+
+        public static void ExecuteActionOnAllObjects(RuleEngine _ruleEngine, Action action, GameObject parent)
+        {
+            foreach (Transform child in parent.transform)
+            {
+                Action newAction = action;
+                GameObject go = child.gameObject;
+                newAction.SetSubject(go);
+                _ruleEngine.ExecuteAction(newAction);
+            }
+        }
     }
 }

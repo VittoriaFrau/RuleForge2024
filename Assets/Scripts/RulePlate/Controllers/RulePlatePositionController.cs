@@ -73,7 +73,7 @@ namespace UI.RuleEditor
     {
         foreach (var button in ruleEditorButtons)
         {
-            Utils.SetStatusButton(active, button);
+            Utils.ChangeButtonAppearance(active, button);
         }
     }
 }
