@@ -10,6 +10,7 @@
     using MixedReality.Toolkit.SpatialManipulation;
     using MixedReality.Toolkit.Subsystems;
     using MixedReality.Toolkit.UX;
+    using UnityEngine.XR;
     using TMPro;
     using UI.RuleEditor;
     using UnityEngine;
@@ -17,6 +18,7 @@
     using UnityEngine.Serialization;
     using UnityEngine.UI;
     using Action = ECAPrototyping.RuleEngine.Action;
+    using UnityEngine.XR.Hands;
     using Object = UnityEngine.Object;
 
     namespace UI
@@ -102,6 +104,36 @@
                 _categoryController = GetComponent<CategoryController>();
                 handModelLeft = OpenXRLeftHandController.GetComponent<HandModel>();
                 handModelRight = OpenXRRightHandController.GetComponent<HandModel>();
+                
+                Debug.Log("Available controllers: " + AreControllersConnected());
+            }
+            
+            //TODO check
+            private bool AreControllersConnected()
+            {
+                List<InputDevice> devices = new List<InputDevice>();
+                InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
+                return devices.Count > 0;
+            }
+            
+            //TODO check
+            bool AreHandsTracked()
+            {
+                XRHandSubsystem m_HandSubsystem;
+                var handSubsystems = new List<XRHandSubsystem>();
+                SubsystemManager.GetSubsystems(handSubsystems);
+
+                for (var i = 0; i < handSubsystems.Count; ++i)
+                {
+                    var handSubsystem = handSubsystems[i];
+                    if (handSubsystem.running)
+                    {
+                        m_HandSubsystem = handSubsystem;
+                        Debug.Log("Hand Tracking is supported ");
+                        break;
+                    }
+                }
+                return handSubsystems != null && handSubsystems.Count > 0;
             }
 
             public void SelectModality(string modality)
@@ -511,7 +543,6 @@
             public void StartRecording()
             {
                 GeneralUIController.Instance.isRecording = true;
-                _categoryController.CustomizeCategoryMenu(GeneralUIController.Instance.GetSelectedObject());
 
                 switch (GeneralUIController.Instance.UIstate)
                 {
@@ -519,6 +550,7 @@
                         RecordInteraction();
                         break;
                     case GeneralUIController.UIState.EditMode:
+                        _categoryController.CustomizeCategoryMenu(GeneralUIController.Instance.GetSelectedObject());
                         RecordAction();
                         break;
                 }
@@ -606,6 +638,9 @@
                     case Modalities.Proximity:
                         AddProximityListener(manipulator);
                         break;
+                    case Modalities.Controller:
+                        AddControllersListener(manipulator);
+                        break;
                 }
                 
             }
@@ -623,6 +658,7 @@
                         manipulator.hoverExited.RemoveAllListeners();
                         break;
                     case Modalities.Touch:
+                    case Modalities.Controller:
                         manipulator.OnClicked.RemoveAllListeners();
                         manipulator.selectEntered.RemoveAllListeners();
                         manipulator.selectExited.RemoveAllListeners();
@@ -770,6 +806,61 @@
                         }
                     });
             }
+
+            private void AddControllersListener(ObjectManipulator manipulator)
+            {
+                GameObject gameObject = manipulator.gameObject;
+
+                //attach listener to object manipulator manipulation started event
+                manipulator.OnClicked.AddListener (() =>
+                {
+                    Debug.Log(manipulator.gameObject.name + " On clicked");
+                    GeneralUIController.Instance.SetDebugText("You clicked on " + manipulator.gameObject.name);
+                    
+                    //Note: event should be added before starting the coroutine
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Controller, "Clicks", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                    {
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
+                    }
+
+                    _categoryController.CustomizeCategoryMenu(gameObject);
+
+                });
+                
+                manipulator.selectEntered.AddListener(interactor =>
+                {
+                    Debug.Log(manipulator.gameObject.name + " Select entered");
+                    GeneralUIController.Instance.SetDebugText("You selected " + manipulator.gameObject.name);
+                    
+                    _categoryController.CustomizeCategoryMenu(gameObject);
+                    
+                    //Note: event should be added before starting the coroutine
+                    ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Controller, "selects", null, false);
+                    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                    {
+                        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
+                    }
+
+                });
+                    
+                manipulator.selectExited.AddListener(interactor =>
+                    {
+                        Debug.Log(manipulator.gameObject.name + " Select exited");
+                        GeneralUIController.Instance.SetDebugText("You deselected " + manipulator.gameObject.name);
+                        //Note: event should be added before starting the coroutine
+                        //Add the event only if it doesn't exist already
+                        ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Controller, "deselects", null, false);
+                        if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                        {
+                            GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                            PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
+                        }
+                    });
+            }
+            
 
             private void AddSpeechListener()
             {
