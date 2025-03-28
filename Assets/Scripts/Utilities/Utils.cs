@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,10 +10,12 @@ using MixedReality.Toolkit.UX;
 //using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
-using UI;
 using UI.RuleEditor;
 using Action = ECAPrototyping.RuleEngine.Action;
 using Object = UnityEngine.Object;
+using UnityEngine.XR;
+
+
 
 namespace UI
 {
@@ -212,7 +215,7 @@ namespace UI
             return new Vector3(-5.3f, 0.0f, -16.3f);
         }
 
-    public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
+        public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
     {
         // Validation checks
         if (string.IsNullOrEmpty(prefabType))
@@ -331,7 +334,7 @@ namespace UI
     }
     
     
-    public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, 
+        public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, 
         Transform interactableTransform, Vector3 position)
     {
         // Validation checks
@@ -451,7 +454,7 @@ namespace UI
     }
         
     
-    /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactablesParent)
+        /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactablesParent)
         {
             ECAEvent e = new ECAEvent(cube);
             
@@ -869,7 +872,6 @@ namespace UI
         return ingVerb.Substring(0, ingVerb.Length - 3);
     }
 
-
         public static string GetRuleDescriptionFromCubePrefab(GameObject cube)
         {
             string ruleDescription = "";
@@ -1189,6 +1191,13 @@ namespace UI
                 newAction.SetSubject(go);
                 _ruleEngine.ExecuteAction(newAction);
             }
+        }
+        
+        public static bool AreControllersConnected()
+        {
+            List<InputDevice> devices = new List<InputDevice>();
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
+            return devices.Count > 0;
         }
     }
 }

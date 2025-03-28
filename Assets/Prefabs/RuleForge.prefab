@@ -1895,11 +1895,11 @@ RectTransform:
   m_Children:
   - {fileID: 4584070188455866495}
   - {fileID: 7020019622529154932}
+  - {fileID: 8168470841287655689}
   - {fileID: 6796160555420855495}
   - {fileID: 4890387275112844650}
   - {fileID: 4323432216983097966}
   - {fileID: 6187197663607401982}
-  - {fileID: 8168470841287655689}
   - {fileID: 3005364486374853594}
   - {fileID: 6310663008007750332}
   m_Father: {fileID: 1906889495600305372}
@@ -101532,6 +101532,8 @@ MonoBehaviour:
   proximityCube: {fileID: 6690143694704629766}
   controllerPrefabLeft: {fileID: 5976469751327894969, guid: 1102adc710b58ee45adb08bdd5d4767c, type: 3}
   controllerPrefabRight: {fileID: 3339478339056654981, guid: 3bd614f14cda63940b56faf0518b55f3, type: 3}
+  shiningControllerLeft: {fileID: 0}
+  shiningControllerRight: {fileID: 0}
   handPrefabLeft: {fileID: 1423679602657988571, guid: 2b468cc4fe6d2b44ebc53b958b38b91a, type: 3}
   handPrefabRight: {fileID: 4354293980546992658, guid: da93d751ddc0f64468dfc02f18d02d00, type: 3}
 --- !u!114 &4766665405315196094
