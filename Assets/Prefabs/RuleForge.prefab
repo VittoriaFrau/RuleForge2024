@@ -31309,7 +31309,7 @@ GameObject:
   - component: {fileID: 2454127825501299980}
   - component: {fileID: 7479194350337323957}
   m_Layer: 5
-  m_Name: Spawn
+  m_Name: Duplicate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31548,7 +31548,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Spawn
+          m_StringArgument: Duplicate
           m_BoolArgument: 0
         m_CallState: 2
   <OnEnabled>k__BackingField:
@@ -38962,7 +38962,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Spawn
+  m_text: Duplicate
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
   m_sharedMaterial: {fileID: -1005824763306460071, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
@@ -70627,7 +70627,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Spawn
+  m_text: Duplicate
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
   m_sharedMaterial: {fileID: -1005824763306460071, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
@@ -101558,8 +101558,12 @@ MonoBehaviour:
   - {fileID: 821046753060588197, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
   - {fileID: 7111704164466066223, guid: 23016d9688d1f5749b9d1ef53309e1af, type: 3}
   - {fileID: 7133046953667732310, guid: 5e875699ce3a69440a31d062f318b43f, type: 3}
-  propPrefabs: []
-  vegetationPrefabs: []
+  propPrefabs:
+  - {fileID: 7957796827298215147, guid: eb7b0d81414d6724fa971f03578cebd2, type: 3}
+  - {fileID: 2989000923634411228, guid: 44cdcd55c8562cc46b31e272eb09fc5b, type: 3}
+  - {fileID: 100000, guid: 876a9efcae3245e4ab66feeb8f437976, type: 3}
+  vegetationPrefabs:
+  - {fileID: 900635493881049116, guid: d81290e6d409e99409053be6ad101dac, type: 3}
   spawnedObjects: []
 --- !u!114 &8716191333414450868
 MonoBehaviour:
@@ -116381,8 +116385,8 @@ MonoBehaviour:
   shapesMenu: {fileID: 4908696201415199541}
   animalMenu: {fileID: 4232413637068484503}
   furnitureMenu: {fileID: 7562245390825121359}
-  propsMenu: {fileID: 0}
-  vegetationMenu: {fileID: 0}
+  propsMenu: {fileID: 4985477017713945674}
+  vegetationMenu: {fileID: 159809368553820125}
   colorPalette: {fileID: 4608038252871778716}
   debugPanel: {fileID: 2274138254633824154}
   menuContentCanvas: {fileID: 6651988460665923547}

@@ -1024,7 +1024,7 @@ namespace UI
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
-                case "spawn":
+                case "duplicate":
                     return new Action(action.GetSubject(), "delete_duplicates");
                 case "follow":
                     return new Action(action.GetSubject(), "unfollow");
@@ -1111,8 +1111,8 @@ namespace UI
                 case "CloseDoor":
                     return (new Action(SelectedObject, "closes"));
                 
-                case "Spawn":
-                    return (new Action(SelectedObject, "spawn"));
+                case "Duplicate":
+                    return (new Action(SelectedObject, "duplicate"));
                 
                 case "Follow":
                     return (new Action(SelectedObject, "follow"));

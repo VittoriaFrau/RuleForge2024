@@ -191,8 +191,8 @@ namespace ECAPrototyping.RuleEngine
         /// <b>SpawnObject</b> spawns a new object in the scene.
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "spawn")]
-        public void SpawnObjects()
+        [Action(typeof(ECAObject), "duplicate")]
+        public void CreateDuplicates()
         {
             Transform floorTransform = GameObject.FindWithTag("Floor").transform;
             Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
@@ -236,7 +236,7 @@ namespace ECAPrototyping.RuleEngine
         
         
         [Action(typeof(ECAObject), "delete_duplicates")]
-        public void DeleteDuplicate()
+        public void DeleteDuplicates()
         {
             foreach (var obj in _objectsMenuController.spawnedObjects)
             {
