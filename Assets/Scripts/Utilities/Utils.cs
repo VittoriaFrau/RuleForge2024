@@ -1121,6 +1121,16 @@ namespace UI
                 case "Unfollow":
                     return (new Action(SelectedObject, "unfollow"));
 
+				case "ChangeText":
+                    return (new Action(SelectedObject, "change text"));
+
+				case "IncreaseCounter":
+                    return (new Action(SelectedObject, "increase counter"));
+
+				case "DecreaseCounter":
+                    return (new Action(SelectedObject, "decresase counter"));
+
+
             }
 
             return null;

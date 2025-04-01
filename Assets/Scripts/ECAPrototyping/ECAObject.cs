@@ -266,5 +266,25 @@ namespace ECAPrototyping.RuleEngine
         {
             this.transform.SetParent(null);
         }
+		
+		[Action(typeof(ECAObject), "change text")]
+        public void ChangeText()
+        {
+            //TODO
+			
+        }
+
+		[Action(typeof(ECAObject), "increase counter")]
+        public void IncreaseCounter()
+        {
+            //TODO
+        }
+
+		[Action(typeof(ECAObject), "decrease counter")]
+        public void DecreaseCounter()
+        {
+            //TODO
+        }
+		
     }
 }
