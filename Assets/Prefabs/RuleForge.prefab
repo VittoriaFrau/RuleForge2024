@@ -101565,7 +101565,7 @@ MonoBehaviour:
   - {fileID: 2989000923634411228, guid: 44cdcd55c8562cc46b31e272eb09fc5b, type: 3}
   - {fileID: 100000, guid: 876a9efcae3245e4ab66feeb8f437976, type: 3}
   vegetationPrefabs:
-  - {fileID: 900635493881049116, guid: d81290e6d409e99409053be6ad101dac, type: 3}
+  - {fileID: 2602975220198116835, guid: e0cd0de1919373d41a51701cc20c08c1, type: 3}
   spawnedObjects: []
 --- !u!114 &8716191333414450868
 MonoBehaviour:
@@ -120627,7 +120627,19 @@ MonoBehaviour:
         m_Calls: []
   <OnClicked>k__BackingField:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 607159369133769202}
+        m_TargetAssemblyTypeName: UI.RuleEditor.HandMenuManager, Assembly-CSharp
+        m_MethodName: ShowVegetationMenu
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   <OnEnabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []

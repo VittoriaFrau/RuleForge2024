@@ -231,6 +231,14 @@ namespace ECAPrototyping.RuleEngine
                 {
                     _objectsMenuController.SpawnForniture(baseName, spawnPosition);
                 }
+                else if (_objectsMenuController.propPrefabs.Find(obj => obj.name == baseName))
+                {
+                    _objectsMenuController.SpawnProp(baseName, spawnPosition);
+                }
+                else if (_objectsMenuController.vegetationPrefabs.Find(obj => obj.name == baseName))
+                {
+                    _objectsMenuController.SpawnVegetation(baseName, spawnPosition);
+                }
             }
         }
         
