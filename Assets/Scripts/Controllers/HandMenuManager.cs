@@ -18,6 +18,7 @@ namespace UI.RuleEditor
         public GameObject furnitureMenu;
         public GameObject propsMenu;
         public GameObject vegetationMenu;
+		public GameObject uiMenu;
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
@@ -152,6 +153,12 @@ namespace UI.RuleEditor
             HideMenus();
             vegetationMenu.SetActive(true);
         }
+            
+        public void ShowUIMenu()
+        {
+            HideMenus();
+            uiMenu.SetActive(true);
+        }   
     
     }
 
