@@ -178631,6 +178631,10 @@ PrefabInstance:
       propertyPath: trackedTargetType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4030209091377909950, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: m_TagString
+      value: NonNativeKeyboard
+      objectReference: {fileID: 0}
     - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
       propertyPath: <SubmitOnEnter>k__BackingField
       value: 1

@@ -1128,7 +1128,7 @@ namespace UI
                     return (new Action(SelectedObject, "increase counter"));
 
 				case "DecreaseCounter":
-                    return (new Action(SelectedObject, "decresase counter"));
+                    return (new Action(SelectedObject, "decrease counter"));
 
 
             }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.UX;
+using TMPro;
 using UI;
 using UnityEngine;
 
@@ -42,6 +43,8 @@ namespace ECAPrototyping.RuleEngine
         public ECABoolean isUsingGravity = new(ECABoolean.BoolType.YES);
         
         private ObjectsMenuController _objectsMenuController;
+        
+        private int counter = 0;
 
         private void Awake()
         {
@@ -270,20 +273,31 @@ namespace ECAPrototyping.RuleEngine
 		[Action(typeof(ECAObject), "change text")]
         public void ChangeText()
         {
-            //TODO
-			
+            //TODO: implement the change text action
         }
 
 		[Action(typeof(ECAObject), "increase counter")]
         public void IncreaseCounter()
         {
-            //TODO
+            if (gameObject.GetComponentInChildren<TextMeshPro>())
+            {
+                counter++;
+                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
+                text.text = "Counter: " + counter;
+            }
+            else Debug.LogError("The object does not have a TextMeshPro component.");
         }
 
 		[Action(typeof(ECAObject), "decrease counter")]
         public void DecreaseCounter()
         {
-            //TODO
+            if (gameObject.GetComponentInChildren<TextMeshPro>())
+            {
+                counter = counter == 0 ? 0 : --counter;
+                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
+                text.text = "Counter: " + counter;
+            }
+            else Debug.LogError("The object does not have a TextMeshPro component.");
         }
 		
     }
