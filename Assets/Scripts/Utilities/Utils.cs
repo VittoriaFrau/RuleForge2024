@@ -1030,6 +1030,12 @@ namespace UI
                     return new Action(action.GetSubject(), "delete_duplicates");
                 case "follow":
                     return new Action(action.GetSubject(), "unfollow");
+                case "change text": 
+                    return new Action(action.GetSubject(), "reset text");
+                case "increase counter":
+                    return new Action(action.GetSubject(), "reset counter");
+                case "decrease counter":
+                    return new Action(action.GetSubject(), "reset counter");
             }
 
             return null;

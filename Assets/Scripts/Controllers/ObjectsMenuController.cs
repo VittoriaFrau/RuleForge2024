@@ -19,6 +19,8 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> UIPrefabs;
     //List of all the objects that have been spawned
     public List<GameObject> spawnedObjects;
+    
+    public GameObject NonNativeKeyboard;
     private Camera mainCamera;
     // Start is called before the first frame update
     void Start()
@@ -85,5 +87,10 @@ public class ObjectsMenuController : MonoBehaviour
     public void SpawnUIElement(string type, Vector3 position)
     {
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, UIPrefabs, mainCamera, interactables.transform, position));
+    }
+    
+    public void ShowKeyboard()
+    {
+        NonNativeKeyboard.SetActive(true);
     }
 }

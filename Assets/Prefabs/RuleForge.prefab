@@ -112580,6 +112580,7 @@ MonoBehaviour:
   - {fileID: 1833847234740766164, guid: d129639bcea06314f9e046f70c8dd387, type: 3}
   - {fileID: 8752660457688561743, guid: 7cbe16de2ae252a4e930258a9bc9edb9, type: 3}
   spawnedObjects: []
+  NonNativeKeyboard: {fileID: 4708769107660008313}
 --- !u!114 &8716191333414450868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137952,6 +137953,18 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 4766665405315196094}
+        m_TargetAssemblyTypeName: ObjectsMenuController, Assembly-CSharp
+        m_MethodName: ShowKeyboard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ChangeText
           m_BoolArgument: 1
         m_CallState: 2
   <OnEnabled>k__BackingField:
@@ -178639,6 +178652,38 @@ PrefabInstance:
       propertyPath: <SubmitOnEnter>k__BackingField
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2266740878681303224}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: CreateAndPublishAction
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UI.EditModeController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_StringArgument
+      value: ChangeText
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 8401378662638236490, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
       propertyPath: m_Name
       value: NonNativeKeyboardContainer
@@ -178648,6 +178693,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+--- !u!1 &4708769107660008313 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4030209091377909950, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+  m_PrefabInstance: {fileID: 8554241553668324295}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7294653912097447237 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1408804572884002434, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}

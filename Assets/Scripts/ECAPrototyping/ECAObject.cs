@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.UX;
+using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -269,12 +270,22 @@ namespace ECAPrototyping.RuleEngine
         {
             this.transform.SetParent(null);
         }
-		
-		[Action(typeof(ECAObject), "change text")]
+        
+        
+        [Action(typeof(ECAObject), "change text")]
         public void ChangeText()
         {
-            //TODO: implement the change text action
+            var keyboard = _objectsMenuController.NonNativeKeyboard.GetComponent<NonNativeKeyboard>();
+            this.GetComponentInChildren<TextMeshPro>().text = keyboard.Text;
         }
+        
+        [Action(typeof(ECAObject), "reset text")]
+        public void ResetText()
+        {
+            this.GetComponentInChildren<TextMeshPro>().text = "Sample example";
+        }
+        
+        
 
 		[Action(typeof(ECAObject), "increase counter")]
         public void IncreaseCounter()
@@ -296,6 +307,17 @@ namespace ECAPrototyping.RuleEngine
                 counter = counter == 0 ? 0 : --counter;
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
                 text.text = "Counter: " + counter;
+            }
+            else Debug.LogError("The object does not have a TextMeshPro component.");
+        }
+        
+        [Action(typeof(ECAObject), "reset counter")]
+        public void ResetCounter()
+        {
+            if (gameObject.GetComponentInChildren<TextMeshPro>())
+            {
+                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
+                text.text = "Counter: 0";
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
