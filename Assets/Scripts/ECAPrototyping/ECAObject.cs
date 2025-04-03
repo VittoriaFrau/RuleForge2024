@@ -259,10 +259,14 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "follow")]
         public void Follow()
         {
-            //attach the object to the GrabInteractor of the Left Hand Controller
             GameObject hand = GameObject.FindWithTag("GrabInteractor");
             this.transform.SetParent(hand.transform);
-            this.transform.localPosition = Vector3.zero;
+            
+            var rb = this.GetComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+            rb.MovePosition(hand.transform.position);
+            rb.MoveRotation(hand.transform.rotation);
         }
         
         [Action(typeof(ECAObject), "unfollow")]
