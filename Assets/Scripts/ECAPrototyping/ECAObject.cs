@@ -3,11 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using ECAPrototyping.Utils;
+using MixedReality.Toolkit.SpatialManipulation;
 using MixedReality.Toolkit.UX;
 using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
 using UI;
 using UnityEngine;
+
 
 namespace ECAPrototyping.RuleEngine
 {
@@ -47,7 +49,7 @@ namespace ECAPrototyping.RuleEngine
         
         private int counter = 0;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             gameRenderer = this.gameObject.GetComponent<Renderer>();
             if(gameRenderer == null)
@@ -327,4 +329,118 @@ namespace ECAPrototyping.RuleEngine
         }
 		
     }
+
+    [ECARules4All("door")]
+    public class DoorBehaviour : ECAObject
+    {
+        [StateVariable("locked", ECARules4AllType.Boolean)]
+        public ECABoolean isLocked = new(ECABoolean.BoolType.YES);
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            // Aggiungi ObjectManipulator se non esiste
+            var manipulator = gameObject.GetComponent<ObjectManipulator>();
+            if (manipulator == null)
+            {
+                manipulator = gameObject.AddComponent<ObjectManipulator>();
+            }
+
+            // Aggiungi BoxCollider se non esiste
+            if (gameObject.GetComponent<BoxCollider>() == null)
+            {
+                gameObject.AddComponent<BoxCollider>();
+            }
+
+            // Configura Rigidbody se non esiste
+            if (gameObject.GetComponent<Rigidbody>() == null)
+            {
+                Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
+        }
+
+        [Action(typeof(DoorBehaviour), "opens")]
+        public void Open()
+        {
+            // Modifica qui: usa GetBoolType() e confronta con BoolType.NO
+            if (isLocked.GetBoolType() == ECABoolean.BoolType.NO)
+            {
+                transform.Rotate(0, 90, 0);
+            }
+        }
+
+        [Action(typeof(DoorBehaviour), "closes")]
+        public void Close()
+        {
+            transform.Rotate(0, -90, 0);
+        }
+
+        [Action(typeof(DoorBehaviour), "unlocks")]
+        public void Unlock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.NO);
+        }
+
+        [Action(typeof(DoorBehaviour), "locks")]
+        public void Lock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.YES);
+        }
+    }
+
+    [ECARules4All("key")]
+    public class KeyBehaviour : ECAObject
+    {
+        [StateVariable("collected", ECARules4AllType.Boolean)]
+        public ECABoolean isCollected = new(ECABoolean.BoolType.NO);
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            // Aggiungi ObjectManipulator se non esiste
+            var manipulator = gameObject.GetComponent<ObjectManipulator>();
+            if (manipulator == null)
+            {
+                manipulator = gameObject.AddComponent<ObjectManipulator>();
+            }
+
+            // Aggiungi BoxCollider se non esiste
+            if (gameObject.GetComponent<BoxCollider>() == null)
+            {
+                gameObject.AddComponent<BoxCollider>();
+            }
+
+            // Configura Rigidbody se non esiste
+            if (gameObject.GetComponent<Rigidbody>() == null)
+            {
+                Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
+        }
+
+        [Action(typeof(KeyBehaviour), "collects")]
+        public void Collect()
+        {
+            isCollected.Assign(ECABoolean.BoolType.YES);
+            Hides(); // Usa il metodo ereditato da ECAObject
+        }
+
+        [Action(typeof(KeyBehaviour), "uses")]
+        public void Use(DoorBehaviour door)
+        {
+            // Modifica qui: usa GetBoolType() invece di GetBool()
+            if (isCollected.GetBoolType() == ECABoolean.BoolType.YES)
+            {
+                door.Unlock();
+            }
+        }
+    }
+
+
+
 }
