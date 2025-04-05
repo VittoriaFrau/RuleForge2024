@@ -62,9 +62,9 @@ namespace ECAPrototyping.RuleEngine
         }
 
         /// <summary>
-        /// <b>opens</b> opens the door.
+        /// <b>Open</b> Open the door.
         /// </summary>
-        [Action(typeof(ECADoor), "opens")]
+        [Action(typeof(ECADoor), "Open")]
         public void OpenDoor()
         {
             if (!isOpen && !rotating && doorTransform != null)
@@ -88,7 +88,7 @@ namespace ECAPrototyping.RuleEngine
                         GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
                         if (GeneralUIController.Instance != null && GeneralUIController.Instance.isRecording)
                         {
-                            Action action = new Action(this.gameObject, "opens");
+                            Action action = new Action(this.gameObject, "Open");
                             generalUIController.InteractionCreationController.SaveRecordedAction(action);
                         }
                     }
@@ -100,9 +100,9 @@ namespace ECAPrototyping.RuleEngine
         }
 
         /// <summary>
-        /// <b>closes</b> closes the door.
+        /// <b>Close</b> Close the door.
         /// </summary>
-        [Action(typeof(ECADoor), "closes")]
+        [Action(typeof(ECADoor), "Close")]
         public void CloseDoor()
         {
             if (isOpen && !rotating && doorTransform != null)
@@ -126,7 +126,7 @@ namespace ECAPrototyping.RuleEngine
                         GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
                         if (GeneralUIController.Instance != null && GeneralUIController.Instance.isRecording)
                         {
-                            Action action = new Action(this.gameObject, "closes");
+                            Action action = new Action(this.gameObject, "Close");
                             generalUIController.InteractionCreationController.SaveRecordedAction(action);
                         }
                     }
