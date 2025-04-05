@@ -19,6 +19,7 @@ namespace ECAPrototyping.RuleEngine
     /// </summary>
     [DisallowMultipleComponent]
     [ECARules4All("object")]
+
     public class ECAObject : MonoBehaviour
     {
         /// <summary>
@@ -31,7 +32,9 @@ namespace ECAPrototyping.RuleEngine
         /// </summary>
         [StateVariable("color", ECARules4AllType.Color)] 
         public Color color;
-        
+
+        [StateVariable("locked", ECARules4AllType.Boolean)]
+        public ECABoolean isLocked = new(ECABoolean.BoolType.YES);
         /// <summary>
         /// <b>isVisible</b> is a boolean that indicates if the object is visible.
         /// If the object is invisible, it will not be rendered but it will still collide with other objects.
@@ -51,6 +54,26 @@ namespace ECAPrototyping.RuleEngine
 
         protected virtual void Awake()
         {
+                      // Aggiungi ObjectManipulator se non esiste
+            var manipulator = gameObject.GetComponent<ObjectManipulator>();
+            if (manipulator == null)
+            {
+                manipulator = gameObject.AddComponent<ObjectManipulator>();
+            }
+
+            // Aggiungi BoxCollider se non esiste
+            if (gameObject.GetComponent<BoxCollider>() == null)
+            {
+                gameObject.AddComponent<BoxCollider>();
+            }
+
+            // Configura Rigidbody se non esiste
+            if (gameObject.GetComponent<Rigidbody>() == null)
+            {
+                Rigidbody rb = gameObject.AddComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
             gameRenderer = this.gameObject.GetComponent<Renderer>();
             if(gameRenderer == null)
                 gameRenderer = this.gameObject.AddComponent<MeshRenderer>();
@@ -327,32 +350,40 @@ namespace ECAPrototyping.RuleEngine
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
-        
+
         [Action(typeof(ECAObject), "Open")]
-        //devo implementare l'azione open per la door
         public void Open()
         {
-            //check if the object is a door
-            if (gameObject.GetComponent<ECADoor>() != null)
+            // Modifica qui: usa GetBoolType() e confronta con BoolType.NO
+            if (isLocked.GetBoolType() == ECABoolean.BoolType.NO)
             {
-                gameObject.GetComponent<ECADoor>().OpenDoor();
+                transform.Rotate(0, 90, 0);
             }
-            else Debug.LogError("The object is not a door.");
         }
 
         [Action(typeof(ECAObject), "Close")]
-        //devo implementare l'azione close per la door
         public void Close()
         {
-            //check if the object is a door
-            if (gameObject.GetComponent<ECADoor>() != null)
-            {
-                gameObject.GetComponent<ECADoor>().CloseDoor();
-            }
-            else Debug.LogError("The object is not a door.");
+            transform.Rotate(0, -90, 0);
         }
 
+        [Action(typeof(ECAObject), "unlocks")]
+        public void Unlock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.NO);
+        }
+
+        [Action(typeof(ECAObject), "locks")]
+        public void Lock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.YES);
+        }
     }
+		
+
+
+        
+
 
 
 }
