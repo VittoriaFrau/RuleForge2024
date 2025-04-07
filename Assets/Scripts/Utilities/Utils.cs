@@ -1136,8 +1136,8 @@ namespace UI
 				case "DecreaseCounter":
                     return (new Action(SelectedObject, "decrease counter"));
                 
-                case "Throw":
-                    return (new Action(SelectedObject, "throw"));
+                case "Launch":
+                    return (new Action(SelectedObject, "launch"));
 
 
             }

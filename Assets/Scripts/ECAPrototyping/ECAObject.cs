@@ -9,6 +9,7 @@ using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
 using UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 namespace ECAPrototyping.RuleEngine
@@ -49,7 +50,9 @@ namespace ECAPrototyping.RuleEngine
         public ECABoolean isUsingGravity = new(ECABoolean.BoolType.YES);
         
         private ObjectsMenuController _objectsMenuController;
-        
+        private InteractionCreationController _interactionCreationController;
+
+        public InputActionReference inputAction;
         private int counter = 0;
 
         protected virtual void Awake()
@@ -81,6 +84,7 @@ namespace ECAPrototyping.RuleEngine
             
             var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
+            _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
         }
         
 
@@ -350,14 +354,41 @@ namespace ECAPrototyping.RuleEngine
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
         
-        [Action(typeof(ECAObject), "throw")]
-        public void Throw()
+        [Action(typeof(ECAObject), "launch")]
+        public void Launch()
         {
-            Unfollow();
-            var rb = GetComponent<Rigidbody>();
-            rb.isKinematic = false;
-            rb.useGravity = true;
-            rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+          StartCoroutine(LaunchTrigger());
+        }
+        
+        private IEnumerator LaunchTrigger()
+        {
+         float timer = 0f;
+             if (!_interactionCreationController.isUsingControllers)
+             {
+                 Unfollow();
+                 var rb = this.GetComponent<Rigidbody>();
+                 rb.isKinematic = false;
+                 rb.useGravity = true;
+                 rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+             }
+             else
+             {
+                 Debug.Log("Using controller ");
+                 while (timer < 10f)
+                 {
+                     if (inputAction.action.ReadValue<float>()==1)
+                     {
+                         Unfollow(); 
+                         var rb = this.GetComponent<Rigidbody>();
+                         rb.isKinematic = false;
+                         rb.useGravity = true;
+                         rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+                         yield break;
+                     } 
+                     timer += Time.deltaTime;
+                     yield return null;
+                 }
+             } 
         }
         
 

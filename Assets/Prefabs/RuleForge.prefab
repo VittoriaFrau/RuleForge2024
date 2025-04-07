@@ -83221,7 +83221,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Throw
+  m_text: Launch
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
   m_sharedMaterial: {fileID: -1005824763306460071, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
@@ -117181,6 +117181,7 @@ MonoBehaviour:
   shiningControllerRight: {fileID: 3339478339056654981, guid: 12f37c524c2eb3f44ae488560e0f23ca, type: 3}
   handPrefabLeft: {fileID: 1423679602657988571, guid: 2b468cc4fe6d2b44ebc53b958b38b91a, type: 3}
   handPrefabRight: {fileID: 4354293980546992658, guid: da93d751ddc0f64468dfc02f18d02d00, type: 3}
+  isUsingControllers: 0
 --- !u!114 &4766665405315196094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127127,7 +127128,7 @@ GameObject:
   - component: {fileID: 2891808735789530857}
   - component: {fileID: 2391476705696255164}
   m_Layer: 5
-  m_Name: Throw
+  m_Name: Launch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -127366,7 +127367,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Throw
+          m_StringArgument: Launch
           m_BoolArgument: 0
         m_CallState: 2
   <OnEnabled>k__BackingField:
@@ -185560,6 +185561,14 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4160709927669568829, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: m_ActionAssets.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4160709927669568829, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
+      propertyPath: m_ActionAssets.Array.data[1]
+      value: 
+      objectReference: {fileID: -944628639613478452, guid: d2cef3533ea67c7499d860986b1ab460, type: 3}
     - target: {fileID: 5425207845909468075, guid: acbf65a81ce2cf94f82a0809298acf70, type: 3}
       propertyPath: model
       value: 

@@ -87,7 +87,7 @@ namespace UI
         public GameObject handPrefabRight;
         private HandModel handModelLeft;
         private HandModel handModelRight;
-        private bool isUsingControllers = false;
+        public bool isUsingControllers = false;
 
         private void Start()
         {

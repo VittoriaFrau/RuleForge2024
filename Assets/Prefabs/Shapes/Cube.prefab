@@ -377,10 +377,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 0}
+  isLocked:
+    choice: 0
   isVisible:
     choice: 0
   isUsingGravity:
     choice: 0
+  inputAction: {fileID: 2634468285697876775, guid: d2cef3533ea67c7499d860986b1ab460, type: 3}
 --- !u!114 &1102951931488109181
 MonoBehaviour:
   m_ObjectHideFlags: 0

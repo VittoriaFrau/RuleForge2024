@@ -72,6 +72,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1237260282239320022}
   m_SourcePrefab: {fileID: 100100000, guid: 0669f3d8f4b119f418a4bbe061cc198f, type: 3}
+--- !u!4 &6099832888027173189 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: 0669f3d8f4b119f418a4bbe061cc198f, type: 3}
+  m_PrefabInstance: {fileID: 1286975607263165023}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7133046953667732310 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 0669f3d8f4b119f418a4bbe061cc198f, type: 3}
@@ -117,10 +122,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 0}
+  isLocked:
+    choice: 0
   isVisible:
     choice: 0
   isUsingGravity:
     choice: 0
+  inputAction: {fileID: 2634468285697876775, guid: d2cef3533ea67c7499d860986b1ab460, type: 3}
 --- !u!65 &2679941805609888449
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -339,7 +347,7 @@ MonoBehaviour:
   <OnDisabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
-  hostTransform: {fileID: 0}
+  hostTransform: {fileID: 6099832888027173189}
   allowedManipulations: 7
   allowedInteractionTypes: -2147483641
   rigidbodyMovementType: 0
