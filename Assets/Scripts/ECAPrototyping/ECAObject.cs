@@ -285,9 +285,9 @@ namespace ECAPrototyping.RuleEngine
         public void Follow()
         {
             GameObject hand = GameObject.FindWithTag("GrabInteractor");
-            this.transform.SetParent(hand.transform);
+            transform.SetParent(hand.transform);
             
-            var rb = this.GetComponent<Rigidbody>();
+            var rb = GetComponent<Rigidbody>();
             rb.useGravity = false;
             rb.isKinematic = true;
             rb.MovePosition(hand.transform.position);
@@ -297,7 +297,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "unfollow")]
         public void Unfollow()
         {
-            this.transform.SetParent(null);
+            transform.SetParent(_objectsMenuController.interactables.transform);
         }
         
         
@@ -305,7 +305,7 @@ namespace ECAPrototyping.RuleEngine
         public void ChangeText()
         {
             var keyboard = _objectsMenuController.NonNativeKeyboard.GetComponent<NonNativeKeyboard>();
-            this.GetComponentInChildren<TextMeshPro>().text = keyboard.Text;
+            GetComponentInChildren<TextMeshPro>().text = keyboard.Text;
         }
         
         [Action(typeof(ECAObject), "reset text")]
@@ -315,7 +315,6 @@ namespace ECAPrototyping.RuleEngine
         }
         
         
-
 		[Action(typeof(ECAObject), "increase counter")]
         public void IncreaseCounter()
         {
@@ -350,6 +349,17 @@ namespace ECAPrototyping.RuleEngine
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
+        
+        [Action(typeof(ECAObject), "throw")]
+        public void Throw()
+        {
+            Unfollow();
+            var rb = GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+        }
+        
 
         [Action(typeof(ECAObject), "Open")]
         public void Open()
