@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.12731704, g: 0.1341472, b: 0.121078566, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -562,22 +562,6 @@ PrefabInstance:
     - target: {fileID: 4224652418178196536, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4766665405315196094, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: furniturePrefabs.Array.data[1]
-      value: 
-      objectReference: {fileID: 7133046953667732310, guid: 5e875699ce3a69440a31d062f318b43f, type: 3}
-    - target: {fileID: 4766665405315196094, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: furniturePrefabs.Array.data[2]
-      value: 
-      objectReference: {fileID: 6044075394097397562, guid: 1895ba0190be7ea42a27d9ef5466703b, type: 3}
-    - target: {fileID: 5113778264890570758, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5113778264890570758, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: <OnClicked>k__BackingField.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5719973515271713112, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y

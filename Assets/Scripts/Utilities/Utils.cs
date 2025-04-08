@@ -1036,6 +1036,8 @@ namespace UI
                     return new Action(action.GetSubject(), "reset counter");
                 case "decrease counter":
                     return new Action(action.GetSubject(), "reset counter");
+                case "double counter":
+                    return new Action(action.GetSubject(), "reset counter");
             }
 
             return null;
@@ -1136,8 +1138,12 @@ namespace UI
 				case "DecreaseCounter":
                     return (new Action(SelectedObject, "decrease counter"));
                 
+                case "DoubleCounter":
+                    return (new Action(SelectedObject, "double counter"));
+                
                 case "Launch":
                     return (new Action(SelectedObject, "launch"));
+                
 
 
             }
