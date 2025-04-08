@@ -1114,9 +1114,9 @@ namespace UI
                     return (new Action(SelectedObject, "turns", ECABoolean.OFF));
 
                 
-                case "OpenDoor":
+                case "Open":
                     return (new Action(SelectedObject, "opens"));
-                case "CloseDoor":
+                case "Close":
                     return (new Action(SelectedObject, "closes"));
                 
                 case "Duplicate":

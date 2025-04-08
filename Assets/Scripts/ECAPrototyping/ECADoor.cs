@@ -64,7 +64,7 @@ namespace ECAPrototyping.RuleEngine
         /// <summary>
         /// <b>Open</b> Open the door.
         /// </summary>
-        [Action(typeof(ECADoor), "Open")]
+        [Action(typeof(ECADoor), "opens")]
         public void OpenDoor()
         {
             if (!isOpen && !rotating && doorTransform != null)
@@ -102,7 +102,7 @@ namespace ECAPrototyping.RuleEngine
         /// <summary>
         /// <b>Close</b> Close the door.
         /// </summary>
-        [Action(typeof(ECADoor), "Close")]
+        [Action(typeof(ECADoor), "closes")]
         public void CloseDoor()
         {
             if (isOpen && !rotating && doorTransform != null)
