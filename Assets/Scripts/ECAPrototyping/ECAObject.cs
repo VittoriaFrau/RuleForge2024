@@ -52,7 +52,6 @@ namespace ECAPrototyping.RuleEngine
         private ObjectsMenuController _objectsMenuController;
         private InteractionCreationController _interactionCreationController;
 
-        public InputActionReference inputAction;
         private int counter = 0;
 
         protected virtual void Awake()
@@ -357,38 +356,11 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "launch")]
         public void Launch()
         {
-          StartCoroutine(LaunchTrigger());
-        }
-        
-        private IEnumerator LaunchTrigger()
-        {
-         float timer = 0f;
-             if (!_interactionCreationController.isUsingControllers)
-             {
-                 Unfollow();
-                 var rb = this.GetComponent<Rigidbody>();
-                 rb.isKinematic = false;
-                 rb.useGravity = true;
-                 rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
-             }
-             else
-             {
-                 Debug.Log("Using controller ");
-                 while (timer < 10f)
-                 {
-                     if (inputAction.action.ReadValue<float>()==1)
-                     {
-                         Unfollow(); 
-                         var rb = this.GetComponent<Rigidbody>();
-                         rb.isKinematic = false;
-                         rb.useGravity = true;
-                         rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
-                         yield break;
-                     } 
-                     timer += Time.deltaTime;
-                     yield return null;
-                 }
-             } 
+            Unfollow();
+            var rb = this.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            rb.useGravity = true;
+            rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
         }
         
 
