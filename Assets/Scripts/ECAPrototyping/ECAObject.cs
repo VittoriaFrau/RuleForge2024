@@ -10,6 +10,7 @@ using TMPro;
 using UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 
 namespace ECAPrototyping.RuleEngine
@@ -246,6 +247,36 @@ namespace ECAPrototyping.RuleEngine
             }
         }
         
+        /// <summary>
+        /// <b>Explode</b> spawns a number of fragments from the object.
+        /// </summary>
+        ///
+        [Action(typeof(ECAObject), "explodes")]
+        public void Explode()
+        {
+            int fragments = 10; 
+            float explosionForce = 500f; 
+            float explosionRadius = 3f;
+            initialPosition = transform.position;
+            for (int i = 0; i < fragments; i++)
+            {
+                Vector3 spawnPos = transform.position + Random.insideUnitSphere * 0.5f;
+                GameObject frag = Instantiate(this.gameObject, spawnPos, Random.rotation);
+                frag.transform.localScale = Vector3.one * 0.05f; // Scale down the fragment
+            
+                Rigidbody rb = frag.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    Vector3 explosionDir = (frag.transform.position - transform.position).normalized;
+                    rb.AddForce(explosionDir * explosionForce);
+                }
+
+                Destroy(frag, 5f); // Auto-destroy after 5 seconds
+            }
+
+            gameObject.SetActive(false); 
+        }
+        
         
         [Action(typeof(ECAObject), "delete_duplicates")]
         public void DeleteDuplicates()
@@ -286,9 +317,10 @@ namespace ECAPrototyping.RuleEngine
             rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
         }
         
-        [Action(typeof(ECAObject), "reset position")]
-        public void ResetPosition()
+        [Action(typeof(ECAObject), "reset")]
+        public void ResetObject()
         {
+            gameObject.SetActive(true);
             transform.position = initialPosition;
             var rb = this.GetComponent<Rigidbody>();
             rb.isKinematic = true;

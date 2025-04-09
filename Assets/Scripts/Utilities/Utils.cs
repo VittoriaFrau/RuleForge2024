@@ -1039,7 +1039,8 @@ namespace UI
                 case "double counter":
                     return new Action(action.GetSubject(), "reset counter");
                 case "launches":
-                    return new Action(action.GetSubject(), "reset position");
+                case "explodes":
+                    return new Action(action.GetSubject(), "reset");
             }
 
             return null;
@@ -1150,7 +1151,7 @@ namespace UI
 
             }
 
-            return null;
+            return new Action(SelectedObject, s);
         }
         
         public static void ChangeButtonAppearance(bool active, GameObject button)
