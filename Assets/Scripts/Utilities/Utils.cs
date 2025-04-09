@@ -1038,6 +1038,8 @@ namespace UI
                     return new Action(action.GetSubject(), "reset counter");
                 case "double counter":
                     return new Action(action.GetSubject(), "reset counter");
+                case "launches":
+                    return new Action(action.GetSubject(), "reset position");
             }
 
             return null;
@@ -1142,7 +1144,7 @@ namespace UI
                     return (new Action(SelectedObject, "double counter"));
                 
                 case "Launch":
-                    return (new Action(SelectedObject, "launch"));
+                    return (new Action(SelectedObject, "launches"));
                 
 
 

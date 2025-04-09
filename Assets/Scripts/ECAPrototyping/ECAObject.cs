@@ -53,6 +53,8 @@ namespace ECAPrototyping.RuleEngine
         private InteractionCreationController _interactionCreationController;
 
         private int counter = 0;
+        
+        private Vector3 initialPosition;
 
         protected virtual void Awake()
         {
@@ -194,18 +196,6 @@ namespace ECAPrototyping.RuleEngine
                    gameObject.GetComponent<Rigidbody>().useGravity = false;
                    break;
             }
-
-            //TEST
-            if (gameObject.name.Equals("feather"))
-            {
-                /*Test test = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<Test>();
-                if (test != null)
-                {
-                    if (isUsingGravity.GetBoolType() == ECABoolean.BoolType.YES)
-                        test.StopLeviosa();
-                    else test.StartLeviosa();
-                }*/
-            }
         }
 
         /// <summary>
@@ -303,14 +293,24 @@ namespace ECAPrototyping.RuleEngine
             transform.SetParent(_objectsMenuController.interactables.transform);
         }
         
-        [Action(typeof(ECAObject), "launch")]
+        [Action(typeof(ECAObject), "launches")]
         public void Launch()
         {
+            initialPosition = transform.position;
             Unfollow();
             var rb = this.GetComponent<Rigidbody>();
             rb.isKinematic = false;
             rb.useGravity = true;
             rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+        }
+        
+        [Action(typeof(ECAObject), "reset position")]
+        public void ResetPosition()
+        {
+            transform.position = initialPosition;
+            var rb = this.GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
         }
         
 
