@@ -1033,10 +1033,8 @@ namespace UI
                 case "change text": 
                     return new Action(action.GetSubject(), "reset text");
                 case "increase counter":
-                    return new Action(action.GetSubject(), "reset counter");
-                case "decrease counter":
-                    return new Action(action.GetSubject(), "reset counter");
                 case "double counter":
+                case "decrease counter":
                     return new Action(action.GetSubject(), "reset counter");
                 case "launches":
                 case "explodes":
