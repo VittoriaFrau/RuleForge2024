@@ -2,6 +2,7 @@ using MixedReality.Toolkit.SpatialManipulation;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using ECAPrototyping.Utils;
 
 namespace UI.RuleEditor
 {
@@ -19,6 +20,14 @@ namespace UI.RuleEditor
         public GameObject propsMenu;
         public GameObject vegetationMenu;
 		public GameObject uiMenu;
+        
+        public GameObject changeTextButton;
+        public GameObject increaseCounterButton;
+        public GameObject decreaseCounterButton;
+        public GameObject doubleCounterButton;
+        public GameObject openButton;
+        public GameObject launchButton;
+        
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
@@ -103,9 +112,46 @@ namespace UI.RuleEditor
         //TODO use taxonomy to show the correct buttons
         public void ShowEditMenu()
         {
-            if(generalUIController.GetSelectedObject() != null)
-                editObjectMenu.SetActive(true);
+            if (generalUIController.GetSelectedObject() != null)
+                CustomizeEditModeMenu();
             else chooseAnObjectMenu.SetActive(true);
+        }
+        
+        public void CustomizeEditModeMenu()
+        { 
+            string objectCategory = Utils.GetECALastScriptFromECAObject(generalUIController.GetSelectedObject());
+            switch (objectCategory)
+            {
+                case "Shape":
+                    editObjectMenu.SetActive(true);
+                    changeTextButton.SetActive(false);
+                    increaseCounterButton.SetActive(false);
+                    decreaseCounterButton.SetActive(false);
+                    doubleCounterButton.SetActive(false);
+                    break;
+                case "Text":
+                    changeTextButton.SetActive(true);
+                    increaseCounterButton.SetActive(false);
+                    decreaseCounterButton.SetActive(false);
+                    doubleCounterButton.SetActive(false);
+                    editObjectMenu.SetActive(true);
+                    break;
+                case "Counter":
+                    changeTextButton.SetActive(false);
+                    increaseCounterButton.SetActive(true);
+                    decreaseCounterButton.SetActive(true);
+                    doubleCounterButton.SetActive(true);
+                    editObjectMenu.SetActive(true);
+                    break;
+                case "Environment":
+                    changeTextButton.SetActive(false);
+                    increaseCounterButton.SetActive(false);
+                    decreaseCounterButton.SetActive(false);
+                    doubleCounterButton.SetActive(false);
+                    editObjectMenu.SetActive(true);
+                    openButton.SetActive(true);
+                    break;
+            }
         }
         
         public void ShowNewInteractionMenu()
@@ -159,6 +205,7 @@ namespace UI.RuleEditor
             HideMenus();
             uiMenu.SetActive(true);
         }   
+        
     
     }
 
