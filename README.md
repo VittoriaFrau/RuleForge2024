@@ -24,6 +24,10 @@ How to import Ruleforge within a project:
 	- Api Compatibility Level: .NET Framework
 	- Scripting Backend: Mono
 
+4. Import the Rule forge prefab
+
+5. You need a gameobject called "Floor" or "floor"
+
 
 
 How to import RuleForge in a new scene (of the same project):
@@ -33,4 +37,4 @@ How to import RuleForge in a new scene (of the same project):
 	- An empty object with Skybox
     - Import the MRTK Input Simulator if needed (MRTK XR Rig is already in the prefab)
     - Import the RuleForge prefab
-    - Optional: Rename your floor object "Floor" or "floor"
+    - Rename your floor object "Floor" or "floor"
