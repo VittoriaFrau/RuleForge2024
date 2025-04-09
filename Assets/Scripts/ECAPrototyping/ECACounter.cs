@@ -28,7 +28,7 @@ namespace ECAPrototyping.RuleEngine
             {
                 counter++;
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "Counter: " + counter;
+                text.text = "" + counter;
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
@@ -40,7 +40,7 @@ namespace ECAPrototyping.RuleEngine
             {
                 counter = counter == 0 ? 0 : --counter;
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "Counter: " + counter;
+                text.text = "" + counter;
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
@@ -52,7 +52,7 @@ namespace ECAPrototyping.RuleEngine
             {
                 counter = 2*counter;
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "Counter: " + counter;
+                text.text = "" + counter;
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
@@ -63,7 +63,7 @@ namespace ECAPrototyping.RuleEngine
             if (gameObject.GetComponentInChildren<TextMeshPro>())
             {
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "Counter: 0";
+                text.text = "0";
             }
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
