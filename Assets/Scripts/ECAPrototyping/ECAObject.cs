@@ -241,26 +241,8 @@ namespace ECAPrototyping.RuleEngine
                 Vector3 spawnPosition = new Vector3(randomX, this.transform.position.y, randomZ);
                 
                 //check the object's category and spawn it
-                if (_objectsMenuController.shapePrefabs.Find(obj => obj.name == baseName))
-                {
-                    _objectsMenuController.SpawnShape(baseName, spawnPosition);
-                }
-                else if (_objectsMenuController.animalPrefabs.Find(obj => obj.name == baseName))
-                {
-                    _objectsMenuController.SpawnAnimal(baseName, spawnPosition);
-                }
-                else if (_objectsMenuController.furniturePrefabs.Find(obj => obj.name == baseName))
-                {
-                    _objectsMenuController.SpawnForniture(baseName, spawnPosition);
-                }
-                else if (_objectsMenuController.propPrefabs.Find(obj => obj.name == baseName))
-                {
-                    _objectsMenuController.SpawnProp(baseName, spawnPosition);
-                }
-                else if (_objectsMenuController.vegetationPrefabs.Find(obj => obj.name == baseName))
-                {
-                    _objectsMenuController.SpawnVegetation(baseName, spawnPosition);
-                }
+                string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
+                _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
             }
         }
         

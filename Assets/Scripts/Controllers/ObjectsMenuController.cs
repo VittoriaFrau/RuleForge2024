@@ -22,10 +22,22 @@ public class ObjectsMenuController : MonoBehaviour
     
     public GameObject NonNativeKeyboard;
     private Camera mainCamera;
+    
+    private Dictionary<string, List<GameObject>> prefabLibrary;
+    
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        prefabLibrary = new Dictionary<string, List<GameObject>>()
+        {
+            {"Shape", shapePrefabs},
+            {"Animal", animalPrefabs},
+            {"Furniture", furniturePrefabs},
+            {"Prop", propPrefabs},
+            {"Vegetation", vegetationPrefabs},
+            {"UIElement", UIPrefabs}
+        };
     }
  
 
@@ -61,34 +73,10 @@ public class ObjectsMenuController : MonoBehaviour
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
     }
     
-    public void SpawnShape(string type, Vector3 position)
+    public void Spawn(string type, Vector3 position, string prefabKey)
     {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, shapePrefabs, mainCamera, interactables.transform, position));
-    }
-    
-    public void SpawnAnimal(string type, Vector3 position)
-    {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, animalPrefabs, mainCamera, interactables.transform, position));
-    }
-    
-    public void SpawnForniture(string type, Vector3 position)
-    {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, furniturePrefabs, mainCamera, interactables.transform, position));
-    }
-    
-    public void SpawnProp(string type, Vector3 position)
-    {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, propPrefabs, mainCamera, interactables.transform, position));
-    }
-    
-    public void SpawnVegetation(string type, Vector3 position)
-    {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, vegetationPrefabs, mainCamera, interactables.transform, position));
-    }
-    
-    public void SpawnUIElement(string type, Vector3 position)
-    {
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, UIPrefabs, mainCamera, interactables.transform, position));
+        List<GameObject> prefabs = prefabLibrary[prefabKey];
+        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position));
     }
     
     public void ShowKeyboard()
