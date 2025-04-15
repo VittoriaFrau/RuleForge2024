@@ -718,7 +718,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.6827, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6657252694161018456}
@@ -827,7 +827,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 3.706419, y: 144.60551, z: 7.020551e-10}
   m_Center: {x: 0.00000019953498, y: 63.572144, z: -1.5713232}
@@ -854,9 +854,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 118
+  m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!1 &2196874111228231207
 GameObject:
@@ -2195,7 +2195,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.000014805417, y: 0.113854155, z: 0.00033942043, w: 0.9934975}
   m_LocalPosition: {x: -0.8746847, y: 0.70440453, z: 1.0685961}
-  m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
+  m_LocalScale: {x: 0.00036959883, y: 0.00036959883, z: 0.00036959883}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 600717965734099993}
@@ -2243,7 +2243,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5160782369274381370}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d9ad66e7cc9a2754d8ea989740c9f00d, type: 3}
   m_Name: 
@@ -2484,10 +2484,10 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 593.42584, y: 452.51498, z: 6854.8354}
+  m_Center: {x: 36.962883, y: 665.999, z: 1371.062}
 --- !u!54 &3816848869966946429
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2510,10 +2510,10 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!23 &7613111376163099976
 MeshRenderer:
@@ -4141,15 +4141,24 @@ PrefabInstance:
       propertyPath: m_Name
       value: Box (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1174224115969912537, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4458683754064377134, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
       propertyPath: m_Mass
       value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 4458683754064377134, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
       propertyPath: m_UseGravity
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 4458683754064377134, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
+      propertyPath: m_Constraints
+      value: 120
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 4458683754064377134, guid: 3a7cf795fbb25d94d895397aa7f3aba5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

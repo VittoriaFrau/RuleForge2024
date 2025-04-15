@@ -125220,7 +125220,7 @@ MonoBehaviour:
   - {fileID: 7957796827298215147, guid: eb7b0d81414d6724fa971f03578cebd2, type: 3}
   - {fileID: 2989000923634411228, guid: 44cdcd55c8562cc46b31e272eb09fc5b, type: 3}
   - {fileID: 100000, guid: 876a9efcae3245e4ab66feeb8f437976, type: 3}
-  - {fileID: 7742917861317621437, guid: fff495a7e079bf34390cd3a23d2f2930, type: 3}
+  - {fileID: 5160782369274381370, guid: 9fae87d1facb74446a2f276f21a18496, type: 3}
   vegetationPrefabs:
   - {fileID: 2602975220198116835, guid: 10038933d2c22814dbaff12551a38547, type: 3}
   UIPrefabs:
@@ -154644,7 +154644,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: ConveyorBelt
+          m_StringArgument: BeltWithBox
           m_BoolArgument: 0
         m_CallState: 2
   <OnEnabled>k__BackingField:
