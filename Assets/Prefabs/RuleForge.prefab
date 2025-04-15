@@ -24351,7 +24351,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: TurnOnConveyor
+          m_StringArgument: turn on conveyor
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 2482955192259723788}
@@ -53843,7 +53843,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: TurnOff
+          m_StringArgument: turn off conveyor
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 993710196664584871}

@@ -1039,6 +1039,8 @@ namespace UI
                 case "launches":
                 case "explodes":
                     return new Action(action.GetSubject(), "reset");
+                case "turn off conveyor":
+                    return new Action(action.GetSubject(), "turn on conveyor");
             }
 
             return null;
@@ -1144,6 +1146,12 @@ namespace UI
                 
                 case "Launch":
                     return (new Action(SelectedObject, "launches"));
+                
+                case "TurnOnConveyor": 
+                    return (new Action(SelectedObject, "turn on conveyor"));
+                
+                case "TurnOffConveyor": 
+                    return (new Action(SelectedObject, "turn off conveyor"));
                 
 
 
