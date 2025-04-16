@@ -21,7 +21,7 @@ namespace ECAPrototyping.RuleEngine
         [SerializeField] private int counter = 0;
         
         
-        [Action(typeof(ECACounter), "increase counter")]
+        [Action(typeof(ECACounter), "increases by one")]
         public void IncreaseCounter()
         {
             if (gameObject.GetComponentInChildren<TextMeshPro>())
@@ -33,7 +33,7 @@ namespace ECAPrototyping.RuleEngine
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
 
-        [Action(typeof(ECACounter), "decrease counter")]
+        [Action(typeof(ECACounter), "decreases by one")]
         public void DecreaseCounter()
         {
             if (gameObject.GetComponentInChildren<TextMeshPro>())
@@ -45,7 +45,7 @@ namespace ECAPrototyping.RuleEngine
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
         
-        [Action(typeof(ECACounter), "double counter")]
+        [Action(typeof(ECACounter), "doubles")]
         public void DoubleCounter()
         {
             if (gameObject.GetComponentInChildren<TextMeshPro>())
@@ -57,7 +57,7 @@ namespace ECAPrototyping.RuleEngine
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
         
-        [Action(typeof(ECACounter), "reset counter")]
+        [Action(typeof(ECACounter), "resets")]
         public void ResetCounter()
         {
             if (gameObject.GetComponentInChildren<TextMeshPro>())

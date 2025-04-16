@@ -26,14 +26,14 @@ namespace ECAPrototyping.RuleEngine
         }
         
         
-        [Action(typeof(ECAText), "change text")]
+        [Action(typeof(ECAText), "changes text")]
         public void ChangeText()
         {
             var keyboard = _objectsMenuController.NonNativeKeyboard.GetComponent<NonNativeKeyboard>();
             GetComponentInChildren<TextMeshPro>().text = keyboard.Text;
         }
         
-        [Action(typeof(ECAText), "reset text")]
+        [Action(typeof(ECAText), "resets text")]
         public void ResetText()
         {
             this.GetComponentInChildren<TextMeshPro>().text = "Sample example";

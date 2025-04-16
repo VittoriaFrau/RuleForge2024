@@ -99,5 +99,10 @@ namespace ECAPrototyping.Utils
         {
             return name;
         }
+        
+        public static bool IsEcaColor(string s)
+        {
+            return colorDict.ContainsKey(s);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using ECAPrototyping.Utils;
 using UI;
 using UnityEngine;
 
@@ -20,6 +21,10 @@ namespace ECAPrototyping.RuleEngine
         private bool rotating = false;
         private Transform doorTransform; // Riferimento al transform di 01_low
         private const float rotationDuration = 1.0f;
+        
+        
+        [StateVariable("locked", ECARules4AllType.Boolean)]
+        public ECABoolean isLocked = new(ECABoolean.BoolType.YES);
 
         //Event to notify when the door action is ended
         public event System.Action DoorOpened;
@@ -167,6 +172,34 @@ namespace ECAPrototyping.RuleEngine
         public bool IsOpen()
         {
             return isOpen;
+        }
+        
+        [Action(typeof(ECAObject), "Open")]
+        public void Open()
+        {
+            // Modifica qui: usa GetBoolType() e confronta con BoolType.NO
+            if (isLocked.GetBoolType() == ECABoolean.BoolType.NO)
+            {
+                transform.Rotate(0, 90, 0);
+            }
+        }
+
+        [Action(typeof(ECAObject), "Close")]
+        public void Close()
+        {
+            transform.Rotate(0, -90, 0);
+        }
+
+        [Action(typeof(ECAObject), "unlocks")]
+        public void Unlock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.NO);
+        }
+
+        [Action(typeof(ECAObject), "locks")]
+        public void Lock()
+        {
+            isLocked.Assign(ECABoolean.BoolType.YES);
         }
     }
 }

@@ -35,8 +35,6 @@ namespace ECAPrototyping.RuleEngine
         [StateVariable("color", ECARules4AllType.Color)] 
         public Color color;
 
-        [StateVariable("locked", ECARules4AllType.Boolean)]
-        public ECABoolean isLocked = new(ECABoolean.BoolType.YES);
         /// <summary>
         /// <b>isVisible</b> is a boolean that indicates if the object is visible.
         /// If the object is invisible, it will not be rendered but it will still collide with other objects.
@@ -203,7 +201,7 @@ namespace ECAPrototyping.RuleEngine
         /// <b>delete_object</b> deletes the object from the scene.
         /// </summary>
         /// <param name="obj"> is the object to delete from the scene </param>
-        [Action(typeof(ECAObject), "deleted")]
+        [Action(typeof(ECAObject), "is deleted")]
         public void DeleteObject()
         {
             Destroy(this.gameObject);
@@ -214,7 +212,7 @@ namespace ECAPrototyping.RuleEngine
         /// <b>SpawnObject</b> spawns a new object in the scene.
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "duplicate")]
+        [Action(typeof(ECAObject), "duplicates")]
         public void CreateDuplicates()
         {
             Transform floorTransform = GameObject.FindWithTag("Floor").transform;
@@ -278,7 +276,7 @@ namespace ECAPrototyping.RuleEngine
         }
         
         
-        [Action(typeof(ECAObject), "delete_duplicates")]
+        [Action(typeof(ECAObject), "delete duplicates")]
         public void DeleteDuplicates()
         {
             foreach (var obj in _objectsMenuController.spawnedObjects)
@@ -287,7 +285,7 @@ namespace ECAPrototyping.RuleEngine
             }
         }
         
-        [Action(typeof(ECAObject), "follow")]
+        [Action(typeof(ECAObject), "follows")]
         public void Follow()
         {
             GameObject hand = GameObject.FindWithTag("GrabInteractor");
@@ -300,7 +298,7 @@ namespace ECAPrototyping.RuleEngine
             rb.MoveRotation(hand.transform.rotation);
         }
         
-        [Action(typeof(ECAObject), "unfollow")]
+        [Action(typeof(ECAObject), "unfollows")]
         public void Unfollow()
         {
             transform.SetParent(_objectsMenuController.interactables.transform);
@@ -317,7 +315,7 @@ namespace ECAPrototyping.RuleEngine
             rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
         }
         
-        [Action(typeof(ECAObject), "reset")]
+        [Action(typeof(ECAObject), "resets")]
         public void ResetObject()
         {
             gameObject.SetActive(true);
@@ -325,35 +323,6 @@ namespace ECAPrototyping.RuleEngine
             var rb = this.GetComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.useGravity = false;
-        }
-        
-
-        [Action(typeof(ECAObject), "Open")]
-        public void Open()
-        {
-            // Modifica qui: usa GetBoolType() e confronta con BoolType.NO
-            if (isLocked.GetBoolType() == ECABoolean.BoolType.NO)
-            {
-                transform.Rotate(0, 90, 0);
-            }
-        }
-
-        [Action(typeof(ECAObject), "Close")]
-        public void Close()
-        {
-            transform.Rotate(0, -90, 0);
-        }
-
-        [Action(typeof(ECAObject), "unlocks")]
-        public void Unlock()
-        {
-            isLocked.Assign(ECABoolean.BoolType.NO);
-        }
-
-        [Action(typeof(ECAObject), "locks")]
-        public void Lock()
-        {
-            isLocked.Assign(ECABoolean.BoolType.YES);
         }
     }
 		

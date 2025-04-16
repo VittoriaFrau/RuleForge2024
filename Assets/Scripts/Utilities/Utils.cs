@@ -928,26 +928,29 @@ namespace UI
         //Returns the category of each gameobject. E.g. cube --> shape, cheese --> food
         public static string GetECALastScriptFromECAObject(GameObject gameObject)
         {
-            Component [] components = gameObject.GetComponents(typeof(MonoBehaviour));
-            
+            Component[] components = gameObject.GetComponents(typeof(MonoBehaviour));
+            string lastECAComponentName = null;
+
             foreach (var component in components)
             {
                 string componentFullName = component.GetType().ToString();
                 int lastDotIndex = componentFullName.LastIndexOf('.');
                 string componentName = componentFullName.Substring(lastDotIndex + 1);
-                if (componentName.Contains("ECA") && !componentName.Equals("ECAObject"))
+
+                if (componentName.StartsWith("ECA") && !componentName.Equals("ECAObject"))
                 {
-                    //TODO find the most appropriate category
-                    if (componentName.Equals("ECAScene"))
-                    {
-                        return "Light";
-                    }
-                    return componentName.Substring(3);
+                    lastECAComponentName = componentName;
                 }
             }
 
-            return "Shape";
+            if (lastECAComponentName != null)
+            {
+                return lastECAComponentName.Substring(3); // remove "ECA"
+            }
+
+            return "Shape"; // fallback
         }
+
 
         public static string GetIconForECACategory(string category)
         {
@@ -1027,7 +1030,7 @@ namespace UI
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
                 case "duplicate":
-                    return new Action(action.GetSubject(), "delete_duplicates");
+                    return new Action(action.GetSubject(), "delete duplicates");
                 case "follow":
                     return new Action(action.GetSubject(), "unfollow");
                 case "change text": 
@@ -1035,12 +1038,14 @@ namespace UI
                 case "increase counter":
                 case "double counter":
                 case "decrease counter":
-                    return new Action(action.GetSubject(), "reset counter");
+                    return new Action(action.GetSubject(), "resets");
                 case "launches":
                 case "explodes":
-                    return new Action(action.GetSubject(), "reset");
-                case "turn off conveyor":
-                    return new Action(action.GetSubject(), "turn on conveyor");
+                    return new Action(action.GetSubject(), "resets");
+                case "turns off":
+                    return new Action(action.GetSubject(), "turns on");
+                case "turns on":
+                    return new Action(action.GetSubject(), "turns off");
             }
 
             return null;
@@ -1048,116 +1053,14 @@ namespace UI
         
         public static Action GetActionFromString(string s, GameObject SelectedObject)
         {
-            switch (s)
+            if (ECAColor.IsEcaColor(s))
             {
-                case "Show":
-                   return new Action(SelectedObject, "shows");
-                
-                case "Hide":
-                    return (new Action(SelectedObject, "hides"));
-                
-                case "Delete":
-                    return (new Action(SelectedObject, "deleted"));
-                
-                case "GravityON":
-                    return (new Action(SelectedObject, "gravityON"));
-                
-                case "GravityOFF":
-                    return (new Action(SelectedObject, "gravityOFF"));
-                
-                case "red":
-                    ECAColor red = new ECAColor("red");
-                    return (new Action(SelectedObject, "changes", "color", "to", red));
-                
-                case "blue":
-                    ECAColor blue = new ECAColor("blue");
-                    return (new Action(SelectedObject, "changes", "color", "to", blue));
-                    
-                case "green":
-                    ECAColor green = new ECAColor("green");
-                    return (new Action(SelectedObject, "changes", "color", "to", green));
-                    
-                case "purple":
-                    ECAColor purple = new ECAColor("purple");
-                    return (new Action(SelectedObject, "changes", "color", "to", purple));
-                
-                case "gray":
-                case "grey":
-                    ECAColor gray = new ECAColor("gray");
-                    return (new Action(SelectedObject, "changes", "color", "to", gray));                    
-                    
-                case "yellow":
-                    ECAColor yellow = new ECAColor("yellow");
-                    return (new Action(SelectedObject, "changes", "color", "to", yellow));
-                    
-                case "cyan":
-                    ECAColor cyan = new ECAColor("cyan");
-                    return (new Action(SelectedObject, "changes", "color", "to", cyan));                    
-                    
-                case "white":
-                    ECAColor white = new ECAColor("white");
-                    return (new Action(SelectedObject, "changes", "color", "to", white));
-                    
-                case "black":
-                    ECAColor black = new ECAColor("black");
-                    return (new Action(SelectedObject, "changes", "color", "to", black));
-                
-                case "WaveHand":
-                    return (new Action(SelectedObject, "waves hand"));
-                
-                case "Dance":
-                    return (new Action(SelectedObject, "dances"));
-                
-                case "TurnOnOff":
-                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
-
-                
-                case "TurnOnLight":
-                    return (new Action(SelectedObject, "turns", ECABoolean.ON));
-                
-                case "TurnOffLight":
-                    return (new Action(SelectedObject, "turns", ECABoolean.OFF));
-
-                
-                case "Open":
-                    return (new Action(SelectedObject, "opens"));
-                case "Close":
-                    return (new Action(SelectedObject, "closes"));
-                
-                case "Duplicate":
-                    return (new Action(SelectedObject, "duplicate"));
-                
-                case "Follow":
-                    return (new Action(SelectedObject, "follow"));
-                case "Unfollow":
-                    return (new Action(SelectedObject, "unfollow"));
-
-				case "ChangeText":
-                    return (new Action(SelectedObject, "change text"));
-
-				case "IncreaseCounter":
-                    return (new Action(SelectedObject, "increase counter"));
-
-				case "DecreaseCounter":
-                    return (new Action(SelectedObject, "decrease counter"));
-                
-                case "DoubleCounter":
-                    return (new Action(SelectedObject, "double counter"));
-                
-                case "Launch":
-                    return (new Action(SelectedObject, "launches"));
-                
-                case "TurnOnConveyor": 
-                    return (new Action(SelectedObject, "turn on conveyor"));
-                
-                case "TurnOffConveyor": 
-                    return (new Action(SelectedObject, "turn off conveyor"));
-                
-
-
+                ECAColor color = new ECAColor(s);
+                return (new Action(SelectedObject, "changes", "color", "to", color));
             }
-
-            return new Action(SelectedObject, s);
+            // get the verb by making the string s lowercase
+            string verb = s.ToLower();
+            return new Action(SelectedObject, verb);
         }
         
         public static void ChangeButtonAppearance(bool active, GameObject button)

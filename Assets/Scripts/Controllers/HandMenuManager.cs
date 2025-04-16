@@ -13,20 +13,19 @@ namespace UI.RuleEditor
         public GameObject editObjectMenu;
         public GameObject newInteractionMenu;
         public GameObject chooseAnObjectMenu;
-        public GameObject rulePlateMenu;
+
         public GameObject shapesMenu;
         public GameObject animalMenu;
         public GameObject furnitureMenu;
         public GameObject propsMenu;
         public GameObject vegetationMenu;
 		public GameObject uiMenu;
-        
-        public GameObject changeTextButton;
-        public GameObject increaseCounterButton;
-        public GameObject decreaseCounterButton;
-        public GameObject doubleCounterButton;
-        public GameObject openButton;
-        public GameObject launchButton;
+
+        public List<GameObject> ecaObjectButtons;
+        public List<GameObject> ecaCounterButtons;
+        public List<GameObject> ecaDoorButtons;
+        public List<GameObject> ecaTextButtons;
+        public List<GameObject> ecaPropsButtons;
         
         public GameObject colorPalette;
         private List<GameObject> menus;
@@ -109,7 +108,6 @@ namespace UI.RuleEditor
             mainMenu.SetActive(true);
         }
 
-        //TODO use taxonomy to show the correct buttons
         public void ShowEditMenu()
         {
             if (generalUIController.GetSelectedObject() != null)
@@ -119,39 +117,37 @@ namespace UI.RuleEditor
         
         public void CustomizeEditModeMenu()
         { 
+            // Hide all the buttons
+            HideEditMenuButtons();
+            
+            // Show the edit menu
             string objectCategory = Utils.GetECALastScriptFromECAObject(generalUIController.GetSelectedObject());
+            editObjectMenu.SetActive(true);
+            ecaObjectButtons.ForEach(button => button.SetActive(true));
             switch (objectCategory)
             {
-                case "Shape":
-                    editObjectMenu.SetActive(true);
-                    changeTextButton.SetActive(false);
-                    increaseCounterButton.SetActive(false);
-                    decreaseCounterButton.SetActive(false);
-                    doubleCounterButton.SetActive(false);
-                    break;
                 case "Text":
-                    changeTextButton.SetActive(true);
-                    increaseCounterButton.SetActive(false);
-                    decreaseCounterButton.SetActive(false);
-                    doubleCounterButton.SetActive(false);
-                    editObjectMenu.SetActive(true);
+                    ecaTextButtons.ForEach(button => button.SetActive(true));
                     break;
                 case "Counter":
-                    changeTextButton.SetActive(false);
-                    increaseCounterButton.SetActive(true);
-                    decreaseCounterButton.SetActive(true);
-                    doubleCounterButton.SetActive(true);
-                    editObjectMenu.SetActive(true);
+                    ecaCounterButtons.ForEach(button => button.SetActive(true));
                     break;
-                case "Environment":
-                    changeTextButton.SetActive(false);
-                    increaseCounterButton.SetActive(false);
-                    decreaseCounterButton.SetActive(false);
-                    doubleCounterButton.SetActive(false);
-                    editObjectMenu.SetActive(true);
-                    openButton.SetActive(true);
+                case "Door":
+                    ecaDoorButtons.ForEach(button => button.SetActive(true));
+                    break;
+                case "Props":
+                    ecaPropsButtons.ForEach(button => button.SetActive(true));
                     break;
             }
+        }
+
+        public void HideEditMenuButtons()
+        {
+            ecaObjectButtons.ForEach(button => button.SetActive(false));
+            ecaCounterButtons.ForEach(button => button.SetActive(false));
+            ecaDoorButtons.ForEach(button => button.SetActive(false));
+            ecaTextButtons.ForEach(button => button.SetActive(false));
+            ecaPropsButtons.ForEach(button => button.SetActive(false));
         }
         
         public void ShowNewInteractionMenu()
