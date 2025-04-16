@@ -937,7 +937,7 @@ namespace UI
                 int lastDotIndex = componentFullName.LastIndexOf('.');
                 string componentName = componentFullName.Substring(lastDotIndex + 1);
 
-                if (componentName.StartsWith("ECA") && !componentName.Equals("ECAObject"))
+                if (componentName.StartsWith("ECA"))
                 {
                     lastECAComponentName = componentName;
                 }
