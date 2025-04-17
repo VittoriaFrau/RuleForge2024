@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Controllers;
 using ECAPrototyping.RuleEngine;
+using Microsoft.MixedReality.OpenXR;
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
@@ -159,6 +160,16 @@ namespace UI
     
             // Right hand
             ReplaceHandModel(handModelRight, controllerPrefabRight.transform);
+            
+            //Adjust the hand menu solver handle
+            Destroy(handMenuManager.GetComponent<HandConstraintPalmUp>());
+            Destroy(handMenuManager.GetComponent<SolverHandler>());
+
+            // to make the menu follow the controller, we put the menu as child of the controller
+            handMenuManager.transform.SetParent(OpenXRLeftHandController.transform);
+            handMenuManager.transform.position = new Vector3(0.115000002f, 0.00899999961f, -0.0240000002f);
+            handMenuManager.transform.rotation = Quaternion.Euler(78.0503616f,151.163528f,139.339493f);
+
         }
             
         private void ActivateControllerModality()
