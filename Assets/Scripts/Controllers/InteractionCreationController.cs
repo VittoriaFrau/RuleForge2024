@@ -167,8 +167,8 @@ namespace UI
 
             // to make the menu follow the controller, we put the menu as child of the controller
             handMenuManager.transform.SetParent(OpenXRLeftHandController.transform);
-            handMenuManager.transform.position = new Vector3(0.115000002f, 0.00899999961f, -0.0240000002f);
-            handMenuManager.transform.rotation = Quaternion.Euler(78.0503616f,151.163528f,139.339493f);
+            handMenuManager.transform.localPosition = new Vector3(0.115000002f, 0.00899999961f, -0.0240000002f);
+            handMenuManager.transform.localRotation = Quaternion.Euler(78.0503616f,151.163528f,139.339493f);
 
         }
             
