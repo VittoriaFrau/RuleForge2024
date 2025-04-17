@@ -867,6 +867,8 @@ namespace UI
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
                 }
             });
+            
+            
         }
             
 
