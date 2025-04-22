@@ -80,14 +80,16 @@ public class ObjectsMenuController : MonoBehaviour
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position));
     }
     
-    public void ShowKeyboard()
+    public void ShowKeyboard(string type)
     {
-        NonNativeKeyboard.SetActive(true);
+        switch (type)
+        {
+          case "Keyboard":
+              NonNativeKeyboard.SetActive(true);
+              break;
+          case "NumericKeyboard":
+              NonNativeNumericKeyboard.SetActive(true);
+              break;
+        }
     }
-    
-    public void ShowNumericKeyboard()
-    {
-        NonNativeNumericKeyboard.SetActive(true);
-    }
-    
 }
