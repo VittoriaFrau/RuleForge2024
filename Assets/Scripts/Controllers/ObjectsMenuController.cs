@@ -21,6 +21,7 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> spawnedObjects;
     
     public GameObject NonNativeKeyboard;
+    public GameObject NonNativeNumericKeyboard;
     private Camera mainCamera;
     
     private Dictionary<string, List<GameObject>> prefabLibrary;
@@ -83,4 +84,10 @@ public class ObjectsMenuController : MonoBehaviour
     {
         NonNativeKeyboard.SetActive(true);
     }
+    
+    public void ShowNumericKeyboard()
+    {
+        NonNativeNumericKeyboard.SetActive(true);
+    }
+    
 }
