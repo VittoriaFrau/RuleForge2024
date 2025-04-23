@@ -27,6 +27,9 @@ namespace UI.RuleEditor
         public List<GameObject> ecaTextButtons;
         public List<GameObject> ecaPropsButtons;
         
+        public GameObject NonNativeKeyboard;
+        public GameObject NonNativeNumericKeyboard;
+        
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
@@ -202,6 +205,21 @@ namespace UI.RuleEditor
             uiMenu.SetActive(true);
         }   
         
+        public void ShowKeyboard(string type)
+        {
+            switch (type)
+            {
+                case "Keyboard":
+                    NonNativeKeyboard.SetActive(true);
+                    generalUIController.SetDebugText("Please, type the text you want to insert in the text box.");
+                    break;
+                case "NumericKeyboard":
+                    NonNativeNumericKeyboard.SetActive(true);
+                    generalUIController.SetDebugText("Please, type the number of elements you want to duplicate.");
+                    break;
+            }
+        }
+
     
     }
 

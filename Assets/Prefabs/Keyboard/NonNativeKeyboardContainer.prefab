@@ -690,6 +690,10 @@ PrefabInstance:
       value: NonNativeKeyboard
       objectReference: {fileID: 0}
     - target: {fileID: 11401954, guid: 74b589d1efab94a4cb70e4b5c22783f8, type: 3}
+      propertyPath: <SubmitOnEnter>k__BackingField
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11401954, guid: 74b589d1efab94a4cb70e4b5c22783f8, type: 3}
       propertyPath: <OnTextUpdate>k__BackingField.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}

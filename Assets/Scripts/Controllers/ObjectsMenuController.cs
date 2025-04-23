@@ -19,9 +19,7 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> UIPrefabs;
     //List of all the objects that have been spawned
     public List<GameObject> spawnedObjects;
-    
-    public GameObject NonNativeKeyboard;
-    public GameObject NonNativeNumericKeyboard;
+        
     private Camera mainCamera;
     
     private Dictionary<string, List<GameObject>> prefabLibrary;
@@ -80,16 +78,4 @@ public class ObjectsMenuController : MonoBehaviour
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position));
     }
     
-    public void ShowKeyboard(string type)
-    {
-        switch (type)
-        {
-          case "Keyboard":
-              NonNativeKeyboard.SetActive(true);
-              break;
-          case "NumericKeyboard":
-              NonNativeNumericKeyboard.SetActive(true);
-              break;
-        }
-    }
 }
