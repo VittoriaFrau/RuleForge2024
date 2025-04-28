@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using ECAPrototyping.Utils;
+using MixedReality.Toolkit.UX.Experimental;
 
 namespace UI.RuleEditor
 {
@@ -31,6 +32,8 @@ namespace UI.RuleEditor
         public GameObject NonNativeKeyboard;
         public GameObject NonNativeNumericKeyboard;
         private int counter = 0;
+        private int nElements;
+        private int nSeconds;
         
         public GameObject colorPalette;
         private List<GameObject> menus;
@@ -238,20 +241,24 @@ namespace UI.RuleEditor
             generalUIController.SetDebugText("Please, type the interval time (seconds) for creating duplicates.\n" +
                                              "Press Enter to submit.");
         }
-        
-        public void EnterSubmit()
+
+        public void OnKeyboardSubmit(string receivedText)
         {
-            if (counter == 0 && NonNativeKeyboard.activeSelf)
+            if (counter == 0)
             {
+                nElements = int.Parse(receivedText);
                 StartCoroutine(ReEnableKeyboardAfterDelay(0.5f));
                 counter++;
             }
-            else if(counter == 1)
+            else if (counter == 1)
             {
-                NonNativeKeyboard.SetActive(false);
-                generalUIController.SetDebugText("Recupero valori.");
+                nSeconds = int.Parse(receivedText);
+                NonNativeNumericKeyboard.SetActive(false);
+                generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
+                counter = 0; 
             }
         }
+
 
     }
 
