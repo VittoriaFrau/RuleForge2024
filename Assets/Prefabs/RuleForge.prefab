@@ -196606,6 +196606,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4030209091377909950, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: m_Name
+      value: NonNativeNumericKeyboard
+      objectReference: {fileID: 0}
     - target: {fileID: 4030209091385000520, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -196632,6 +196636,34 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4030209091385000520, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 607159369133769202}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: GetTimeIntervalFromKeyboard
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UI.RuleEditor.HandMenuManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091385069716, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}
+      propertyPath: <OnTextSubmit>k__BackingField.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 8401378662638236490, guid: 3a890b7ab37cd0c41b8ae6d1c3ba70be, type: 3}

@@ -1,3 +1,4 @@
+using System.Collections;
 using MixedReality.Toolkit.SpatialManipulation;
 using System.Collections.Generic;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace UI.RuleEditor
         
         public GameObject NonNativeKeyboard;
         public GameObject NonNativeNumericKeyboard;
+        private int counter = 0;
         
         public GameObject colorPalette;
         private List<GameObject> menus;
@@ -50,6 +52,7 @@ namespace UI.RuleEditor
                 shapesMenu, colorPalette, chooseAnObjectMenu};
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             generalUIController = eventHandler.GetComponent<GeneralUIController>();
+            NonNativeNumericKeyboard.SetActive(true);
 
             //if in unity editor, move the menu closer to the camera
             if (!isUsingOculusLink)
@@ -214,13 +217,42 @@ namespace UI.RuleEditor
                     generalUIController.SetDebugText("Please, type the text you want to insert in the text box.");
                     break;
                 case "NumericKeyboard":
+                    string name = generalUIController.GetSelectedObject().name;
+                    string baseName = name.Substring(0, name.Length - 1);
                     NonNativeNumericKeyboard.SetActive(true);
-                    generalUIController.SetDebugText("Please, type the number of elements you want to duplicate.");
+                    generalUIController.SetDebugText("Please, type the number of " + baseName.ToLower() + "s" +
+                                                     " you want to duplicate.\n Press Enter to submit.\n");
                     break;
             }
         }
+        
+        private void GetTimeIntervalFromKeyboard()
+        {
+            StartCoroutine(ReEnableKeyboardAfterDelay(0.5f));
+        }
 
-    
+        private IEnumerator ReEnableKeyboardAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            NonNativeNumericKeyboard.SetActive(true);
+            generalUIController.SetDebugText("Please, type the interval time (seconds) for creating duplicates.\n" +
+                                             "Press Enter to submit.");
+        }
+        
+        public void EnterSubmit()
+        {
+            if (counter == 0 && NonNativeKeyboard.activeSelf)
+            {
+                StartCoroutine(ReEnableKeyboardAfterDelay(0.5f));
+                counter++;
+            }
+            else if(counter == 1)
+            {
+                NonNativeKeyboard.SetActive(false);
+                generalUIController.SetDebugText("Recupero valori.");
+            }
+        }
+
     }
 
 }
