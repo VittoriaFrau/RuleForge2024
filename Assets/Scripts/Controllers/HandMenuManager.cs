@@ -241,6 +241,8 @@ namespace UI.RuleEditor
                                                                            "for creating duplicates.");
                     else if (counter == 2)
                     {
+                        var ecaObject = generalUIController.GetSelectedObject();
+                        ecaObject.GetComponent<ECAObject>().CreateDuplicates(nElements, nSeconds);
                         generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
                         editObjectMenu.SetActive(true);
                         Destroy(numericKeyboard.gameObject);
@@ -274,7 +276,6 @@ namespace UI.RuleEditor
             var enterButton = keyboard
                 .GetComponentsInChildren<Button>(true)
                 .FirstOrDefault(b => b.name == "Enter_Button" && b.gameObject.activeInHierarchy);
-            
             switch (keyboard.name)
             {
                case "Keyboard1":

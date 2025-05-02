@@ -207,20 +207,26 @@ namespace ECAPrototyping.RuleEngine
             Destroy(this.gameObject);
             
         }
-        
+
         /// <summary>
         /// <b>SpawnObject</b> spawns a new object in the scene.
         /// </summary>
         ///
         [Action(typeof(ECAObject), "duplicates")]
-        public void CreateDuplicates()
+        public void CreateDuplicates(int spawnCount, float delaySeconds)
         {
+            StartCoroutine(CreateDuplicatesCoroutine(spawnCount, delaySeconds));
+        }
+
+        private IEnumerator CreateDuplicatesCoroutine(int spawnCount, float delaySeconds)
+        {
+            Debug.Log("Dentro la coroutine");
             Transform floorTransform = GameObject.FindWithTag("Floor").transform;
             Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
             if (floorRenderer == null)
             {
                 Debug.LogError("Il Floor non ha un Renderer.");
-                return;
+                yield break;
             }
 
             Bounds floorBounds = floorRenderer.bounds;
@@ -229,21 +235,23 @@ namespace ECAPrototyping.RuleEngine
             float minZ = floorBounds.min.z;
             float maxZ = floorBounds.max.z;
 
-            int spawnCount = 4;
+            string baseName = this.name.Substring(0, this.name.Length - 1);
+            string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
+
+            float margin = 2.0f;
+
             for (int i = 0; i < spawnCount; i++)
             {
-                string baseName = this.name.Substring(0, this.name.Length - 1);
+                float randomX = Random.Range(minX + margin, maxX - margin);
+                float randomZ = Random.Range(minZ + margin, maxZ - margin);
+                Vector3 spawnPosition = new Vector3(randomX, transform.position.y, randomZ);
 
-                float margin = 2.0f; // Margine per evitare spawn fuori dalle pareti
-                float randomX = UnityEngine.Random.Range(minX + margin, maxX - margin);
-                float randomZ = UnityEngine.Random.Range(minZ + margin, maxZ - margin);
-                Vector3 spawnPosition = new Vector3(randomX, this.transform.position.y, randomZ);
-                
-                //check the object's category and spawn it
-                string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
                 _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
+
+                yield return new WaitForSeconds(delaySeconds);
             }
         }
+
         
         /// <summary>
         /// <b>Explode</b> spawns a number of fragments from the object.
