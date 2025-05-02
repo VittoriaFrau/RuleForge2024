@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UI;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ObjectsMenuController : MonoBehaviour
 {
@@ -17,12 +19,15 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> propPrefabs;
     public List<GameObject> vegetationPrefabs;
     public List<GameObject> UIPrefabs;
+    public List<GameObject> keyboardPrefabs;
     //List of all the objects that have been spawned
     public List<GameObject> spawnedObjects;
         
     private Camera mainCamera;
     
     private Dictionary<string, List<GameObject>> prefabLibrary;
+    
+    private GeneralUIController generalUIController;
     
     // Start is called before the first frame update
     void Start()
@@ -37,6 +42,7 @@ public class ObjectsMenuController : MonoBehaviour
             {"Vegetation", vegetationPrefabs},
             {"UIElement", UIPrefabs}
         };
+        generalUIController = GetComponent<GeneralUIController>();
     }
  
 
@@ -77,5 +83,26 @@ public class ObjectsMenuController : MonoBehaviour
         List<GameObject> prefabs = prefabLibrary[prefabKey];
         spawnedObjects.Add(Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position));
     }
+    
+    public GameObject NewKeyboard(string type)
+    {
+        GameObject uiElement = Utils.InstantiateObject(type, keyboardPrefabs, mainCamera, interactables.transform);
+        uiElement.GetComponent<Rigidbody>().useGravity = false;
+        uiElement.GetComponent<Rigidbody>().isKinematic = true;
+        uiElement.GetComponent<BoxCollider>().enabled = false;
+        uiElement.transform.position = new Vector3((float)-0.116, (float)1.575, (float)0.717);
+        
+        Transform[] children = uiElement.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in children)
+        {
+            if (t.name == "NonNativeKeyboard")
+            {
+                t.gameObject.SetActive(true);
+                break;
+            }
+        }
+        return uiElement;
+    }
+    
     
 }

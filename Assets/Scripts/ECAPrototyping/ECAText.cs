@@ -21,18 +21,13 @@ namespace ECAPrototyping.RuleEngine
     {
         private ObjectsMenuController _objectsMenuController;
         private HandMenuManager _handMenuManager;
+        private GameObject keyboard;
 
-        private void Awake()
-        {
-            _handMenuManager = GameObject.FindWithTag("HandMenu").GetComponent<HandMenuManager>();
-        }
-        
-        
+
         [Action(typeof(ECAText), "changes text")]
         public void ChangeText()
         {
-            var keyboard = _handMenuManager.NonNativeKeyboard.GetComponent<NonNativeKeyboard>();
-            GetComponentInChildren<TextMeshPro>().text = keyboard.Text;
+            //todo
         }
         
         [Action(typeof(ECAText), "resets text")]
