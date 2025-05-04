@@ -99,6 +99,7 @@ GameObject:
   - component: {fileID: 7407851971610018953}
   - component: {fileID: 5546918329406512528}
   - component: {fileID: -1397001153998408099}
+  - component: {fileID: 4111852796386310724}
   m_Layer: 0
   m_Name: Rock
   m_TagString: Untagged
@@ -170,8 +171,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3658566, y: 1.728773, z: 2.7508092}
-  m_Center: {x: 0.18292832, y: 0.36438662, z: 0.13999295}
+  m_Size: {x: 1.7415811, y: 1.274703, z: 2.2272203}
+  m_Center: {x: -0.118851796, y: 0.5914214, z: 0.012405519}
 --- !u!54 &4332716866590601846
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -413,7 +414,7 @@ MonoBehaviour:
   <OnDisabled>k__BackingField:
     m_PersistentCalls:
       m_Calls: []
-  hostTransform: {fileID: 0}
+  hostTransform: {fileID: 2602975220197888451}
   allowedManipulations: 7
   allowedInteractionTypes: -2147483641
   rigidbodyMovementType: 0
@@ -484,6 +485,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4111852796386310724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2602975220198116835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a19b7081d8d2c4148a395f43f4a25796, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!1 &4262936917969038591
 GameObject:
   m_ObjectHideFlags: 0

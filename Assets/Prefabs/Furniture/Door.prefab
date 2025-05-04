@@ -83,6 +83,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2464134315158428755}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5397590864017915603}
   m_SourcePrefab: {fileID: 100100000, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
 --- !u!1 &6044075394097397562 stripped
 GameObject:
@@ -418,13 +421,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 0}
-  isLocked:
-    choice: 0
   isVisible:
     choice: 0
   isUsingGravity:
     choice: 0
-  inputAction: {fileID: 2634468285697876775, guid: d2cef3533ea67c7499d860986b1ab460, type: 3}
 --- !u!114 &2481523126959896305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -451,6 +451,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isOpen: 0
+  isLocked:
+    choice: 0
 --- !u!114 &2464134315158428755
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,6 +467,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   additionalHeightOffset: -0.5
   rotationY: 90
+--- !u!114 &5397590864017915603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6044075394097397562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b013444a3dab4c3e8567b8e0fe00e948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &6389216030554252672 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}

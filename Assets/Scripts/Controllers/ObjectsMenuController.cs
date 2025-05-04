@@ -17,7 +17,7 @@ public class ObjectsMenuController : MonoBehaviour
     public List<GameObject> animalPrefabs;
     public List<GameObject> furniturePrefabs;
     public List<GameObject> propPrefabs;
-    public List<GameObject> vegetationPrefabs;
+    public List<GameObject> environmentPrefabs;
     public List<GameObject> UIPrefabs;
     public List<GameObject> keyboardPrefabs;
     //List of all the objects that have been spawned
@@ -27,8 +27,7 @@ public class ObjectsMenuController : MonoBehaviour
     
     private Dictionary<string, List<GameObject>> prefabLibrary;
     
-    private GeneralUIController generalUIController;
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,10 +38,9 @@ public class ObjectsMenuController : MonoBehaviour
             {"Animal", animalPrefabs},
             {"Furniture", furniturePrefabs},
             {"Prop", propPrefabs},
-            {"Vegetation", vegetationPrefabs},
+            {"Environment", environmentPrefabs},
             {"UIElement", UIPrefabs}
         };
-        generalUIController = GetComponent<GeneralUIController>();
     }
  
 
@@ -68,7 +66,7 @@ public class ObjectsMenuController : MonoBehaviour
     
     public void NewVegetation(string type)
     {
-        Utils.InstantiateObject(type, vegetationPrefabs, mainCamera, interactables.transform);
+        Utils.InstantiateObject(type, environmentPrefabs, mainCamera, interactables.transform);
     }
     
     public void NewUIElement(string type)

@@ -123705,7 +123705,7 @@ MonoBehaviour:
   - {fileID: 2989000923634411228, guid: 44cdcd55c8562cc46b31e272eb09fc5b, type: 3}
   - {fileID: 100000, guid: 876a9efcae3245e4ab66feeb8f437976, type: 3}
   - {fileID: 5160782369274381370, guid: 9fae87d1facb74446a2f276f21a18496, type: 3}
-  vegetationPrefabs:
+  environmentPrefabs:
   - {fileID: 2602975220198116835, guid: 10038933d2c22814dbaff12551a38547, type: 3}
   UIPrefabs:
   - {fileID: 1833847234740766164, guid: d129639bcea06314f9e046f70c8dd387, type: 3}

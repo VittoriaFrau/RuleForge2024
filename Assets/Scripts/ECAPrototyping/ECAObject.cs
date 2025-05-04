@@ -220,7 +220,6 @@ namespace ECAPrototyping.RuleEngine
 
         private IEnumerator CreateDuplicatesCoroutine(int spawnCount, float delaySeconds)
         {
-            Debug.Log("Dentro la coroutine");
             Transform floorTransform = GameObject.FindWithTag("Floor").transform;
             Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
             if (floorRenderer == null)
