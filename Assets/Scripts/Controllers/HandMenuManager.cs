@@ -54,15 +54,18 @@ namespace UI.RuleEditor
         // determine when the headset is actually active.
         public bool isUsingOculusLink;
 
-        void Start()
+        private void Awake()
         {
-            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             menus = new List<GameObject> {mainMenu, newObjectMenu, editObjectMenu, newInteractionMenu, 
                 shapesMenu, colorPalette, chooseAnObjectMenu};
+            _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             generalUIController = eventHandler.GetComponent<GeneralUIController>();
             objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
+        }
 
+        void Start()
+        {
             //if in unity editor, move the menu closer to the camera
             if (!isUsingOculusLink)
             {
