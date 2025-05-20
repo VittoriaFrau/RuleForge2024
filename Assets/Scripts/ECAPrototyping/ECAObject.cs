@@ -8,6 +8,7 @@ using MixedReality.Toolkit.UX;
 using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
 using UI;
+using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -282,7 +283,10 @@ namespace ECAPrototyping.RuleEngine
             gameObject.SetActive(false); 
         }
         
-        
+        /// <summary>
+        /// <b>DeleteDuplicates</b> deletes all the duplicates of the object in the scene.
+        /// </summary>
+        ///
         [Action(typeof(ECAObject), "delete duplicates")]
         public void DeleteDuplicates()
         {
@@ -292,6 +296,10 @@ namespace ECAPrototyping.RuleEngine
             }
         }
         
+        /// <summary>
+        /// <b>Follow</b> makes the object follow the hand.
+        /// </summary>
+        /// 
         [Action(typeof(ECAObject), "follows")]
         public void Follow()
         {
@@ -305,12 +313,20 @@ namespace ECAPrototyping.RuleEngine
             rb.MoveRotation(hand.transform.rotation);
         }
         
+        /// <summary>
+        /// <b>Unfollow</b> detaches the object from the hand and place it back into the interactables.
+        /// </summary>
+        /// 
         [Action(typeof(ECAObject), "unfollows")]
         public void Unfollow()
         {
             transform.SetParent(_objectsMenuController.interactables.transform);
         }
         
+        /// <summary>
+        /// <b>Launch</b> makes the object move it forward at some speed.
+        /// </summary>
+        /// 
         [Action(typeof(ECAObject), "launches")]
         public void Launch()
         {
@@ -322,6 +338,10 @@ namespace ECAPrototyping.RuleEngine
             rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
         }
         
+        /// <summary>
+        /// <b>ResetObject</b> restore the initial properties of the object.
+        /// </summary>
+        /// 
         [Action(typeof(ECAObject), "resets")]
         public void ResetObject()
         {
@@ -331,12 +351,27 @@ namespace ECAPrototyping.RuleEngine
             rb.isKinematic = true;
             rb.useGravity = false;
         }
-    }
-		
-
-
         
-
-
-
+        /// <summary>
+        /// <b>DefineSpawnArea</b> enables the spawncube to define the spawn area of one object close to another.  
+        /// </summary>
+        /// 
+        [Action(typeof(ECAObject), "define spawn area")]
+        public void DefineSpawnArea()
+        {
+            GameObject cube = _interactionCreationController.spawnCube;
+            cube.SetActive(true);
+            SpawnCubeCollision spawnCubeCollision = cube.GetComponentInChildren<SpawnCubeCollision>(true);
+            
+            spawnCubeCollision.ResetToInitialPosition();
+            spawnCubeCollision.ChangeMaterial("default");
+            spawnCubeCollision.backButton.SetActive(true);
+            
+            GeneralUIController.Instance.SetDebugText("Where should the "+ 
+                                                      GeneralUIController.Instance.GetSelectedObject().name.ToLower() + 
+                                                      " spawn? Use the cube to define an area close to an object.");
+        }
+        
+        
+    }
 }

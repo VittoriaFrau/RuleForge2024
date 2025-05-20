@@ -78,7 +78,7 @@ namespace UI
         // Proximity
         [Header("Proximity Modality")]
         public GameObject proximityCube;
-            
+
         [Header("Controller Modality")]
         public GameObject controllerPrefabLeft;
         public GameObject controllerPrefabRight;
@@ -89,6 +89,8 @@ namespace UI
         private HandModel handModelLeft;
         private HandModel handModelRight;
         public bool isUsingControllers = false;
+
+        public GameObject spawnCube;
 
         private void Start()
         {
