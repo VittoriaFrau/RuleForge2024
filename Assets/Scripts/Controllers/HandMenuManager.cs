@@ -249,6 +249,7 @@ namespace UI.RuleEditor
                         generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
                         editObjectMenu.SetActive(true);
                         Destroy(numericKeyboard.gameObject);
+                        counter = 0;
                     }
                     
                     CloseButtonClicked(numericKeyboard);

@@ -252,6 +252,18 @@ namespace ECAPrototyping.RuleEngine
             }
         }
 
+        /// <summary>
+        /// <b>DeleteDuplicates</b> deletes all the duplicates of the object in the scene.
+        /// </summary>
+        ///
+        [Action(typeof(ECAObject), "delete duplicates")]
+        public void DeleteDuplicates()
+        {
+            foreach (var obj in _objectsMenuController.spawnedObjects)
+            {
+                Destroy(obj);
+            }
+        }
         
         /// <summary>
         /// <b>Explode</b> spawns a number of fragments from the object.
@@ -283,18 +295,6 @@ namespace ECAPrototyping.RuleEngine
             gameObject.SetActive(false); 
         }
         
-        /// <summary>
-        /// <b>DeleteDuplicates</b> deletes all the duplicates of the object in the scene.
-        /// </summary>
-        ///
-        [Action(typeof(ECAObject), "delete duplicates")]
-        public void DeleteDuplicates()
-        {
-            foreach (var obj in _objectsMenuController.spawnedObjects)
-            {
-                Destroy(obj);
-            }
-        }
         
         /// <summary>
         /// <b>Follow</b> makes the object follow the hand.

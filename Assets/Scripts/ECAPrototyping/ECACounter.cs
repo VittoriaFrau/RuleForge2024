@@ -57,11 +57,12 @@ namespace ECAPrototyping.RuleEngine
             else Debug.LogError("The object does not have a TextMeshPro component.");
         }
         
-        [Action(typeof(ECACounter), "resets")]
+        [Action(typeof(ECACounter), "resets counter")]
         public void ResetCounter()
         {
             if (gameObject.GetComponentInChildren<TextMeshPro>())
             {
+                counter = 0;
                 var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
                 text.text = "0";
             }

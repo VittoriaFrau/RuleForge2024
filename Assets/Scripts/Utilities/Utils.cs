@@ -970,6 +970,12 @@ namespace UI
                     return "Icon 22";
                 case "Light":
                     return "Icon 90";
+                case "Text":
+                    return "Assets/Resources/Icons/font.png";
+                case "Counter":
+                    return "Assets/Resources/Icons/counter.png";
+                case "Animal":
+                    return "Assets/Resources/Icons/paws.png";
             }
             Debug.LogError("Icon null for category "+ category);
             return null;
@@ -1029,16 +1035,16 @@ namespace UI
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
-                case "duplicate":
+                case "duplicates":
                     return new Action(action.GetSubject(), "delete duplicates");
                 case "follow":
                     return new Action(action.GetSubject(), "unfollow");
-                case "change text": 
-                    return new Action(action.GetSubject(), "reset text");
-                case "increase counter":
-                case "double counter":
-                case "decrease counter":
-                    return new Action(action.GetSubject(), "resets");
+                case "changes text": 
+                    return new Action(action.GetSubject(), "resets text");
+                case "increases by one":
+                case "doubles":
+                case "decreases by one":
+                    return new Action(action.GetSubject(), "resets counter");
                 case "launches":
                 case "explodes":
                     return new Action(action.GetSubject(), "resets");
