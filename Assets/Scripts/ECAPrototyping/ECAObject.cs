@@ -303,6 +303,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "follows")]
         public void Follow()
         {
+            initialPosition = transform.position;
             GameObject hand = GameObject.FindWithTag("GrabInteractor");
             transform.SetParent(hand.transform);
             
@@ -321,6 +322,7 @@ namespace ECAPrototyping.RuleEngine
         public void Unfollow()
         {
             transform.SetParent(_objectsMenuController.interactables.transform);
+            ResetObject();
         }
         
         /// <summary>

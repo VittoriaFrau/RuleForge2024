@@ -962,6 +962,7 @@ namespace UI
                 case "Shape":
                     return "Icon 133";
                 case "Food":
+                case "Prop":    
                     return "Icon 54";
                 case "Environment":
                 case "Furniture":
@@ -1037,8 +1038,8 @@ namespace UI
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
                 case "duplicates":
                     return new Action(action.GetSubject(), "delete duplicates");
-                case "follow":
-                    return new Action(action.GetSubject(), "unfollow");
+                case "follows":
+                    return new Action(action.GetSubject(), "unfollows");
                 case "changes text": 
                     return new Action(action.GetSubject(), "resets text");
                 case "increases by one":
