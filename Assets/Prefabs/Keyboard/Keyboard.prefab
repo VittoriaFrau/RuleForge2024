@@ -120,6 +120,18 @@ PrefabInstance:
       propertyPath: m_TagString
       value: NonNativeKeyboard
       objectReference: {fileID: 0}
+    - target: {fileID: 4030209091377941798, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091377996586, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4030209091378018504, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4030209091385000520, guid: b48759fbb1b36d148aecfe0019214f95, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
