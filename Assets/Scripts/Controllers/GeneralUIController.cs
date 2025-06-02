@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Controllers;
 using TMPro;
 using UI.RuleEditor;
@@ -22,6 +23,8 @@ namespace UI
         private GameObject _selectedObject;
         public List<ECAEvent> recordedEvents = new();
         public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
+        public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
+        public Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
         
         public enum UIState
         {
@@ -113,7 +116,12 @@ namespace UI
             DeActivatePreviousState(UIState.EditMode);
             _uiState = UIState.EditMode;
             if(_selectedObject == null) text.text = "You can select an object to modify";
-            else text.text = "You are modifying the object " + _selectedObject.name;
+            else
+            {
+                text.text = "You are modifying the object " + _selectedObject.name;
+                RegisterInitialPosition(_selectedObject);
+                RegisterOriginalMaterial(_selectedObject);
+            }
             _editModeController.UpdateAndAddListeners();
             handMenuManager.HandleHandMenu(_uiState);
         }
@@ -150,6 +158,36 @@ namespace UI
         public void SetDebugText(string text)
         {
             this.text.text = text;
+        }
+        
+        private void RegisterInitialPosition(GameObject obj)
+        {
+            if (!initialPositions.ContainsKey(obj))
+            {
+                initialPositions[obj] = obj.transform.position;
+            }
+        }
+
+        public Vector3 GetInitialPosition(GameObject obj)
+        {
+            return initialPositions.TryGetValue(obj, out var pos) ? pos : obj.transform.position;
+        }
+        
+        public void RegisterOriginalMaterial(GameObject obj)
+        {
+            if (!originalMaterials.ContainsKey(obj))
+            {
+                Renderer renderer = obj.GetComponentInChildren<Renderer>();
+                if (renderer != null)
+                {
+                    originalMaterials[obj] = renderer.material;
+                }
+            }
+        }
+
+        public Material GetOriginalMaterial(GameObject obj)
+        {
+            return originalMaterials.TryGetValue(obj, out var mat) ? mat : null;
         }
 
     }

@@ -39,6 +39,8 @@ namespace UI.RuleEditor
         private int nSeconds;
         private string inputText = "";
 
+        public Material spawnMaterial;
+
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
@@ -245,7 +247,11 @@ namespace UI.RuleEditor
                     else if (counter == 2)
                     {
                         var ecaObject = generalUIController.GetSelectedObject();
+                        Renderer[] renderers = ecaObject.GetComponentsInChildren<Renderer>();
+                        foreach (Renderer r in renderers) r.material = spawnMaterial; // update material 
+                        
                         ecaObject.GetComponent<ECAObject>().CreateDuplicates(nElements, nSeconds);
+                        
                         generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
                         editObjectMenu.SetActive(true);
                         Destroy(numericKeyboard.gameObject);

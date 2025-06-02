@@ -50,10 +50,9 @@ namespace ECAPrototyping.RuleEngine
         public ECABoolean isUsingGravity = new(ECABoolean.BoolType.YES);
         
         private ObjectsMenuController _objectsMenuController;
-        private InteractionCreationController _interactionCreationController;
+        private GeneralUIController _generalUIController;
 
         private int counter = 0;
-        
         private Vector3 initialPosition;
 
         protected virtual void Awake()
@@ -85,7 +84,7 @@ namespace ECAPrototyping.RuleEngine
             
             var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
-            _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
+            _generalUIController = eventHandler.GetComponent<GeneralUIController>();
         }
         
 
@@ -263,6 +262,16 @@ namespace ECAPrototyping.RuleEngine
             {
                 Destroy(obj);
             }
+            // Restore original material if it was changed of the object
+            Material originalMat = _generalUIController.GetOriginalMaterial(this.gameObject);
+            if (originalMat != null)
+            {
+                Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+                foreach (Renderer rend in renderers)
+                {
+                    rend.material = originalMat;
+                }
+            }
         }
         
         /// <summary>
@@ -347,33 +356,39 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "resets")]
         public void ResetObject()
         {
+            Vector3 initialPos = _generalUIController.GetInitialPosition(this.gameObject);
+            gameObject.transform.position = initialPos;
             gameObject.SetActive(true);
-            transform.position = initialPosition;
-            var rb = this.GetComponent<Rigidbody>();
+
+            var rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.useGravity = false;
         }
-        
+
+
+
         /// <summary>
-        /// <b>DefineSpawnArea</b> enables the spawncube to define the spawn area of one object close to another.  
+        /// <b>Moves</b> moves the selected object close to the spawn cube.   
         /// </summary>
         /// 
-        [Action(typeof(ECAObject), "define spawn area")]
-        public void DefineSpawnArea()
+        [Action(typeof(ECAObject), "moves")]
+        public void Moves()
         {
-            GameObject cube = _interactionCreationController.spawnCube;
-            cube.SetActive(true);
-            SpawnCubeCollision spawnCubeCollision = cube.GetComponentInChildren<SpawnCubeCollision>(true);
-            
-            spawnCubeCollision.ResetToInitialPosition();
-            spawnCubeCollision.ChangeMaterial("default");
-            spawnCubeCollision.backButton.SetActive(true);
-            
-            GeneralUIController.Instance.SetDebugText("Where should the "+ 
-                                                      GeneralUIController.Instance.GetSelectedObject().name.ToLower() + 
-                                                      " spawn? Use the cube to define an area close to an object.");
+            initialPosition = transform.position;
+            var rb = GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            GameObject spawnCube = GameObject.FindGameObjectWithTag("SpawnCube");
+            if (spawnCube)
+            {
+                Transform spawnCubeChild = spawnCube.transform.GetChild(0);
+                if (spawnCubeChild != null)
+                {
+                    Vector3 targetPosition = spawnCubeChild.position;
+                    transform.position = targetPosition;
+                    rb.MovePosition(targetPosition);
+                }
+            }
         }
-        
-        
     }
 }

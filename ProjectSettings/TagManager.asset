@@ -22,6 +22,8 @@ TagManager:
   - Floor
   - GrabInteractor
   - NonNativeKeyboard
+  - HandMenu
+  - SpawnCube
   layers:
   - Default
   - TransparentFX

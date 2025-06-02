@@ -1047,7 +1047,8 @@ namespace UI
                 case "decreases by one":
                     return new Action(action.GetSubject(), "resets counter");
                 case "launches":
-                case "explodes":
+                case "explodes": 
+                case "moves":
                     return new Action(action.GetSubject(), "resets");
                 case "turns off":
                     return new Action(action.GetSubject(), "turns on");

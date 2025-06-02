@@ -40,6 +40,7 @@ namespace UI
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         public HandMenuManager handMenuManager;
+        private GeneralUIController generalUIController;
         private CategoryController _categoryController;
         [FormerlySerializedAs("interactables")] public GameObject interactablesParent;
             
@@ -102,6 +103,8 @@ namespace UI
             _categoryController = GetComponent<CategoryController>();
             handModelLeft = OpenXRLeftHandController.GetComponent<HandModel>();
             handModelRight = OpenXRRightHandController.GetComponent<HandModel>();
+            
+            generalUIController = GetComponent<GeneralUIController>();
 
             StartCoroutine(CheckControllersWithDelay(2));
         }
@@ -950,6 +953,26 @@ namespace UI
             _screenshotCamera.TakeModalityScreenshot(gameObject, modality, ecaEvent);
             if(bubblesVisible) ShowBubblesExceptSelectedModality();
             handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
+        }
+        
+        
+        public void PrepareForMoveAction()
+        {
+            //Restore the initial position of the selected object
+            GameObject selectedObject = generalUIController.GetSelectedObject();
+            Vector3 initialPos = generalUIController.GetInitialPosition(selectedObject);
+            selectedObject.transform.position = initialPos;
+            
+            // Restore the initial position and properties of the spawn cube
+            spawnCube.SetActive(true);
+            SpawnCubeCollision spawnCubeCollision = spawnCube.GetComponentInChildren<SpawnCubeCollision>(true);
+            spawnCubeCollision.ResetToInitialPosition();
+            spawnCubeCollision.ChangeMaterial("default");
+            spawnCubeCollision.backButton.SetActive(true);
+
+            GeneralUIController.Instance.SetDebugText("Where should the "+ 
+                                                      GeneralUIController.Instance.GetSelectedObject().name.ToLower() + 
+                                                      " move? Use the cube to define an area close to an object.");
         }
     }
 }

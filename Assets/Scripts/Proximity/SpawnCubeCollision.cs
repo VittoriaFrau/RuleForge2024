@@ -20,6 +20,7 @@ namespace UI
         public Material proximityMaterial;
         private Renderer rend;
         public GeneralUIController _generalUIController;
+        public EditModeController _editModeController;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         private GameObject ProximityGameObject1, ProximityGameObject2;
@@ -76,21 +77,25 @@ namespace UI
 
         void OnTriggerEnter(Collider other)
         {
-            String selectedObjectName = GeneralUIController.Instance.GetSelectedObject().name.ToLower();
-            if (other.CompareTag("Interactable"))
+            GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
+            string selectedObjBaseName = selectedObject.name.Substring(0, name.Length).ToLower();
+            
+            if (other.CompareTag("Interactable") && other.gameObject != selectedObject)
             {
                 ProximityGameObject1 = other.gameObject;
+                string proximityObjectName = ProximityGameObject1.name.Substring(0, name.Length-1).ToLower();
                 ChangeMaterial("proximity");
-                _generalUIController.SetDebugText("Do you want the new " + selectedObjectName + "s" +
-                                                  " to spawn close to the " + ProximityGameObject1.name.ToLower() + "?");
+                _generalUIController.SetDebugText("Do you want the new " + selectedObjBaseName + "s" +
+                                                  " to move close to the " + proximityObjectName + "?");
                 interactionButtons.SetActive(true);
                 backButton.SetActive(false);
                 handMenuManager.HideMenus();
+                
+                _editModeController.CreateAndPublishAction("moves");
                 if (GeneralUIController.Instance.isRecording)
                 {
-                    string screenshotName = selectedObjectName + "spawn near " + ProximityGameObject1.name;
+                    string screenshotName = selectedObjBaseName + "moves near " + ProximityGameObject1.name;
                     _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
-                    //todo: create the resulting cube
                 }
             }
         }
@@ -102,6 +107,8 @@ namespace UI
                 ChangeMaterial("current");
             }
         }
+        
+        
     
     }
 
