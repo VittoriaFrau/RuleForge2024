@@ -5,9 +5,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ECAPrototyping.RuleEngine;
 using UI;
 using UI.RuleEditor;
 using Unity.VisualScripting;
+using Action = System.Action;
 
 namespace UI
 {
@@ -29,6 +31,10 @@ namespace UI
         public GameObject interactionButtons;
         public GameObject backButton;
         private Vector3 initialPosition;
+        private string selectedObjBaseName;
+        private GameObject selectedObject => GeneralUIController.Instance.GetSelectedObject();
+        
+        private RuleEngine _ruleEngine;
         private void Awake()
         {
             rend = GetComponent<Renderer>();
@@ -43,6 +49,9 @@ namespace UI
             }
             handMenuManager = GameObject.FindGameObjectWithTag("HandMenu").GetComponent<HandMenuManager>();
             initialPosition = transform.localPosition;
+            _ruleEngine = RuleEngine.GetInstance();
+            
+            selectedObjBaseName = selectedObject.name.Substring(0, name.Length).ToLower();
         }
 
         public void ResetToInitialPosition()
@@ -77,9 +86,6 @@ namespace UI
 
         void OnTriggerEnter(Collider other)
         {
-            GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
-            string selectedObjBaseName = selectedObject.name.Substring(0, name.Length).ToLower();
-            
             if (other.CompareTag("Interactable") && other.gameObject != selectedObject)
             {
                 ProximityGameObject1 = other.gameObject;
@@ -90,13 +96,7 @@ namespace UI
                 interactionButtons.SetActive(true);
                 backButton.SetActive(false);
                 handMenuManager.HideMenus();
-                
                 _editModeController.CreateAndPublishAction("moves");
-                if (GeneralUIController.Instance.isRecording)
-                {
-                    string screenshotName = selectedObjBaseName + "moves near " + ProximityGameObject1.name;
-                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
-                }
             }
         }
 
@@ -104,10 +104,21 @@ namespace UI
         {
             if (other.CompareTag("Interactable"))
             {
-                ChangeMaterial("current");
+                ChangeMaterial("default");
             }
         }
         
+        public void PrepareToRecordMoveAction()
+        {
+            if (GeneralUIController.Instance.isRecording)
+            {
+                ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves");
+                GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
+                string screenshotName = selectedObjBaseName + " moves near " + ProximityGameObject1.name;
+                _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
+            }
+            GeneralUIController.Instance.EditModeState();
+        }
         
     
     }
