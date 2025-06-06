@@ -10,7 +10,7 @@ namespace ECAPrototyping.RuleEngine
     /// </summary>
     [DisallowMultipleComponent]
     [ECARules4All("door")]
-    [RequireComponent(typeof(ECAEnvironment))]
+    [RequireComponent(typeof(ECAFurniture))]
     public class ECADoor : MonoBehaviour
     {
         /// <summary>

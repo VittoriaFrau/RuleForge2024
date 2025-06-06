@@ -76,16 +76,13 @@ PrefabInstance:
       addedObject: {fileID: 5598099977168022642}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2481523126959896305}
+      addedObject: {fileID: 5397590864017915603}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3039958801802340388}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2464134315158428755}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5397590864017915603}
   m_SourcePrefab: {fileID: 100100000, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
 --- !u!1 &6044075394097397562 stripped
 GameObject:
@@ -425,7 +422,7 @@ MonoBehaviour:
     choice: 0
   isUsingGravity:
     choice: 0
---- !u!114 &2481523126959896305
+--- !u!114 &5397590864017915603
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -434,10 +431,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6044075394097397562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a19b7081d8d2c4148a395f43f4a25796, type: 3}
+  m_Script: {fileID: 11500000, guid: b013444a3dab4c3e8567b8e0fe00e948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!114 &3039958801802340388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -467,18 +463,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   additionalHeightOffset: -0.5
   rotationY: 90
---- !u!114 &5397590864017915603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6044075394097397562}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b013444a3dab4c3e8567b8e0fe00e948, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &6389216030554252672 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 09ddb1c3303e7db4585aa7a24396162c, type: 3}
