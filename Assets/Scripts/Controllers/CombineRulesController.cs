@@ -56,7 +56,10 @@ namespace UI
         {
             foreach (var rule in activeMeanwhileRules)
             {
-                rule.UpdateTimer(Time.deltaTime);
+                if (rule != null)
+                {
+                    rule.UpdateTimer(Time.deltaTime);
+                }
             }
         }
 
