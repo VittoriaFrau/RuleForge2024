@@ -10,6 +10,7 @@ using UnityEngine.Serialization;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
+using Action = ECAPrototyping.RuleEngine.Action;
 
 namespace UI.RuleEditor
 {
@@ -34,13 +35,8 @@ namespace UI.RuleEditor
         public List<GameObject> ecaTextButtons;
         public List<GameObject> ecaPropsButtons;
         
-        private int counter;
-        private int nElements;
-        private int nSeconds;
         private string inputText = "";
-
-        public Material spawnMaterial;
-
+        
         public GameObject colorPalette;
         private List<GameObject> menus;
         public GameObject debugPanel;
@@ -55,6 +51,13 @@ namespace UI.RuleEditor
         // and the XRDisplaySubsystem is not immediately "running" in Start(), making it difficult to
         // determine when the headset is actually active.
         public bool isUsingOculusLink;
+        
+        public enum KeyboardMode
+        {
+            EditText,
+            SetTimerSeconds,
+            SetDuplicateCount
+        }
 
         private void Awake()
         {
@@ -220,48 +223,80 @@ namespace UI.RuleEditor
         {
             HideMenus();
             uiMenu.SetActive(true);
-        }   
-        
-        public void ShowKeyboard(string type)
+        }
+
+       /* public void ShowKeyboard(string s)
         {
-            editObjectMenu.SetActive(false);
-            switch (type)
+        }*/
+        
+
+        public void ShowKeyboard(string keyboardMode)
+        {
+            if (string.IsNullOrEmpty(keyboardMode)) return;
+            // parse keyboardMode to KeyboardMode enum
+            if (!Enum.TryParse(keyboardMode, out KeyboardMode keyboardModeEnum))
             {
-                case "Keyboard":
+                Debug.LogError($"Invalid keyboard mode: {keyboardMode}");
+                return;
+            }
+            editObjectMenu.SetActive(false);
+            switch (keyboardModeEnum)
+            {
+                case KeyboardMode.EditText:
                     GameObject keyboard = objectsMenuController.NewKeyboard("Keyboard");
                     generalUIController.SetDebugText("Please, type the text you want to insert in the text box.");
                     CloseButtonClicked(keyboard);
-                    EnterButtonClicked(keyboard);
-                    break;
-                case "NumericKeyboard":
-                    GameObject numericKeyboard = objectsMenuController.NewKeyboard("NumericPad");
-                    string name = generalUIController.GetSelectedObject().name;
-                    string baseName = name.Substring(0, name.Length - 1);
-                    
-                    if (counter == 0) 
-                        generalUIController.SetDebugText("Please, type the number of " + baseName.ToLower() + "s" +
-                                                                        " you want to duplicate.");
-                    else if(counter == 1) 
-                        generalUIController.SetDebugText("Please, type the interval time (seconds) " +
-                                                                           "for creating duplicates.");
-                    else if (counter == 2)
+                    EnterButtonClicked(keyboard, (input) =>
                     {
-                        var ecaObject = generalUIController.GetSelectedObject();
-                        Renderer[] renderers = ecaObject.GetComponentsInChildren<Renderer>();
-                        foreach (Renderer r in renderers) r.material = spawnMaterial; // update material 
-                        
-                        ecaObject.GetComponent<ECAObject>().CreateDuplicates(nElements, nSeconds);
-                        
-                        generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
-                        editObjectMenu.SetActive(true);
-                        Destroy(numericKeyboard.gameObject);
-                        counter = 0;
-                    }
-                    
-                    CloseButtonClicked(numericKeyboard);
-                    EnterButtonClicked(numericKeyboard);
+                        GameObject uiElement = generalUIController.GetSelectedObject();
+                        if (uiElement != null)
+                        {
+                            Action action = new Action(GeneralUIController.Instance.GetSelectedObject(), "changes to", input);
+                            editModeController.CreateAndPublishAction( "changes text", action);
+                            Destroy(keyboard);
+                            generalUIController.EditModeState();
+                        }
+                    });
                     break;
-            }
+                case KeyboardMode.SetTimerSeconds:
+                    GameObject numericKeyboardSeconds = objectsMenuController.NewKeyboard("NumericPad");
+                    CloseButtonClicked(numericKeyboardSeconds);
+                    EnterButtonClicked(numericKeyboardSeconds, (input) =>
+                    {
+                        //TODO timer
+                        Destroy(numericKeyboardSeconds.gameObject);
+                    });
+                    break;
+
+                /*else if (counter == 2)
+                {
+                    var ecaObject = generalUIController.GetSelectedObject();
+                    Renderer[] renderers = ecaObject.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer r in renderers) r.material = spawnMaterial; // update material
+
+                    ecaObject.GetComponent<ECAObject>().CreateDuplicates(nElements, nSeconds);
+
+                    generalUIController.SetDebugText("N.Elements: " + nElements + "\n N.Seconds: " + nSeconds);
+                    editObjectMenu.SetActive(true);
+                    Destroy(numericKeyboard.gameObject);
+                    counter = 0;
+                }
+                break;*/
+                case KeyboardMode.SetDuplicateCount:
+                    GameObject numericKeyboardDuplicate = objectsMenuController.NewKeyboard("NumericPad");
+                    generalUIController.SetDebugText("Please, type the number of duplicates you want to create.");
+                    CloseButtonClicked(numericKeyboardDuplicate);
+                    EnterButtonClicked(numericKeyboardDuplicate, (input) =>
+                    {
+                        
+                        editModeController.CreateAndPublishAction("duplicates", new Action(GeneralUIController.Instance.GetSelectedObject(),
+                            "duplicates", "itself" , "into" , int.Parse(input)));
+                        Destroy(numericKeyboardDuplicate.gameObject);
+                        generalUIController.EditModeState();
+
+                    });
+            break;
+        }
         }
         
         private void CloseButtonClicked(GameObject keyboard)
@@ -280,57 +315,55 @@ namespace UI.RuleEditor
             }
         }
         
-        private void EnterButtonClicked(GameObject keyboard)
+        private void EnterButtonClicked(GameObject keyboard, Action<string> onEnterCallback)
         {
             var script = keyboard.GetComponent<ECAKeyboard>();
             var enterButton = keyboard
                 .GetComponentsInChildren<Button>(true)
                 .FirstOrDefault(b => b.name == "Enter_Button" && b.gameObject.activeInHierarchy);
-            switch (keyboard.name)
+            if (enterButton != null)
             {
-               case "Keyboard1":
-                   if (enterButton != null)
-                   {
-                       enterButton.onClick.AddListener(() =>
-                       {
-                           GameObject uiElement = generalUIController.GetSelectedObject();
-                           if (uiElement != null)
-                           {
-                               var textMesh = uiElement.GetComponentInChildren<TextMeshPro>();
-                               textMesh.text = script.inputText;
-                               editObjectMenu.SetActive(true);
-                               Destroy(keyboard);
-                           }
-                       });
-                   }
-                   break;
-               case "NumericPad1":
-                   if (enterButton != null)
-                   {
-                       enterButton.onClick.AddListener(() =>
-                       {
-                           if (counter == 0)
-                           {
-                               nElements = int.Parse(script.inputText);
-                           }
-                           else if (counter == 1)
-                           {
-                               nSeconds = int.Parse(script.inputText);
-                           }
-                           counter++;
-                           StartCoroutine(DestroyAndShowNewKeyboard(keyboard));
-                       });
-                   }
-                   break;
+                enterButton.onClick.AddListener(() =>
+                {
+                    string inputText = script.inputText;
+                    onEnterCallback?.Invoke(inputText);
+                });
             }
+            /* switch (keyboard.name)
+             {
+                case "Keyboard1":
+                    if (enterButton != null)
+                    {
+                        enterButton.onClick.AddListener(() =>
+                        {
+                            string inputText = script.inputText;
+                            onEnterCallback?.Invoke(inputText);
+
+                            GameObject uiElement = generalUIController.GetSelectedObject();
+                            if (uiElement != null)
+                            {
+                                var textMesh = uiElement.GetComponentInChildren<TextMeshPro>();
+                                textMesh.text = script.inputText;
+                                editObjectMenu.SetActive(true);
+                                Destroy(keyboard);
+                            }
+                        });
+                    }
+                    break;
+                case "NumericPad1":
+                    if (enterButton != null)
+                    {
+                        int valueSelected;
+                        enterButton.onClick.AddListener(() =>
+                        {
+                            valueSelected = int.Parse(script.inputText);
+                            onEnterCallback?.Invoke(inputText);
+                        });
+                    }
+                    break;
+             }*/
         }
         
-        private IEnumerator DestroyAndShowNewKeyboard(GameObject keyboard)
-        {
-            Destroy(keyboard);
-            yield return new WaitForSeconds(2f);
-            ShowKeyboard("NumericKeyboard");
-        }
 
 
     }

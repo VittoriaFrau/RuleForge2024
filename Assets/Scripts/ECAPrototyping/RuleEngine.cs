@@ -1196,21 +1196,24 @@ namespace ECAPrototyping.RuleEngine
 
         public static bool operator ==(Action one, Action two)
         {
+            if (ReferenceEquals(one, two))
+                return true;
+
+            if (one is null || two is null)
+                return false;
+
             return one.ActionEquals(two);
         }
 
         public static bool operator !=(Action one, Action two)
         {
-            return !one.ActionEquals(two);
+            return !(one == two);
         }
 
-        //TODO null action
         private bool ActionEquals(Action action)
         {
-            /*if (action == null)
-            {
-                return true;
-            }*/
+            if (action == null)
+               return false;
             if (!a_subject.Equals(action.GetSubject()))
                 return false;
             if (!a_verb.Equals(action.GetActionMethod()))

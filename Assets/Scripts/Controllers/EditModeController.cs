@@ -77,10 +77,11 @@ namespace UI
             interactables = (from Transform child in interactablesParent.transform select child.gameObject).ToList();
         }
 
-        public void CreateAndPublishAction(string actionName)
+        public void CreateAndPublishAction(string actionName, Action action = null)
         {
             if (_ruleEngine == null) return;
-            Action action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
+            if(action==null) 
+                action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
             // If I'm recording, I need to save the action
             if (GeneralUIController.Instance.isRecording && actionName != "moves")
             {

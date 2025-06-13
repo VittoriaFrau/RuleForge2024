@@ -25,6 +25,7 @@ namespace UI
         public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
         public Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+        public Material spawnMaterial;
         
         public enum UIState
         {

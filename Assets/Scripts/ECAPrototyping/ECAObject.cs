@@ -49,6 +49,9 @@ namespace ECAPrototyping.RuleEngine
         [StateVariable("gravity", ECARules4AllType.Boolean)] 
         public ECABoolean isUsingGravity = new(ECABoolean.BoolType.YES);
         
+        [StateVariable("duplicate", ECARules4AllType.Boolean)] 
+        public ECABoolean isDuplicated = new(ECABoolean.BoolType.NO);
+        
         private ObjectsMenuController _objectsMenuController;
         private GeneralUIController _generalUIController;
 
@@ -212,20 +215,17 @@ namespace ECAPrototyping.RuleEngine
         /// <b>SpawnObject</b> spawns a new object in the scene.
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "duplicates")]
-        public void CreateDuplicates(int spawnCount, float delaySeconds)
+        [Action(typeof(ECAObject), "duplicates" , "itself", "into", typeof(int) )]
+        public void CreateDuplicates(int spawnCount)
         {
-            StartCoroutine(CreateDuplicatesCoroutine(spawnCount, delaySeconds));
-        }
-
-        private IEnumerator CreateDuplicatesCoroutine(int spawnCount, float delaySeconds)
-        {
+            Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in renderers) r.material = GeneralUIController.Instance.spawnMaterial; // update material 
             Transform floorTransform = GameObject.FindWithTag("Floor").transform;
             Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
             if (floorRenderer == null)
             {
                 Debug.LogError("Il Floor non ha un Renderer.");
-                yield break;
+                return;
             }
 
             Bounds floorBounds = floorRenderer.bounds;
@@ -246,11 +246,10 @@ namespace ECAPrototyping.RuleEngine
                 Vector3 spawnPosition = new Vector3(randomX, transform.position.y, randomZ);
 
                 _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
-
-                yield return new WaitForSeconds(delaySeconds);
             }
+            isDuplicated.Assign(ECABoolean.BoolType.YES);
         }
-
+        
         /// <summary>
         /// <b>DeleteDuplicates</b> deletes all the duplicates of the object in the scene.
         /// </summary>
@@ -272,6 +271,7 @@ namespace ECAPrototyping.RuleEngine
                     rend.material = originalMat;
                 }
             }
+            isDuplicated.Assign(ECABoolean.BoolType.NO);
         }
         
         /// <summary>

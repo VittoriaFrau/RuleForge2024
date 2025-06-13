@@ -24,10 +24,10 @@ namespace ECAPrototyping.RuleEngine
         private GameObject keyboard;
 
 
-        [Action(typeof(ECAText), "changes text")]
-        public void ChangeText()
+        [Action(typeof(ECAText), "changes to", typeof(string))]
+        public void ChangeText(string newText)
         {
-            //todo
+            GetComponentInChildren<TextMeshPro>().text = newText;
         }
         
         [Action(typeof(ECAText), "resets text")]
