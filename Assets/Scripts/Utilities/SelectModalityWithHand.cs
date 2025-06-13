@@ -6,8 +6,8 @@ public class SelectModalityWithHand : MonoBehaviour
     private InteractionCreationController _interactionCreationController;
     // This prevents multiple unwanted OnTriggerEnter activations when bubbles redistribute.
     // It adds a temporary lock (isRedistributing) to ignore new trigger events until the redistribution is complete.
-    private bool isRedistributing = false;
-    private float distributionTime = 5.0f;
+    private static bool isRedistributing = false;
+    private float distributionTime = 1.5f;
 
     // Start is called before the first frame update
     void Start()
