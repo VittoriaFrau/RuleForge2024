@@ -76,10 +76,12 @@ public class ObjectsMenuController : MonoBehaviour
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
     }
     
-    public void Spawn(string type, Vector3 position, string prefabKey)
+    public GameObject Spawn(string type, Vector3 position, string prefabKey)
     {
         List<GameObject> prefabs = prefabLibrary[prefabKey];
-        spawnedObjects.Add(Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position));
+        GameObject newObj = Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position);
+        spawnedObjects.Add(newObj);
+        return newObj;
     }
     
     public GameObject NewKeyboard(string type)
