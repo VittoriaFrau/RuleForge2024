@@ -245,7 +245,12 @@ namespace ECAPrototyping.RuleEngine
                 float randomZ = Random.Range(minZ + margin, maxZ - margin);
                 Vector3 spawnPosition = new Vector3(randomX, transform.position.y, randomZ);
 
-                _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
+                GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
+                
+                //Apply new material to all renderers in the duplicate object
+                Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
+                foreach (Renderer r in duplicateRenderers)
+                    r.material = GeneralUIController.Instance.spawnMaterial;
             }
             isDuplicated.Assign(ECABoolean.BoolType.YES);
         }
