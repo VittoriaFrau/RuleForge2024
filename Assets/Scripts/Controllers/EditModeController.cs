@@ -76,6 +76,12 @@ namespace UI
         {
             interactables = (from Transform child in interactablesParent.transform select child.gameObject).ToList();
         }
+        
+        //Method for Unity to create and publish an action
+        public void CreateAndPublishAction(string actionName)
+        {
+            CreateAndPublishAction(actionName, null);
+        }
 
         public void CreateAndPublishAction(string actionName, Action action = null)
         {
