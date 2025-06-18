@@ -86,18 +86,6 @@ namespace ECAPrototyping.RuleEngine
                 // Avvia la rotazione solo per il componente porta
                 StartCoroutine(Rotate(new Vector3(0, 90, 0), doorTransform.gameObject, () =>
                 {
-                    // Callback dopo la rotazione
-                    GameObject eventHandler = GameObject.FindWithTag("EventHandler");
-                    if (eventHandler != null)
-                    {
-                        GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
-                        if (GeneralUIController.Instance != null && GeneralUIController.Instance.isRecording)
-                        {
-                            Action action = new Action(this.gameObject, "Open");
-                            generalUIController.InteractionCreationController.SaveRecordedAction(action);
-                        }
-                    }
-                    
                     // Notifica che la porta è stata aperta
                     DoorOpened?.Invoke();
                 }));
@@ -124,17 +112,6 @@ namespace ECAPrototyping.RuleEngine
                 // Avvia la rotazione inversa solo per il componente porta
                 StartCoroutine(Rotate(new Vector3(0, -90, 0), doorTransform.gameObject, () =>
                 {
-                    // Callback dopo la rotazione
-                    GameObject eventHandler = GameObject.FindWithTag("EventHandler");
-                    if (eventHandler != null)
-                    {
-                        GeneralUIController generalUIController = eventHandler.GetComponent<GeneralUIController>();
-                        if (GeneralUIController.Instance != null && GeneralUIController.Instance.isRecording)
-                        {
-                            Action action = new Action(this.gameObject, "Close");
-                            generalUIController.InteractionCreationController.SaveRecordedAction(action);
-                        }
-                    }
                 }));
             }
         }
