@@ -12,6 +12,9 @@ using MixedReality.Toolkit.Subsystems;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using Action = ECAPrototyping.RuleEngine.Action;
 
 namespace UI
@@ -206,6 +209,18 @@ namespace UI
             {
                 selectInputVisualizer.SelectInput = handModel.SelectInput;
             }
+           /* XRDirectInteractor interactor = newModel.gameObject.AddComponent<XRDirectInteractor>();
+            interactor.interactionManager = FindObjectOfType<XRInteractionManager>();
+
+            XRController controller = newModel.gameObject.AddComponent<XRController>();
+            controller.controllerNode = XRNode.LeftHand; // o RightHand
+
+// Assicurati che il prefab abbia anche un Collider e Rigidbody
+            Collider col = newModel.gameObject.AddComponent<SphereCollider>();
+            Rigidbody rb = newModel.gameObject.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+*/
         }
         
         private void DeActivateControllerModality()
@@ -582,7 +597,7 @@ namespace UI
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
                 Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
-                _oppositeActionEvents.Add(oppositeAction);
+                if(oppositeAction != null) _oppositeActionEvents.Add(oppositeAction);
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 Debug.Log("Saved action: " + ecaEvent);
                 GeneralUIController.Instance.SetDebugText(ecaEvent.ToString());

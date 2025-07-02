@@ -1036,8 +1036,8 @@ namespace UI
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
-                case "duplicates":
-                    return new Action(action.GetSubject(), "delete duplicates");
+               /* case "is duplicated into":
+                    return new Action(action.GetSubject(), "delete duplicates");*/
                 case "follows":
                     return new Action(action.GetSubject(), "unfollows");
                 case "changes text": 

@@ -212,10 +212,10 @@ namespace ECAPrototyping.RuleEngine
         }
 
         /// <summary>
-        /// <b>SpawnObject</b> spawns a new object in the scene.
+        /// <b>Duplicates</b> the object into N objects
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "duplicates" , "itself", "into", typeof(int) )]
+        [Action(typeof(ECAObject), "is duplicated into" , typeof(int))]
         public void CreateDuplicates(int spawnCount)
         {
             Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
@@ -253,6 +253,8 @@ namespace ECAPrototyping.RuleEngine
                     r.material = GeneralUIController.Instance.spawnMaterial;
             }
             isDuplicated.Assign(ECABoolean.BoolType.YES);
+            
+            this.gameObject.name = "new" + baseName;
         }
         
         /// <summary>

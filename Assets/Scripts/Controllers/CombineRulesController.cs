@@ -346,7 +346,7 @@ namespace UI
                 BindEvent(whenGameObject, whenEvent, tracker, false);
             }
             
-            if (meanwhileEvents.Length > 0)
+            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileRules.Count == 0)
             {
                 foreach (var meanwhileRule in meanwhileEvents)
                 {
