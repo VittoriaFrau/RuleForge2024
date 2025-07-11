@@ -1011,10 +1011,10 @@ namespace UI
             return e;
         }
 
-        public static Action GetOppositeAction(Action action, ECAEvent ecaEvent)
+        public static Action GetOppositeAction(Action action, String ecaEventVerb)
         {
             // TODO inserire tutti gli altri
-            switch (ecaEvent.Verb)
+            switch (ecaEventVerb)
             {
                 case "hides":
                     return new Action(action.GetSubject(), "shows");

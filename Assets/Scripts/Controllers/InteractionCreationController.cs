@@ -544,7 +544,7 @@ namespace UI
             }
         }
 
-        private void ExecuteOppositeActions()
+        public void ExecuteOppositeActions()
         {
             foreach (var action in _oppositeActionEvents)
             {
@@ -596,7 +596,7 @@ namespace UI
             GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
-                Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent);
+                Action oppositeAction = Utils.GetOppositeAction(action, ecaEvent.Verb);
                 if(oppositeAction != null) _oppositeActionEvents.Add(oppositeAction);
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 Debug.Log("Saved action: " + ecaEvent);
@@ -699,6 +699,7 @@ namespace UI
             _modality = Modalities.None;
             DeActivateCurrentModality();
             HideModalitiesBubbles();
+            _categoryController.HideCategoryMenu();
         }
 
         IEnumerator TakeScreenShot(List<ECAEvent> _events)
@@ -786,7 +787,7 @@ namespace UI
             GameObject gameObject = manipulator.gameObject;
 
             //attach listener to object manipulator manipulation started event
-            manipulator.OnClicked.AddListener (() =>
+            /*manipulator.OnClicked.AddListener (() =>
             {
                 Debug.Log(manipulator.gameObject.name + " On clicked");
                 GeneralUIController.Instance.SetDebugText("You clicked on " + manipulator.gameObject.name);
@@ -801,7 +802,7 @@ namespace UI
 
                 _categoryController.CustomizeCategoryMenu(gameObject);
 
-            });
+            });*/
                 
             manipulator.selectEntered.AddListener(interactor =>
             {

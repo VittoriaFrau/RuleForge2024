@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ECAPrototyping.RuleEngine;
 using UI.RuleEditor;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace UI
         private readonly ECAEvent[] sequence;
         private readonly ECAEvent[] thenEvents;
         private readonly RuleEngine ruleEngine;
+        private readonly List<Action> oppositeActions;
         private bool hasCompleted = false;
 
         public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] thenEvents, RuleEngine ruleEngine)
@@ -17,6 +19,7 @@ namespace UI
             this.sequence = whenSequence;
             this.thenEvents = thenEvents;
             this.ruleEngine = ruleEngine;
+            this.oppositeActions = new List<Action>();
         }
 
         public void EventTriggered(ECAEvent triggeredEvent)
@@ -59,6 +62,7 @@ namespace UI
             foreach (var thenEvent in thenEvents)
             {
                 ruleEngine.ExecuteAction(thenEvent.Action);
+                oppositeActions.Add(Utils.GetOppositeAction(thenEvent.Action, thenEvent.Verb));
             }
 
             hasCompleted = true;
@@ -71,6 +75,19 @@ namespace UI
             // Ad esempio:
             EventSequenceTracker tracker = new EventSequenceTracker(new ECAEvent[0], thenEvents, RuleEngine.GetInstance());
             tracker.TriggerActionsDirectly(null); // oppure una logica più complessa
+        }
+        
+        
+        public void ExecuteOppositeActions()
+        {
+            if (oppositeActions == null || oppositeActions.Count == 0) return;
+
+            foreach (var action in oppositeActions)
+            {
+                ruleEngine.ExecuteAction(action);
+            }
+
+            oppositeActions.Clear();
         }
     }
 

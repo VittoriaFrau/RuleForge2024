@@ -21,6 +21,7 @@ namespace UI.RuleEditor
         public GameObject editObjectMenu;
         public GameObject newInteractionMenu;
         public GameObject chooseAnObjectMenu;
+        public GameObject playMenu;
 
         public GameObject shapesMenu;
         public GameObject animalMenu;
@@ -105,7 +106,19 @@ namespace UI.RuleEditor
                 case GeneralUIController.UIState.RuleComposition:
                     ShowRuleCompositionMenu();
                     break;
+                case GeneralUIController.UIState.Play:
+                    mainMenu.SetActive(false);
+                    debugPanel.SetActive(false);
+                    playMenu.SetActive(true);
+                    break;
             }
+        }
+
+        public void DeActivatePlayStateMenu()
+        {
+            playMenu.SetActive(false);
+            mainMenu.SetActive(true);
+            debugPanel.SetActive(true);
         }
         
         /// <summary>

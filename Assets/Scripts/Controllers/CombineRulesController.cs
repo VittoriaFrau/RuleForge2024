@@ -22,7 +22,7 @@ namespace UI
         public GameObject whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
         private List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         private ECAEvent[] currentThenEvents;
-
+        public EventSequenceTracker eventSequenceTracker;
 
         public enum ContainerType
         {
@@ -337,13 +337,13 @@ namespace UI
                 return;
             }
 
-            EventSequenceTracker tracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
+            eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
 
             // Bind dei whenEvents normali
             foreach (var whenEvent in whenEvents)
             {
                 GameObject whenGameObject = whenEvent.ObjectRef;
-                BindEvent(whenGameObject, whenEvent, tracker, false);
+                BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
             }
             
             if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileRules.Count == 0)
@@ -358,7 +358,7 @@ namespace UI
                     foreach (var meanwhileEvent in meanwhileRule.events)
                     {
                         GameObject eventGameObject = meanwhileEvent.ObjectRef;
-                        BindEvent(eventGameObject, meanwhileEvent, tracker, false, meanwhileRule);
+                        BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
                     }
                 }
             }
@@ -369,7 +369,7 @@ namespace UI
             {
                 ECAEvent equivalenceEvent = equivalenceEvents[0];
                 GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
-                BindEvent(equivalenceGameObject, equivalenceEvent, tracker, true);
+                BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
             }
         }
 
@@ -381,6 +381,7 @@ namespace UI
             return allContainers
             .Select(container =>
                 Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileRules))
+            .Where(rule => rule != null)
             .ToArray();
         }
 

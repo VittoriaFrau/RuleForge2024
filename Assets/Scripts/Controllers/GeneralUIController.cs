@@ -33,7 +33,8 @@ namespace UI
             EditMode,
             NewObject,
             NewInteraction,
-            RuleComposition
+            RuleComposition,
+            Play
         }
         private UIState _uiState;
         public UIState UIstate
@@ -93,6 +94,10 @@ namespace UI
                 case UIState.RuleComposition:
                     _combineRulesController.DeActivateRuleComposition();
                     break;
+                case UIState.Play:
+                    handMenuManager.DeActivatePlayStateMenu();
+                    _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
+                    break;
             }
         }
 
@@ -142,6 +147,14 @@ namespace UI
             _uiState = UIState.RuleComposition;
             handMenuManager.HandleHandMenu(_uiState);
             _combineRulesController.ActivateCombineRules();
+        }
+        
+        public void PlayState()
+        {
+            DeActivatePreviousState(UIState.Play);
+            _uiState = UIState.Play;
+            handMenuManager.HandleHandMenu(_uiState);
+            _combineRulesController.CalculateRule();
         }
 
         public void SetSelectedObject(GameObject _selectedObject)
