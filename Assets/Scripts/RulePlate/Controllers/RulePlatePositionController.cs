@@ -28,7 +28,7 @@ namespace UI.RuleEditor
         
         _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
         _combineRulesController.DeactivateRuleDebugText();
-        ruleEditorPlate = _combineRulesController.ruleEditorPlate;
+        ruleEditorPlate = _combineRulesController.ruleEditorPlatePrefab;
         _boundsController = ruleEditorPlate.GetComponent<BoundsControl>();
         if(rulePlateManipulator==null) rulePlateManipulator = ruleEditorPlate.GetComponent<ObjectManipulator>();
         

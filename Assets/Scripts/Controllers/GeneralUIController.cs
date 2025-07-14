@@ -63,7 +63,7 @@ namespace UI
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
-            if(_combineRulesController.ruleEditorPlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlate.gameObject.SetActive(false);
+            if(_combineRulesController.activeRulePlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlatePrefab.gameObject.SetActive(false);
             DefaultState();
         }
         
@@ -155,6 +155,8 @@ namespace UI
             _uiState = UIState.Play;
             handMenuManager.HandleHandMenu(_uiState);
             _combineRulesController.CalculateRule();
+            _combineRulesController.activeRulePlate = null;
+            ClearRecordedEvents();
         }
 
         public void SetSelectedObject(GameObject _selectedObject)

@@ -9,17 +9,18 @@ using MixedReality.Toolkit.Subsystems;
 using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace UI
 {
     public class CombineRulesController : MonoBehaviour
     {
         //Rule composition
-        public GameObject removableBarrier;
-        public TextMeshProUGUI whenText, thenText;
-        public GameObject ruleEditorPlate;
-        public GameObject cubePlate, modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
-        public GameObject whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
+        private GameObject removableBarrier, cubePlate, whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
+        private TextMeshProUGUI whenText, thenText;
+        [FormerlySerializedAs("ruleEditorPlate")] public GameObject ruleEditorPlatePrefab;
+        public GameObject activeRulePlate;
+        public GameObject modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
         private List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
@@ -40,11 +41,10 @@ namespace UI
         private List<CubeContainerClass> whenContainers;
         private List<CubeContainerClass> thenContainers;
         public GameObject modalityContainerPrefab, actionContainerPrefab;
-        public GameObject ruleDebugText, cubeHelp;
+        private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
         private HandMenuManager handMenuManager;
         private InteractionCreationController interactionCreationController;
-        public GameObject MRTKSpeech;
 
         private void Start()
         {
@@ -79,7 +79,12 @@ namespace UI
             }
 
             //Set the rule plate visible
-            ruleEditorPlate.SetActive(true);
+            if (activeRulePlate == null)
+            {
+                activeRulePlate = Instantiate(ruleEditorPlatePrefab, ruleEditorPlatePrefab.transform.parent);
+                activeRulePlate.SetActive(true);
+                CacheReferencesCurrentRulePlate();
+            }
 
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(true);
@@ -96,7 +101,7 @@ namespace UI
         public void DeActivateRuleComposition()
         {
             //Set the rule plate visible
-            ruleEditorPlate.SetActive(false);
+            activeRulePlate.SetActive(false);
 
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(false);
@@ -108,7 +113,7 @@ namespace UI
         public void ResetCubePositions()
         {
             //Repositioning the plate in case the user has moved it
-            ruleEditorPlate.transform.localPosition = new Vector3(-14.4f, -119.0f, 774.0f);
+            activeRulePlate.transform.localPosition = new Vector3(-14.4f, -119.0f, 774.0f);
 
             // Using the original position of the cube, position it again there
             foreach (var recordedEvent in GeneralUIController.Instance.recordedEvents)
@@ -200,9 +205,9 @@ namespace UI
         public void InitializeVariables()
         {
             whenText = GameObject.FindGameObjectsWithTag("RuleText")
-                .ToList().Find(x => x.name == "WhenText").GetComponent<TextMeshProUGUI>();
+                .ToList().Find(x => x.name == "WhenText" && x.activeSelf).GetComponent<TextMeshProUGUI>();
             thenText = GameObject.FindGameObjectsWithTag("RuleText")
-                .ToList().Find(x => x.name == "ThenText").GetComponent<TextMeshProUGUI>();
+                .ToList().Find(x => x.name == "ThenText" && x.activeSelf).GetComponent<TextMeshProUGUI>();
 
             //Adds the default containers
             whenContainers = new List<CubeContainerClass>();
@@ -454,7 +459,19 @@ namespace UI
             }
         }
 
-
+        private void CacheReferencesCurrentRulePlate()
+        {
+            // Cache references to the current rule plate components
+            removableBarrier = activeRulePlate.transform.Find("CubePlate/Barriers").gameObject;
+            whenText = activeRulePlate.transform.Find("RuleText/Action Button/Frontplate/AnimatedContent/WhenTextContainer/WhenText").GetComponent<TextMeshProUGUI>();
+            thenText = activeRulePlate.transform.Find("RuleText/Action Button/Frontplate/AnimatedContent/ThenTextContainer/ThenText").GetComponent<TextMeshProUGUI>();
+            whenSequentialRow = activeRulePlate.transform.Find("RulePlate/When/Frontplate/SequentialRow").gameObject;
+            whenEquivalenceRow = activeRulePlate.transform.Find("RulePlate/When/Frontplate/EquivalenceRow").gameObject;
+            thenSequentialRow = activeRulePlate.transform.Find("RulePlate/Then/Frontplate/SequentialRow").gameObject;
+            cubePlate = activeRulePlate.transform.Find("CubePlate").gameObject;
+            cubeHelp = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/CubeHelp").gameObject;
+            ruleDebugText = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/RuleDebugText").gameObject;
+        }
 
         private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
             bool isEquivalence, MeanwhileRule meanwhileRule = null)
@@ -499,8 +516,7 @@ namespace UI
                     break;
             }
         }
-
-
+        
         private void BindTouchEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
             var manipulator = target.GetComponent<ObjectManipulator>();
