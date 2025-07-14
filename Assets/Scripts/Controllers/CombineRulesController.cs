@@ -85,6 +85,10 @@ namespace UI
                 activeRulePlate.SetActive(true);
                 CacheReferencesCurrentRulePlate();
             }
+            else
+            {
+                activeRulePlate.SetActive(true);
+            }
 
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(true);

@@ -220,38 +220,29 @@ namespace ECAPrototyping.RuleEngine
         {
             Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
             foreach (Renderer r in renderers) r.material = GeneralUIController.Instance.spawnMaterial; // update material 
-            Transform floorTransform = GameObject.FindWithTag("Floor").transform;
-            Renderer floorRenderer = floorTransform.GetComponent<Renderer>();
-            if (floorRenderer == null)
-            {
-                Debug.LogError("Il Floor non ha un Renderer.");
-                return;
-            }
-
-            Bounds floorBounds = floorRenderer.bounds;
-            float minX = floorBounds.min.x;
-            float maxX = floorBounds.max.x;
-            float minZ = floorBounds.min.z;
-            float maxZ = floorBounds.max.z;
-
             string baseName = this.name.Substring(0, this.name.Length - 1);
             string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
 
             float margin = 2.0f;
 
+            // Width of the base object
+            Bounds originalBounds = GetComponent<Renderer>().bounds;
+            float objectWidth = originalBounds.size.x;
+            float spacing = objectWidth + margin;
+
+            Vector3 basePosition = transform.position;
+
             for (int i = 0; i < spawnCount; i++)
             {
-                float randomX = Random.Range(minX + margin, maxX - margin);
-                float randomZ = Random.Range(minZ + margin, maxZ - margin);
-                Vector3 spawnPosition = new Vector3(randomX, transform.position.y, randomZ);
-
+                //with this method we can spawn the objects in a line on the right
+                Vector3 spawnPosition = basePosition + new Vector3(spacing * (i + 1), 0, 0); 
                 GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
-                
-                //Apply new material to all renderers in the duplicate object
+
                 Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
                 foreach (Renderer r in duplicateRenderers)
                     r.material = GeneralUIController.Instance.spawnMaterial;
             }
+
             isDuplicated.Assign(ECABoolean.BoolType.YES);
             
             this.gameObject.name = "new" + baseName;
