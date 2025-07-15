@@ -52,6 +52,8 @@ namespace ECAPrototyping.RuleEngine
         [StateVariable("duplicate", ECARules4AllType.Boolean)] 
         public ECABoolean isDuplicated = new(ECABoolean.BoolType.NO);
         
+        public ECABoolean isACopy = new(ECABoolean.BoolType.NO);
+        
         private ObjectsMenuController _objectsMenuController;
         private GeneralUIController _generalUIController;
 
@@ -215,12 +217,21 @@ namespace ECAPrototyping.RuleEngine
         /// <b>Duplicates</b> the object into N objects
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "is duplicated into" , typeof(int))]
+        [Action(typeof(ECAObject), "is duplicated" , typeof(int))]
         public void CreateDuplicates(int spawnCount)
         {
-            Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
-            foreach (Renderer r in renderers) r.material = GeneralUIController.Instance.spawnMaterial; // update material 
+            if (_generalUIController.UIstate != GeneralUIController.UIState.Play)
+            {
+                Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
+                foreach (Renderer r in renderers)
+                    r.material = GeneralUIController.Instance.spawnMaterial; // update material 
+            }
+
             string baseName = this.name.Substring(0, this.name.Length - 1);
+            if(name.StartsWith("new"))
+            {
+                baseName = name.Substring(3); // remove "new" prefix if it exists
+            }
             string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
 
             float margin = 2.0f;
@@ -237,10 +248,14 @@ namespace ECAPrototyping.RuleEngine
                 //with this method we can spawn the objects in a line on the right
                 Vector3 spawnPosition = basePosition + new Vector3(spacing * (i + 1), 0, 0); 
                 GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
+                duplicate.GetComponent<ECAObject>().isACopy.Assign(ECABoolean.BoolType.YES);
 
-                Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
-                foreach (Renderer r in duplicateRenderers)
-                    r.material = GeneralUIController.Instance.spawnMaterial;
+                if (_generalUIController.UIstate != GeneralUIController.UIState.Play)
+                {
+                    Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
+                    foreach (Renderer r in duplicateRenderers)
+                        r.material = GeneralUIController.Instance.spawnMaterial;
+                }
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);
@@ -260,7 +275,7 @@ namespace ECAPrototyping.RuleEngine
                 Destroy(obj);
             }
             // Restore original material if it was changed of the object
-            Material originalMat = _generalUIController.GetOriginalMaterial(this.gameObject);
+            Material originalMat = GeneralUIController.GetOriginalMaterial(this.gameObject);
             if (originalMat != null)
             {
                 Renderer[] renderers = GetComponentsInChildren<Renderer>(true);

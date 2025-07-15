@@ -24,7 +24,7 @@ namespace UI
         public List<ECAEvent> recordedEvents = new();
         public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
-        public Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
+        public static Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
         public Material spawnMaterial;
         
         public enum UIState
@@ -63,7 +63,10 @@ namespace UI
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
-            if(_combineRulesController.activeRulePlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlatePrefab.gameObject.SetActive(false);
+            if (_combineRulesController.activeRulePlate)
+            {
+                if(_combineRulesController.activeRulePlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlatePrefab.gameObject.SetActive(false);
+            }
             DefaultState();
         }
         
@@ -157,7 +160,12 @@ namespace UI
             _combineRulesController.CalculateRule();
             _combineRulesController.activeRulePlate = null;
             ClearRecordedEvents();
+            //if in the scene there is a duplicate object, destroy it   
+            Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
+            
         }
+        
+        
 
         public void SetSelectedObject(GameObject _selectedObject)
         {
@@ -201,7 +209,7 @@ namespace UI
             }
         }
 
-        public Material GetOriginalMaterial(GameObject obj)
+        public static Material GetOriginalMaterial(GameObject obj)
         {
             return originalMaterials.TryGetValue(obj, out var mat) ? mat : null;
         }

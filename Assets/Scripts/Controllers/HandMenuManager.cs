@@ -303,7 +303,7 @@ namespace UI.RuleEditor
                     {
                         
                         editModeController.CreateAndPublishAction("duplicates", new Action(GeneralUIController.Instance.GetSelectedObject(),
-                            "is duplicated into", int.Parse(input)));
+                            "is duplicated", int.Parse(input)));
                         Destroy(numericKeyboardDuplicate.gameObject);
                         generalUIController.EditModeState();
 

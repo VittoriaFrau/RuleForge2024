@@ -11,6 +11,7 @@ using MixedReality.Toolkit.UX;
 using TMPro;
 using UnityEngine;
 using UI.RuleEditor;
+using Unity.VisualScripting;
 using Action = ECAPrototyping.RuleEngine.Action;
 using Object = UnityEngine.Object;
 using UnityEngine.XR;
@@ -332,7 +333,35 @@ namespace UI
 
         return go;
     }
-    
+
+        public static void DestroySpawnedObjects(Transform interactablesTransform)
+        {
+            foreach (Transform go in interactablesTransform)
+            {
+                ECAObject ecaObjectComponent = go.GetComponent<ECAObject>();
+                if (ecaObjectComponent)
+                {
+                    if (ecaObjectComponent.isACopy == ECABoolean.YES)
+                    {
+                        GameObject.Destroy(go.gameObject);
+                    }
+
+                    if (ecaObjectComponent.isDuplicated == ECABoolean.YES)
+                    {
+                        // If the object is duplicated, we need to restore the original material
+                        Material originalMat = GeneralUIController.GetOriginalMaterial(go.gameObject);
+                        if (originalMat != null)
+                        {
+                            Renderer[] renderers = go.GetComponentsInChildren<Renderer>(true);
+                            foreach (Renderer rend in renderers)
+                            {
+                                rend.material = originalMat;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     
         public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, 
         Transform interactableTransform, Vector3 position)
@@ -687,6 +716,10 @@ namespace UI
                     break;
                 case InteractionCreationController.Modalities.None: // action cube
                     labelTexts[1] = e.Verb;
+                    if(e.Verb.Equals("is duplicated"))
+                    {
+                        labelTexts[2] = e.ObjectStr + " times";
+                    }
                     break;
                 default:
                     labelTexts[1] = e.EventStr; 

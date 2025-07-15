@@ -25,6 +25,11 @@ namespace ECAPrototyping.RuleEngine
             ValueType = null;
             variableName = "";
             ModifierString = "";
+            if (verb.Equals("is duplicated"))
+            {
+                // This is a special case for the duplication action
+                variableName = "times";
+            }
         }
         public ActionAttribute(Type subjecType, string verb, Type objectType, string modifierString, Type valueType)
         {
@@ -35,6 +40,15 @@ namespace ECAPrototyping.RuleEngine
             variableName = "";
             ModifierString = modifierString;
         }
+        
+        /*public ActionAttribute(Type subjecType, string verb, Type objectType, string modifierString)
+        {
+            SubjectType = subjecType;
+            Verb = verb;
+            ObjectType = objectType;
+            variableName = "";
+            ModifierString = modifierString;
+        }*/
         public ActionAttribute(Type subjecType, string verb, string variable, string modifierString, Type valueType)
         {
             SubjectType = subjecType;
@@ -60,7 +74,11 @@ namespace ECAPrototyping.RuleEngine
         public override string ToString()
         {
             if (variableName != "")
+            {
+                if(variableName.Equals("times"))
+                    return $"{SubjectType.Name} {Verb} {ObjectType.Name} {variableName}";
                 return $"{SubjectType.Name} {Verb} {variableName} {ModifierString} {ValueType.Name}";
+            }
             if (ValueType != null)
                 return $"{SubjectType.Name} {Verb} {ObjectType.Name} {ModifierString} {ValueType.Name}";
             if (ObjectType != null)

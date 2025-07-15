@@ -321,8 +321,8 @@ namespace UI
 
         public void DeactivateRuleDebugText()
         {
-            cubeHelp.SetActive(true);
-            ruleDebugText.SetActive(false);
+            if (cubeHelp) cubeHelp.SetActive(true);
+            if(ruleDebugText) ruleDebugText.SetActive(false);
         }
 
 

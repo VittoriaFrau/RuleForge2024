@@ -20,6 +20,8 @@ namespace UI
         public int CubeID{ get; set; } //ID of the cube, same of the CubeController
         public Action Action { get; set; } // Only for action cubes
         
+        public string VariableName { get; set; } // Name of the variable, if any
+        
         public Vector3 CubeInitialPosition { get; set; }
         public bool IsActionEvent { get; set; }
         

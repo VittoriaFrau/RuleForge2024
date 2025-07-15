@@ -1363,6 +1363,32 @@ namespace ECAPrototyping.RuleEngine
                                 }
                             }
                         }
+                        else if (GetModifier() != null && GetObjectType() != null)
+                        {
+                            foreach (MethodInfo m in cType.GetMethods())
+                            {
+                                ActionAttribute[] actions =
+                                    (ActionAttribute[])m.GetCustomAttributes(typeof(ActionAttribute), true);
+                                foreach (ActionAttribute a in actions)
+                                {
+                                    if (a.Verb == GetActionMethod() &&
+                                        a.SubjectType == c.GetType() &&
+                                        a.ObjectType == GetObjectType() &&
+                                        a.ModifierString == GetModifier())
+                                    {
+                                        method.Add(m);
+                                        subject.Add(c);
+                                        if (!changed)
+                                        {
+                                            type = ActionType.OBJECT; 
+                                            changed = true;
+                                        }
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
                         else
                             //Se non c'é il suddetto campo popolato significa che é una regola che richiama funzioni, si controlla quindi se la funzione é presente nel
                             //componente, e nel caso si esegue, sempre dopo aver controllato se i tipi sono compatibili
