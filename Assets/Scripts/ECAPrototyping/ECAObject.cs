@@ -256,11 +256,11 @@ namespace ECAPrototyping.RuleEngine
                     foreach (Renderer r in duplicateRenderers)
                         r.material = GeneralUIController.Instance.spawnMaterial;
                 }
+
+                duplicate.name = "new" + baseName;
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);
-            
-            this.gameObject.name = "new" + baseName;
         }
         
         /// <summary>
