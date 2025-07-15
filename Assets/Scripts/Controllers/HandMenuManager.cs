@@ -8,6 +8,7 @@ using System.Linq;
 using ECAPrototyping.RuleEngine;
 using UnityEngine.Serialization;
 using ECAPrototyping.Utils;
+using MixedReality.Toolkit.UX;
 using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
 using Action = ECAPrototyping.RuleEngine.Action;
@@ -177,6 +178,14 @@ namespace UI.RuleEditor
             }
         }
 
+        public void HideRecordButtonInEditMenu()
+        {
+            foreach (var button in editObjectMenu.GetComponentsInChildren<PressableButton>(false))
+            {
+                if (button.gameObject.name.Equals("Record")) button.gameObject.SetActive(false);
+            }
+        }
+
         public void HideEditMenuButtons()
         {
             ecaObjectButtons.ForEach(button => button.SetActive(false));
@@ -268,6 +277,10 @@ namespace UI.RuleEditor
                             editModeController.CreateAndPublishAction( "changes text", action);
                             Destroy(keyboard);
                             generalUIController.EditModeState();
+                            if (GeneralUIController.Instance.isRecording)
+                            {
+                                HideRecordButtonInEditMenu();
+                            }
                         }
                     });
                     break;
@@ -306,7 +319,11 @@ namespace UI.RuleEditor
                             "is duplicated", int.Parse(input)));
                         Destroy(numericKeyboardDuplicate.gameObject);
                         generalUIController.EditModeState();
-
+                        //hide record button if it's recording
+                        if (GeneralUIController.Instance.isRecording)
+                        {
+                            HideRecordButtonInEditMenu();
+                        }
                     });
             break;
         }
