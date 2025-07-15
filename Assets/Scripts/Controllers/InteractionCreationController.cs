@@ -12,10 +12,8 @@ using MixedReality.Toolkit.Subsystems;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.XR;
-using UnityEngine.XR.Interaction.Toolkit;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using Action = ECAPrototyping.RuleEngine.Action;
+using UnityEngine.InputSystem;
 
 namespace UI
 {
@@ -93,6 +91,7 @@ namespace UI
         private HandModel handModelLeft;
         private HandModel handModelRight;
         public bool isUsingControllers = false;
+        [SerializeField] private InputActionReference triggerAction;
 
         public GameObject spawnCube;
 
@@ -226,6 +225,7 @@ namespace UI
         private void DeActivateControllerModality()
         {
             ActivateControllers();
+            DisableControllerTrigger();
         }
 
         private void ActivateProximityModality()
@@ -645,6 +645,10 @@ namespace UI
             {
                 AddListener(go);
             }
+            if(_modality == Modalities.Controller)
+            {
+                EnableControllerTrigger();
+            }
         }
 
         private void AddListener(ObjectManipulator manipulator)
@@ -841,7 +845,7 @@ namespace UI
             GameObject gameObject = manipulator.gameObject;
 
             //attach listener to object manipulator manipulation started event
-            manipulator.OnClicked.AddListener (() =>
+            /*manipulator.OnClicked.AddListener (() =>
             {
                 Debug.Log(manipulator.gameObject.name + " On clicked");
                 GeneralUIController.Instance.SetDebugText("You clicked on " + manipulator.gameObject.name);
@@ -856,7 +860,7 @@ namespace UI
 
                 _categoryController.CustomizeCategoryMenu(gameObject);
 
-            });
+            });*/
                 
             manipulator.selectEntered.AddListener(interactor =>
             {
@@ -888,11 +892,39 @@ namespace UI
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
                 }
             });
-            
-            
         }
-            
+        
+        public void EnableControllerTrigger()
+        {
+            if (triggerAction != null)
+            {
+                triggerAction.action.started += OnTriggerPressed;
+                triggerAction.action.Enable();
+            }
+        }
 
+        public void DisableControllerTrigger()
+        {
+            if (triggerAction != null)
+            {
+                triggerAction.action.started -= OnTriggerPressed;
+                triggerAction.action.Disable();
+            }
+        }
+
+
+        private void OnTriggerPressed(InputAction.CallbackContext ctx)
+        {
+            Debug.Log("Trigger pressed");
+            GeneralUIController.Instance.SetDebugText("Trigger pressed");
+
+            var ecaEvent = new ECAEvent(null, Modalities.Controller, "trigger pressed", Utils.LoadPNG("Assets/Resources/Icons/controller.png"), false);
+            if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+            {
+                GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+            }
+        }
+        
         private void AddSpeechListener()
         {
             // Get the first running phrase recognition subsystem.
@@ -952,9 +984,7 @@ namespace UI
                 PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch, ecaEvent);
             }
         }
-            
-            
-
+        
         public void PrepareForActionScreenShot(GameObject gameObject)
         {
             handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
@@ -970,7 +1000,6 @@ namespace UI
             if(bubblesVisible) ShowBubblesExceptSelectedModality();
             handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear
         }
-        
         
         public void PrepareForMoveAction()
         {
@@ -989,6 +1018,12 @@ namespace UI
             GeneralUIController.Instance.SetDebugText("Where should the "+ 
                                                       GeneralUIController.Instance.GetSelectedObject().name.ToLower() + 
                                                       " move? Use the cube to define an area close to an object.");
+        }
+        
+        //get trigger action reference method
+        public InputActionReference GetTriggerActionReference()
+        {
+            return triggerAction;
         }
     }
 }

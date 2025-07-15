@@ -75,6 +75,7 @@ namespace UI
                 handMenuManager.menuContentCanvas.SetActive(true);
                 handMenuManager.debugPanel.SetActive(true);
                 handMenuManager.mainMenu.SetActive(true);
+                GeneralUIController.Instance.UIstate = GeneralUIController.UIState.Default;
                 return;
             }
 
@@ -514,6 +515,10 @@ namespace UI
                 case InteractionCreationController.Modalities.Proximity:
                     BindProximityEvent(target, eventToBind, triggerAction);
                     break;
+                
+                case InteractionCreationController.Modalities.Controller:
+                    BindControllerEvent(eventToBind, triggerAction);
+                    break;
 
                 default:
                     Debug.LogWarning($"Unknown modality: {eventToBind.Modality}");
@@ -564,6 +569,18 @@ namespace UI
 #else
             Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
 #endif
+        }
+
+        private void BindControllerEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
+        {
+            var triggerInput = interactionCreationController.GetTriggerActionReference();
+            if (triggerInput == null || triggerInput.action == null)
+            {
+                Debug.LogError("Trigger InputActionReference is not assigned.");
+                return;
+            }
+            triggerInput.action.performed += ctx => triggerAction(ecaEvent);
+            triggerInput.action.Enable();
         }
 
         private void BindLaserEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)

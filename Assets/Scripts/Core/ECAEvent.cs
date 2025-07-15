@@ -131,6 +131,11 @@ namespace UI
                 return "The user says " + EventStr;
             }
 
+            if (modality == InteractionCreationController.Modalities.Controller && ObjectRef == null)
+            {
+                return "The user presses the trigger";
+            }
+            
             if (modality != InteractionCreationController.Modalities.None)
             {
                 if (EventStr != null && Verb != null && EventStr != null)
@@ -160,7 +165,7 @@ namespace UI
                     break;
                 default:   
                     Verb = modality.ToString();
-                    ObjectStr = ObjectRef.name;
+                    if(ObjectRef) ObjectStr = ObjectRef.name;
                     break;
             }
         }

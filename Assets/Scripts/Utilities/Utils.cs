@@ -714,6 +714,10 @@ namespace UI
                     labelTexts[1] = "is near to"; //3rd person for reading
                     labelTexts[2] = e.ObjectStr;
                     break;
+                case InteractionCreationController.Modalities.Controller:
+                    labelTexts[1] = "presses";
+                    labelTexts[2] = "trigger";
+                    break;
                 case InteractionCreationController.Modalities.None: // action cube
                     labelTexts[1] = e.Verb;
                     if(e.Verb.Equals("is duplicated"))

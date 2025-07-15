@@ -32,7 +32,7 @@ namespace UI
 
             if (triggeredEvent == expectedEvent)
             {
-                Debug.Log($"[Tracker] Event {CurrentIndex} ({triggeredEvent.EventStr}) triggered correctly on {triggeredEvent.ObjectRef.name}");
+                Debug.Log($"[Tracker] Event {CurrentIndex} ({triggeredEvent.EventStr}) triggered correctly on {triggeredEvent.ObjectRef?.name ?? "null object"}");
 
                 CurrentIndex++;
 
