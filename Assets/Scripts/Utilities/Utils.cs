@@ -1041,7 +1041,15 @@ namespace UI
                 case Action.ActionType.VERB:
                     break;
                 case Action.ActionType.OBJECT:
-                    e.ObjectStr = action.GetModifierValue().ToString();
+                    if (action.GetModifierValue() != null)
+                    {
+                        e.ObjectStr = action.GetModifierValue().ToString();
+                    }
+                    else
+                    {
+                        GameObject actionObject = action.GetObject() as GameObject;
+                        e.ObjectStr = actionObject.name;
+                    }
                     break;
             }
 
@@ -1085,7 +1093,7 @@ namespace UI
                     return new Action(action.GetSubject(), "resets counter");
                 case "is thrown":
                 case "explodes": 
-                case "moves":
+                case "moves near":
                     return new Action(action.GetSubject(), "resets");
                 case "turns off":
                     return new Action(action.GetSubject(), "turns on");

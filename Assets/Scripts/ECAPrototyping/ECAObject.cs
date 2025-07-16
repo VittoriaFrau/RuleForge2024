@@ -55,7 +55,6 @@ namespace ECAPrototyping.RuleEngine
         public ECABoolean isACopy = new(ECABoolean.BoolType.NO);
         
         private ObjectsMenuController _objectsMenuController;
-        private GeneralUIController _generalUIController;
 
         private int counter = 0;
         private Vector3 initialPosition;
@@ -89,7 +88,6 @@ namespace ECAPrototyping.RuleEngine
             
             var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
-            _generalUIController = eventHandler.GetComponent<GeneralUIController>();
         }
         
 
@@ -220,7 +218,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "is duplicated" , typeof(int))]
         public void CreateDuplicates(int spawnCount)
         {
-            if (_generalUIController.UIstate != GeneralUIController.UIState.Play)
+            if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
             {
                 Renderer[] renderers = this.gameObject.GetComponentsInChildren<Renderer>();
                 foreach (Renderer r in renderers)
@@ -250,7 +248,7 @@ namespace ECAPrototyping.RuleEngine
                 GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
                 duplicate.GetComponent<ECAObject>().isACopy.Assign(ECABoolean.BoolType.YES);
 
-                if (_generalUIController.UIstate != GeneralUIController.UIState.Play)
+                if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
                 {
                     Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
                     foreach (Renderer r in duplicateRenderers)
@@ -326,14 +324,23 @@ namespace ECAPrototyping.RuleEngine
         public void Follow()
         {
             initialPosition = transform.position;
-            GameObject hand = GameObject.FindWithTag("GrabInteractor");
-            transform.SetParent(hand.transform);
+            //If we are using the controllers I substitute the mesh
+            /*if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
+            {
+                
+            }
+            else*/
+            {
+                GameObject hand = GameObject.FindWithTag("GrabInteractor");
+                transform.SetParent(hand.transform);
             
-            var rb = GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.isKinematic = true;
-            rb.MovePosition(hand.transform.position);
-            rb.MoveRotation(hand.transform.rotation);
+                var rb = GetComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+                rb.MovePosition(hand.transform.position);
+                rb.MoveRotation(hand.transform.rotation);
+            }
+            
         }
         
         /// <summary>
@@ -369,7 +376,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "resets")]
         public void ResetObject()
         {
-            Vector3 initialPos = _generalUIController.GetInitialPosition(this.gameObject);
+            Vector3 initialPos = GeneralUIController.Instance.GetInitialPosition(this.gameObject);
             gameObject.transform.position = initialPos;
             gameObject.SetActive(true);
 
@@ -384,8 +391,8 @@ namespace ECAPrototyping.RuleEngine
         /// <b>Moves</b> moves the selected object close to the spawn cube.   
         /// </summary>
         /// 
-        [Action(typeof(ECAObject), "moves")]
-        public void Moves()
+        [Action(typeof(ECAObject), "moves near", typeof(ECAObject))]
+        public void Moves(ECAObject targetObject)
         {
             initialPosition = transform.position;
             var rb = GetComponent<Rigidbody>();

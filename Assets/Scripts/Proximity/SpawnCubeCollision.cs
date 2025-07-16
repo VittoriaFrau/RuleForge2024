@@ -25,7 +25,7 @@ namespace UI
         public EditModeController _editModeController;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
-        private GameObject ProximityGameObject1, ProximityGameObject2;
+        public GameObject ProximityGameObject1, ProximityGameObject2;
         public HandMenuManager handMenuManager;
 
         public GameObject interactionButtons;
@@ -89,14 +89,19 @@ namespace UI
             if (other.CompareTag("Interactable") && other.gameObject != selectedObject)
             {
                 ProximityGameObject1 = other.gameObject;
-                string proximityObjectName = ProximityGameObject1.name.Substring(0, name.Length-1).ToLower();
+                string proximityObjectName = ProximityGameObject1.name.Substring(0, 
+                    ProximityGameObject1.name.Length-1).ToLower();
                 ChangeMaterial("proximity");
-                _generalUIController.SetDebugText("Do you want the new " + selectedObjBaseName + "s" +
-                                                  " to move close to the " + proximityObjectName + "?");
+                _generalUIController.SetDebugText("Do you want the " + selectedObjBaseName + 
+                                                  " to move near to the " + proximityObjectName + "?");
                 interactionButtons.SetActive(true);
                 backButton.SetActive(false);
                 handMenuManager.HideMenus();
-                _editModeController.CreateAndPublishAction("moves");
+                if (GeneralUIController.Instance.isRecording)
+                {
+                    handMenuManager.HideRecordButtonInEditMenu();
+                }
+                _editModeController.CreateAndPublishAction("moves near");
             }
         }
 
@@ -112,12 +117,17 @@ namespace UI
         {
             if (GeneralUIController.Instance.isRecording)
             {
-                ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves");
+                ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves near", 
+                    ProximityGameObject1);
                 GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
-                string screenshotName = selectedObjBaseName + " moves near " + ProximityGameObject1.name;
+                string screenshotName = selectedObjBaseName + " moves near" + ProximityGameObject1.name;
                 _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
             }
             GeneralUIController.Instance.EditModeState();
+            if (GeneralUIController.Instance.isRecording)
+            {
+                handMenuManager.HideRecordButtonInEditMenu();
+            }
         }
         
     

@@ -89,9 +89,15 @@ namespace UI
             if(action==null) 
                 action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
             // If I'm recording, I need to save the action
-            if (GeneralUIController.Instance.isRecording && actionName != "moves")
+            if (GeneralUIController.Instance.isRecording && actionName != "moves near")
             {
                 generalUIController.InteractionCreationController.SaveRecordedAction(action);
+            }else if (actionName.Equals("moves near"))
+            {
+                // we need to assign to the action the proximity object
+                GameObject proximityObject = generalUIController.InteractionCreationController.spawnCube
+                    .GetComponentInChildren<SpawnCubeCollision>(true).ProximityGameObject1;
+                action.SetObject(proximityObject);
             }
 
             switch (_categoryController.categoryObjectSelected)
