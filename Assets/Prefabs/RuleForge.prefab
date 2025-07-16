@@ -136085,6 +136085,7 @@ MonoBehaviour:
   handPrefabLeft: {fileID: 1423679602657988571, guid: 2b468cc4fe6d2b44ebc53b958b38b91a, type: 3}
   handPrefabRight: {fileID: 4354293980546992658, guid: da93d751ddc0f64468dfc02f18d02d00, type: 3}
   isUsingControllers: 0
+  triggerAction: {fileID: 187161793506945269, guid: 18c412191cdc9274897f101c7fd5316f, type: 3}
   spawnCube: {fileID: 6404416877680165826}
 --- !u!114 &4766665405315196094
 MonoBehaviour:
@@ -147708,7 +147709,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Launches
+          m_StringArgument: is thrown
           m_BoolArgument: 0
         m_CallState: 2
   <OnEnabled>k__BackingField:
@@ -156308,7 +156309,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6722718290296788083}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -169.64}
+  m_LocalPosition: {x: 0, y: 0, z: -167.1}
   m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -156317,7 +156318,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 625, y: -50}
+  m_AnchoredPosition: {x: 185, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!33 &2880772922691603957

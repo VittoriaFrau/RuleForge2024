@@ -1083,7 +1083,7 @@ namespace UI
                 case "doubles":
                 case "decreases by one":
                     return new Action(action.GetSubject(), "resets counter");
-                case "launches":
+                case "is thrown":
                 case "explodes": 
                 case "moves":
                     return new Action(action.GetSubject(), "resets");

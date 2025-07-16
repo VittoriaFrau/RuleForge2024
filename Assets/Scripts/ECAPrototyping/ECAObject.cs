@@ -351,7 +351,7 @@ namespace ECAPrototyping.RuleEngine
         /// <b>Launch</b> makes the object move it forward at some speed.
         /// </summary>
         /// 
-        [Action(typeof(ECAObject), "launches")]
+        [Action(typeof(ECAObject), "is thrown")]
         public void Launch()
         {
             initialPosition = transform.position;
