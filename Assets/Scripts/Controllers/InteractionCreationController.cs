@@ -84,14 +84,13 @@ namespace UI
         [Header("Controller Modality")]
         public GameObject controllerPrefabLeft;
         public GameObject controllerPrefabRight;
-        public GameObject shiningControllerLeft;
-        public GameObject shiningControllerRight;
-        public GameObject handPrefabLeft;
-        public GameObject handPrefabRight;
         private HandModel handModelLeft;
         private HandModel handModelRight;
         public bool isUsingControllers = false;
         [SerializeField] private InputActionReference triggerAction;
+        private Dictionary<GameObject, Material> originalMaterials = new();
+        private GameObject controllerLeftReference, controllerRightReference;
+
 
         public GameObject spawnCube;
 
@@ -163,10 +162,10 @@ namespace UI
         private void ActivateControllers()
         {
             // Left hand
-            ReplaceHandModel(handModelLeft, controllerPrefabLeft.transform);
+            controllerLeftReference = ReplaceHandModel(handModelLeft, controllerPrefabLeft.transform);
     
             // Right hand
-            ReplaceHandModel(handModelRight, controllerPrefabRight.transform);
+            controllerRightReference = ReplaceHandModel(handModelRight, controllerPrefabRight.transform);
             
             //Adjust the hand menu solver handle
             Destroy(handMenuManager.GetComponent<HandConstraintPalmUp>());
@@ -184,14 +183,11 @@ namespace UI
             // Hides modality bubble
             HideModalityBubble("Controller");
 
-            // Left hand
-            ReplaceHandModel(handModelLeft, shiningControllerLeft.transform);
-    
-            // Right hand
-            ReplaceHandModel(handModelRight, shiningControllerRight.transform);
+            ApplyShining(controllerLeftReference, shiningTouchMaterial);
+            ApplyShining(controllerRightReference, shiningTouchMaterial);
         }
 
-        private void ReplaceHandModel(HandModel handModel, Transform newPrefab)
+        private GameObject ReplaceHandModel(HandModel handModel, Transform newPrefab)
         {
             if (handModel.Model != null)
             {
@@ -208,25 +204,66 @@ namespace UI
             {
                 selectInputVisualizer.SelectInput = handModel.SelectInput;
             }
-           /* XRDirectInteractor interactor = newModel.gameObject.AddComponent<XRDirectInteractor>();
-            interactor.interactionManager = FindObjectOfType<XRInteractionManager>();
 
-            XRController controller = newModel.gameObject.AddComponent<XRController>();
-            controller.controllerNode = XRNode.LeftHand; // o RightHand
-
-// Assicurati che il prefab abbia anche un Collider e Rigidbody
-            Collider col = newModel.gameObject.AddComponent<SphereCollider>();
-            Rigidbody rb = newModel.gameObject.AddComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.isKinematic = true;
-*/
+            return newModel.gameObject;
         }
         
         private void DeActivateControllerModality()
         {
-            ActivateControllers();
+            RestoreOriginalMaterial(controllerLeftReference);
+            RestoreOriginalMaterial(controllerRightReference);
             DisableControllerTrigger();
         }
+        
+
+        public void ApplyShining(GameObject controllerInstance, Material shiningMaterial)
+        {
+            if (!controllerInstance.scene.IsValid())
+            {
+                Debug.LogWarning("ApplyShining: The object is not a scene instance: " + controllerInstance.name);
+                return;
+            }
+
+            Transform bodyGeo = controllerInstance.transform.Find("RootNode/generic_trigger_squeeze_touchpad_thumbstick_R/BodyController_geo");
+            if (bodyGeo != null)
+            {
+                Renderer renderer = bodyGeo.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    if (!originalMaterials.ContainsKey(controllerInstance))
+                    {
+                        originalMaterials[controllerInstance] = renderer.material; // Solo sulle istanze
+                    }
+
+                    renderer.material = shiningMaterial;
+                }
+            }
+        }
+
+        public void RestoreOriginalMaterial(GameObject controllerInstance)
+        {
+            if (!controllerInstance.scene.IsValid())
+            {
+                Debug.LogWarning("RestoreOriginalMaterial: The object is not a scene instance: " + controllerInstance.name);
+                return;
+            }
+
+            if (originalMaterials.TryGetValue(controllerInstance, out Material originalMat))
+            {
+                Transform bodyGeo = controllerInstance.transform.Find("RootNode/generic_trigger_squeeze_touchpad_thumbstick_R/BodyController_geo");
+                if (bodyGeo != null)
+                {
+                    Renderer renderer = bodyGeo.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        renderer.material = originalMat;
+                    }
+                }
+
+                originalMaterials.Remove(controllerInstance);
+            }
+        }
+
 
         private void ActivateProximityModality()
         {
