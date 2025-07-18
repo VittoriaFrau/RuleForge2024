@@ -58,7 +58,13 @@ namespace UI
                 {
                     interactable.AddComponent<Prototypation>();
                 }
-                _objectManipulator.OnClicked.AddListener(() => interactable.GetComponent<Prototypation>().ShowEditMenu());
+                _objectManipulator.OnClicked.AddListener(() =>
+                {
+                    interactable.GetComponent<Prototypation>().ShowEditMenu();
+                    // for the demo
+                    if(interactable.name.Contains("gun")) _objectManipulator.enabled = false; // Disable manipulation for the gun object
+                });
+                
             }
         }
         

@@ -325,11 +325,29 @@ namespace ECAPrototyping.RuleEngine
         {
             initialPosition = transform.position;
             //If we are using the controllers I substitute the mesh
-            /*if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
+            if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
             {
-                
+                GeneralUIController.Instance.InteractionCreationController.ReplaceLeftControllerModel(gameObject.transform);
+                if (gameObject.name.Contains("gun"))
+                {
+                    // adjustments for the demo
+                    transform.localPosition = new Vector3(-7.53674394e-05f, 0.000259717082f, -5.92828146e-05f);
+                    transform.localRotation = Quaternion.Euler(88.7832413f,209.190033f,209.371323f);
+                    transform.localScale = new Vector3(0.17f, 0.17f, 0.17f);
+                    
+                    // Freeze the rotation
+                    Rigidbody rb = GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY 
+                                                                              | RigidbodyConstraints.FreezeRotationZ 
+                                                                              | RigidbodyConstraints.FreezePositionZ
+                                                                              | RigidbodyConstraints.FreezePositionY
+                                                                              | RigidbodyConstraints.FreezePositionX;
+                    }
+                }
             }
-            else*/
+            else
             {
                 GameObject hand = GameObject.FindWithTag("GrabInteractor");
                 transform.SetParent(hand.transform);

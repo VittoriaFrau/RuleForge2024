@@ -257,7 +257,7 @@ namespace UI
             GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
             if (floor != null)
             {
-                Vector3 upwardOffset = Vector3.up * 1f;
+                Vector3 upwardOffset = Vector3.up * 2f;
                 Vector3 forwardOffset = mainCamera.transform.forward * 2f;
                 spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
             }
