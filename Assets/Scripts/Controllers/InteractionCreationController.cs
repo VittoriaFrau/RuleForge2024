@@ -9,6 +9,7 @@ using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
 using MixedReality.Toolkit.Subsystems;
+using MixedReality.Toolkit.UX;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -127,7 +128,7 @@ namespace UI
             if (_modality != Modalities.None) DeActivateCurrentModality();
 
             _modality = (Modalities)Enum.Parse(typeof(Modalities), modality);
-            ShowModalitiesBubbles();
+            ShowModalitiesBubbles(false);
             GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
                                                                             + " use your modality to interact with any object in the scene");
             switch (_modality)
@@ -525,8 +526,17 @@ namespace UI
             go.SetActive(false);
         }
 
-        public void ShowModalitiesBubbles()
+        public void ShowModalitiesBubbles(bool firstTime = true)
         {
+            // mode the modality bubble container according to the view of the user
+            if (firstTime)
+            {
+                Transform modalityBubbleContainer = modalitiesBubbles[0].transform.parent;
+                modalityBubbleContainer.position = Camera.main.transform.position + Camera.main.transform.forward * 0.8f;
+                modalityBubbleContainer.rotation = Camera.main.transform.rotation;
+            }
+            
+            
             // if a modality bubble is already selected, hide it
             if (_modality != Modalities.None)
             {
@@ -1096,6 +1106,7 @@ namespace UI
             spawnCubeCollision.ResetToInitialPosition();
             spawnCubeCollision.ChangeMaterial("default");
             spawnCubeCollision.backButton.SetActive(true);
+            spawnCubeCollision.backButton.GetComponentInChildren<PressableButton>().OnClicked.AddListener(() => ResetSpawnCubeAndSelectedObject());
 
             AttachSelectedObjectToSpawnCube(selectedObject);
 
@@ -1144,8 +1155,9 @@ namespace UI
         /// <summary>
         /// Reset spawnCube and selectedObject to their initial state.
         /// </summary>
-        public void ResetSpawnCubeAndSelectedObject(GameObject selectedObject)
+        public void ResetSpawnCubeAndSelectedObject()
         {
+            GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
             if (selectedObject == null || spawnCube == null) return;
 
             // Restore spawnCube's parent and transform
@@ -1161,6 +1173,9 @@ namespace UI
             {
                 rb.constraints = RigidbodyConstraints.None;
             }
+            var spawnCubeCollision = spawnCube.GetComponentInChildren<SpawnCubeCollision>(true);
+            spawnCubeCollision.backButton.GetComponentInChildren<PressableButton>().OnClicked.RemoveListener(() => ResetSpawnCubeAndSelectedObject());
+
         }
 
         //get trigger action reference method

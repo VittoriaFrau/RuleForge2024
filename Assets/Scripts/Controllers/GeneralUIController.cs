@@ -14,7 +14,7 @@ namespace UI
 
         private GameObject textGo;
         public GameObject eventHandler;
-        private EditModeController _editModeController;
+        public EditModeController _editModeController;
         private InteractionCreationController _interactionCreationController;
         private CombineRulesController _combineRulesController;
         public HandMenuManager handMenuManager;
@@ -24,7 +24,6 @@ namespace UI
         public List<ECAEvent> recordedEvents = new();
         public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
-        public static Dictionary<GameObject, Material> originalMaterials = new Dictionary<GameObject, Material>();
         public Material spawnMaterial;
         
         public enum UIState
@@ -129,7 +128,6 @@ namespace UI
             {
                 text.text = "You are modifying the object " + _selectedObject.name;
                 RegisterInitialPosition(_selectedObject);
-                RegisterOriginalMaterial(_selectedObject);
             }
             _editModeController.UpdateAndAddListeners();
             handMenuManager.HandleHandMenu(_uiState);
@@ -162,7 +160,7 @@ namespace UI
             ClearRecordedEvents();
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
-            
+            Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
         }
         
         
@@ -197,22 +195,6 @@ namespace UI
             return initialPositions.TryGetValue(obj, out var pos) ? pos : obj.transform.position;
         }
         
-        public void RegisterOriginalMaterial(GameObject obj)
-        {
-            if (!originalMaterials.ContainsKey(obj))
-            {
-                Renderer renderer = obj.GetComponentInChildren<Renderer>();
-                if (renderer != null)
-                {
-                    originalMaterials[obj] = renderer.material;
-                }
-            }
-        }
-
-        public static Material GetOriginalMaterial(GameObject obj)
-        {
-            return originalMaterials.TryGetValue(obj, out var mat) ? mat : null;
-        }
 
     }
 }

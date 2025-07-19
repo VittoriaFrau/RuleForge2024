@@ -58,6 +58,10 @@ namespace ECAPrototyping.RuleEngine
 
         private int counter = 0;
         private Vector3 initialPosition;
+        
+        // Store original materials for this object and its children
+        private Material originalMaterial;
+        private Dictionary<Renderer, Material[]> childOriginalMaterials = new();
 
         protected virtual void Awake()
         {
@@ -88,6 +92,8 @@ namespace ECAPrototyping.RuleEngine
             
             var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
             _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
+            
+            SaveOriginalMaterials();
         }
         
 
@@ -232,19 +238,13 @@ namespace ECAPrototyping.RuleEngine
             }
             string objCategory = UI.Utils.GetECALastScriptFromECAObject(this.gameObject);
 
-            float margin = 2.0f;
-
-            // Width of the base object
-            Bounds originalBounds = GetComponent<Renderer>().bounds;
-            float objectWidth = originalBounds.size.x;
-            float spacing = objectWidth + margin;
-
+            float spacing = 0.3f;
             Vector3 basePosition = transform.position;
 
             for (int i = 0; i < spawnCount; i++)
             {
                 //with this method we can spawn the objects in a line on the right
-                Vector3 spawnPosition = basePosition + new Vector3(spacing * (i + 1), 0, 0); 
+                Vector3 spawnPosition = new Vector3(spacing * i, basePosition.y, basePosition.z);
                 GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
                 duplicate.GetComponent<ECAObject>().isACopy.Assign(ECABoolean.BoolType.YES);
 
@@ -253,6 +253,8 @@ namespace ECAPrototyping.RuleEngine
                     Renderer[] duplicateRenderers = duplicate.GetComponentsInChildren<Renderer>();
                     foreach (Renderer r in duplicateRenderers)
                         r.material = GeneralUIController.Instance.spawnMaterial;
+                    //in edit mode we need to add the listener to edit the object
+                    GeneralUIController.Instance._editModeController.AddListenerToSingleInteractable(duplicate);
                 }
 
                 duplicate.name = "new" + baseName;
@@ -273,15 +275,7 @@ namespace ECAPrototyping.RuleEngine
                 Destroy(obj);
             }
             // Restore original material if it was changed of the object
-            Material originalMat = GeneralUIController.GetOriginalMaterial(this.gameObject);
-            if (originalMat != null)
-            {
-                Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
-                foreach (Renderer rend in renderers)
-                {
-                    rend.material = originalMat;
-                }
-            }
+            RestoreOriginalMaterials();
             isDuplicated.Assign(ECABoolean.BoolType.NO);
         }
         
@@ -425,6 +419,50 @@ namespace ECAPrototyping.RuleEngine
                     Vector3 targetPosition = spawnCubeChild.position;
                     transform.position = targetPosition;
                     rb.MovePosition(targetPosition);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Saves the original material of this object and all child renderers.
+        /// </summary>
+        private void SaveOriginalMaterials()
+        {
+            Renderer thisRenderer = GetComponent<Renderer>();
+            if (thisRenderer != null)
+            {
+                originalMaterial = thisRenderer.sharedMaterial;
+            }
+
+            Renderer[] childRenderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in childRenderers)
+            {
+                if (!childOriginalMaterials.ContainsKey(renderer))
+                {
+                    childOriginalMaterials[renderer] = renderer.sharedMaterials;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Restores the original material to this object and all child renderers.
+        /// </summary>
+        public void RestoreOriginalMaterials()
+        {
+            Renderer thisRenderer = GetComponent<Renderer>();
+            if (thisRenderer != null && originalMaterial != null)
+            {
+                thisRenderer.material = originalMaterial;
+            }
+
+            foreach (var pair in childOriginalMaterials)
+            {
+                Renderer renderer = pair.Key;
+                Material[] originalMats = pair.Value;
+
+                if (renderer != null)
+                {
+                    renderer.materials = originalMats;
                 }
             }
         }

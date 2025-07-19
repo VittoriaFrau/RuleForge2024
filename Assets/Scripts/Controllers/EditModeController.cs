@@ -47,25 +47,32 @@ namespace UI
         {
             foreach (var interactable in interactables)
             {
-                ObjectManipulator _objectManipulator = interactable.GetComponent<ObjectManipulator>();
-                if (_objectManipulator == null)
-                {
-                    _objectManipulator = interactable.GetComponentInChildren<ObjectManipulator>();
-                }
-                
-                // Check if the Prototypation component is attached to the interactable object, if not, add it
-                if (interactable.GetComponent<Prototypation>() == null)
-                {
-                    interactable.AddComponent<Prototypation>();
-                }
-                _objectManipulator.OnClicked.AddListener(() =>
-                {
-                    interactable.GetComponent<Prototypation>().ShowEditMenu();
-                    // for the demo
-                    if(interactable.name.Contains("gun")) _objectManipulator.enabled = false; // Disable manipulation for the gun object
-                });
-                
+                AddListenerToSingleInteractable(interactable);
             }
+        }
+
+        public void AddListenerToSingleInteractable(GameObject interactable)
+        {
+            ObjectManipulator _objectManipulator = interactable.GetComponent<ObjectManipulator>();
+            if (_objectManipulator == null)
+            {
+                _objectManipulator = interactable.GetComponentInChildren<ObjectManipulator>();
+            }
+                
+            // Check if the Prototypation component is attached to the interactable object, if not, add it
+            if (interactable.GetComponent<Prototypation>() == null)
+            {
+                interactable.AddComponent<Prototypation>();
+            }
+            _objectManipulator.OnClicked.AddListener(() =>
+            {
+                interactable.GetComponent<Prototypation>().ShowEditMenu();
+                // for the demo
+                //if(interactable.name.Contains("gun"))
+                _objectManipulator.enabled = false; // Disable manipulation for the gun object
+                
+                if(interactable.name.Contains("gun")) _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+            });
         }
         
         public void RemoveListenerToInteractables()

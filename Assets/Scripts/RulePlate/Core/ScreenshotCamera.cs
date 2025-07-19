@@ -59,7 +59,7 @@ namespace UI.RuleEditor
         public static void PositionSecondaryCameraInFrontOfObject(GameObject gameObject, Camera secondaryCamera, Camera mainCamera)
         {
             Collider collider = gameObject.GetComponent<Collider>();
-            
+            if(collider==null) collider = gameObject.GetComponentInChildren<Collider>();
             //Position the camera
             float cameraDistance = 2.0f; // Constant factor
             Vector3 objectSizes = collider.bounds.max - collider.bounds.min;

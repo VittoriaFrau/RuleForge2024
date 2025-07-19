@@ -90,6 +90,11 @@ namespace UI
             {
                 activeRulePlate.SetActive(true);
             }
+            
+            // Position the rule plate using the view of the main camera and add a small offset for the upper view
+            activeRulePlate.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 3.0f;
+            activeRulePlate.transform.localPosition = new Vector3(activeRulePlate.transform.localPosition.x, -1036f,
+                activeRulePlate.transform.localPosition.z);
 
             //Barrier to prevent the cubes from falling
             removableBarrier.SetActive(true);
@@ -112,7 +117,7 @@ namespace UI
             removableBarrier.SetActive(false);
 
             GeneralUIController.Instance.UIstate = GeneralUIController.UIState.Default;
-            GeneralUIController.Instance.DefaultState();
+            //GeneralUIController.Instance.DefaultState();
         }
 
         public void ResetCubePositions()
@@ -195,7 +200,7 @@ namespace UI
             }
 
             //Scorro la lista di tuple e ordino i cubi in base all'indice
-            actionCubesTuple = actionCubesTuple.OrderBy(x => x.Item1).ToList();
+            actionCubesTuple = actionCubesTuple.OrderByDescending(x => x.Item1).ToList();
 
             //Posiziono il primo cubo in firstCubeContainerLocalPosition e i successivi in base alla posizione del precedente
             for (int i = 0; i < actionCubesTuple.Count; i++)
@@ -414,23 +419,27 @@ namespace UI
 
             foreach (var containerName in containerNames)
             {
-                var foundTransform = row.transform.Find(containerName);
-                if (foundTransform == null)
+                var foundTransforms = Utils.FindAllChildrenWithName(row.transform, containerName);
+
+                if (foundTransforms.Count == 0)
                 {
-                    Debug.LogWarning($"Transform '{containerName}' not found under '{row.name}'");
+                    Debug.LogWarning($"No transforms named '{containerName}' found under '{row.name}'");
                     continue;
                 }
 
-                var containers = foundTransform
-                    .gameObject
-                    .GetComponentsInChildren<CubeContainer>()
-                    .Where(c => c.currentCube != null);
+                foreach (var foundTransform in foundTransforms)
+                {
+                    var containers = foundTransform
+                        .GetComponentsInChildren<CubeContainer>()
+                        .Where(c => c.currentCube != null);
 
-                allContainers.AddRange(containers);
+                    allContainers.AddRange(containers);
+                }
             }
 
             return allContainers;
         }
+
         
         private void OnMeanwhileEventTriggered(ECAEvent triggeredEvent, MeanwhileRule rule)
         {

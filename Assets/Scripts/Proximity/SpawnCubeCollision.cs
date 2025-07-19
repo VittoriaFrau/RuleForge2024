@@ -129,7 +129,7 @@ namespace UI
                 handMenuManager.HideRecordButtonInEditMenu();
             }
             
-            GeneralUIController.Instance.InteractionCreationController.ResetSpawnCubeAndSelectedObject(selectedObject);
+            GeneralUIController.Instance.InteractionCreationController.ResetSpawnCubeAndSelectedObject();
         }
         
     

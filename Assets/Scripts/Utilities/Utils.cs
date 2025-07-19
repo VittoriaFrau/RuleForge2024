@@ -22,7 +22,19 @@ namespace UI
 {
     public class Utils
     {
-        
+        public static List<Transform> FindAllChildrenWithName(Transform parent, string nameToFind)
+        {
+            var result = new List<Transform>();
+
+            foreach (Transform child in parent.GetComponentsInChildren<Transform>(true))
+            {
+                if (child.name == nameToFind)
+                    result.Add(child);
+            }
+
+            return result;
+        }
+
         public static GameObject GetPrefabFromString(string s, List<GameObject> prefabs)
         {
             foreach (var prefab in prefabs)
@@ -257,7 +269,7 @@ namespace UI
             GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
             if (floor != null)
             {
-                Vector3 upwardOffset = Vector3.up * 2f;
+                Vector3 upwardOffset = Vector3.up * 1f;
                 Vector3 forwardOffset = mainCamera.transform.forward * 2f;
                 spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
             }
@@ -333,6 +345,18 @@ namespace UI
 
         return go;
     }
+        
+        public static void ApplyOriginalMaterialToDuplicatedObjects(Transform interactablesTransform)
+        {
+            foreach (Transform go in interactablesTransform)
+            {
+                ECAObject ecaObjectComponent = go.GetComponent<ECAObject>();
+                if (ecaObjectComponent && ecaObjectComponent.isDuplicated == ECABoolean.YES)
+                {
+                    ecaObjectComponent.RestoreOriginalMaterials();
+                }
+            }
+        }
 
         public static void DestroySpawnedObjects(Transform interactablesTransform)
         {
@@ -344,20 +368,6 @@ namespace UI
                     if (ecaObjectComponent.isACopy == ECABoolean.YES)
                     {
                         GameObject.Destroy(go.gameObject);
-                    }
-
-                    if (ecaObjectComponent.isDuplicated == ECABoolean.YES)
-                    {
-                        // If the object is duplicated, we need to restore the original material
-                        Material originalMat = GeneralUIController.GetOriginalMaterial(go.gameObject);
-                        if (originalMat != null)
-                        {
-                            Renderer[] renderers = go.GetComponentsInChildren<Renderer>(true);
-                            foreach (Renderer rend in renderers)
-                            {
-                                rend.material = originalMat;
-                            }
-                        }
                     }
                 }
             }
@@ -399,7 +409,7 @@ namespace UI
         }
 
         // Calculate spawn position
-        Vector3 spawnPosition;
+        /*Vector3 spawnPosition;
         try
         {
             GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
@@ -419,13 +429,13 @@ namespace UI
         {
             Debug.LogError($"Error calculating spawn position: {e.Message}");
             return null;
-        }
+        }*/
 
         // Instantiate object
         GameObject go = null;
         try
         {
-            go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            go = Object.Instantiate(prefab, position, Quaternion.identity);
             if (go == null)
             {
                 Debug.LogError("Failed to instantiate object!");
@@ -1081,8 +1091,8 @@ namespace UI
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
-               /* case "is duplicated into":
-                    return new Action(action.GetSubject(), "delete duplicates");*/
+                case "is duplicated":
+                    return new Action(action.GetSubject(), "delete duplicates");
                 case "follows":
                     return new Action(action.GetSubject(), "unfollows");
                 case "changes text": 
