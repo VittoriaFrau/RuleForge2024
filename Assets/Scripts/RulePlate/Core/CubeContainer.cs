@@ -79,6 +79,11 @@ namespace UI.RuleEditor
                 return;
             }
             
+            if(collision.gameObject == currentCube)
+            {
+                // If the current cube is the same as the colliding cube, do nothing
+                return;
+            }
             
             // Check if collision occurred with a RuleCube and not already instantiating
             if ((collision.gameObject.CompareTag("RuleCubes") || collision.gameObject.CompareTag("ActionRuleCube")) && !isInstantiating)
