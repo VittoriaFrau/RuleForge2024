@@ -486,7 +486,7 @@ namespace UI
             HideModalityBubble("Speech");
             GeneralUIController.Instance.SetDebugText("Speak to the microphone");
 
-#if !UNITY_EDITOR
+/*#if !UNITY_EDITOR
     MRTKSpeech.SetActive(true);
 
     var keywordSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
@@ -499,7 +499,7 @@ namespace UI
         }
     }
 
-#else
+#else*/
             if (isUsingControllers)
             {
                 MRTKSpeech.SetActive(true);
@@ -517,8 +517,11 @@ namespace UI
                 microphone.transform.localPosition = new Vector3(0.0031f, -0.0713f, 0.0745f);
                 microphone.transform.localRotation = Quaternion.Euler(76.47f, 354.95f, 350.32f);
                 microphone.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+                
+                //DEMO
+                StartCoroutine(WaitForSpeechDemo());
 
-                var keywordSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+                /*var keywordSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
                 if (keywordSubsystem != null)
                 {
                     foreach (var keyword in keywords)
@@ -526,13 +529,24 @@ namespace UI
                         keywordSubsystem.CreateOrGetEventForKeyword(keyword)
                             .AddListener(() => GeneralUIController.Instance.SetDebugText("You said " + keyword));
                     }
-                }
+                }*/
             }
             else
             {
                 Debug.Log("You are not using a headset, speech modality is not available.");
             }
-#endif
+//#endif
+        }
+        
+        // wait 3 seconds
+        public IEnumerator WaitForSpeechDemo()
+        {
+            yield return new WaitForSeconds(5f);
+            GeneralUIController.Instance.SetDebugText("You said \"Fire\"");
+            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "fire",
+                Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
+            if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
         }
         
         public void DeActivateSpeechModality()
@@ -544,11 +558,11 @@ namespace UI
                 // Restore original transform if needed
                 if (microphoneOriginalTransform != null)
                 {
-                    microphone.transform.SetParent(null);
                     microphone.transform.position = microphoneOriginalTransform.position;
                     microphone.transform.rotation = microphoneOriginalTransform.rotation;
                     microphone.transform.localScale = microphoneOriginalTransform.localScale;
                 }
+                microphone.SetActive(false);
             }
 
             if (MRTKSpeech != null)
@@ -787,7 +801,7 @@ namespace UI
                     AddTouchListener(manipulator);
                     break;
                 case Modalities.Speech:
-                    AddSpeechListener();
+                    //AddSpeechListener();
                     break;
                 case Modalities.Proximity:
                     AddProximityListener(manipulator);
