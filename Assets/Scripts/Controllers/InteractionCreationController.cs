@@ -76,6 +76,8 @@ namespace UI
         [Header("Speech Modality")] public GameObject MRTKSpeech;
         public GameObject microphone;
         private List<string> keywords = new() { "fire", "leviosa", "change", "abracadabra" };
+        private Transform microphoneOriginalTransform;
+        
 
         // Proximity
         [Header("Proximity Modality")] public GameObject proximityCube;
@@ -474,38 +476,88 @@ namespace UI
 
         public void ActivateSpeechModality()
         {
+            if (microphone == null || MRTKSpeech == null)
+            {
+                Debug.LogWarning("Microphone or MRTKSpeech GameObject is not assigned.");
+                return;
+            }
+
             microphone.SetActive(true);
             HideModalityBubble("Speech");
             GeneralUIController.Instance.SetDebugText("Speak to the microphone");
 
-            // if not in unity editor, start the socket
 #if !UNITY_EDITOR
-                MRTKSpeech.SetActive(true);
-                // Get the first running phrase recognition subsystem.
-                var keywordRecognitionSubsystem =
- XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+    MRTKSpeech.SetActive(true);
 
-                // If we found one...
-                if (keywordRecognitionSubsystem != null)
+    var keywordSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+    if (keywordSubsystem != null)
+    {
+        foreach (var keyword in keywords)
+        {
+            keywordSubsystem.CreateOrGetEventForKeyword(keyword)
+                .AddListener(() => GeneralUIController.Instance.SetDebugText("You said " + keyword));
+        }
+    }
+
+#else
+            if (isUsingControllers)
+            {
+                MRTKSpeech.SetActive(true);
+
+                // Save original transform
+                microphoneOriginalTransform = microphone.transform;
+
+                // Attach to controller
+                microphone.transform.SetParent(controllerRightReference.transform.parent);
+                var handler = microphone.GetComponent<SolverHandler>();
+                if (handler != null) handler.enabled = false;
+                var radialView = microphone.GetComponent<RadialView>();
+                if (radialView != null) radialView.enabled = false;
+
+                microphone.transform.localPosition = new Vector3(0.0031f, -0.0713f, 0.0745f);
+                microphone.transform.localRotation = Quaternion.Euler(76.47f, 354.95f, 350.32f);
+                microphone.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+
+                var keywordSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+                if (keywordSubsystem != null)
                 {
-                    // Register a keyword and its associated action with the subsystem
                     foreach (var keyword in keywords)
                     {
-                        keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword).
-                            AddListener(() => { GeneralUIController.Instance.SetDebugText("You said " + keyword); });
+                        keywordSubsystem.CreateOrGetEventForKeyword(keyword)
+                            .AddListener(() => GeneralUIController.Instance.SetDebugText("You said " + keyword));
                     }
                 }
-#else
-            Debug.Log("You are not using an headset, you can't use the speech modality");
+            }
+            else
+            {
+                Debug.Log("You are not using a headset, speech modality is not available.");
+            }
 #endif
-
         }
-
+        
         public void DeActivateSpeechModality()
         {
-            MRTKSpeech.SetActive(false);
-            microphone.SetActive(false);
+            if (microphone != null)
+            {
+                microphone.transform.SetParent(modalitiesBubbles[0].transform.parent);
+                
+                // Restore original transform if needed
+                if (microphoneOriginalTransform != null)
+                {
+                    microphone.transform.SetParent(null);
+                    microphone.transform.position = microphoneOriginalTransform.position;
+                    microphone.transform.rotation = microphoneOriginalTransform.rotation;
+                    microphone.transform.localScale = microphoneOriginalTransform.localScale;
+                }
+            }
+
+            if (MRTKSpeech != null)
+            {
+                MRTKSpeech.SetActive(false);
+            }
+
         }
+
 
         public void HideModalitiesBubbles()
         {
@@ -697,20 +749,6 @@ namespace UI
             {
                 GeneralUIController.Instance.SetDebugText(
                     "Recording started. Please, use the proximity cube as trigger");
-
-                /*//check if the proximity cube's isTrigger is true
-                if (proximityCube.GetComponentsInChildren<BoxCollider>().FirstOrDefault().isTrigger)
-                {
-                    //change the material of the proximity cube
-                    proximityCube.GetComponentsInChildren<ProximityCubeCollision>().FirstOrDefault()?.ChangeMaterial("record");
-                    generalUIController.SetDebugText("Recording started. Please, interact with the proximity cube");
-                }
-                else
-                {
-                    generalUIController.SetDebugText("Please, set the proximity cube as trigger");
-                    return;
-                }*/
-
             }
             else GeneralUIController.Instance.SetDebugText("Recording started. Please, interact with an object");
 
