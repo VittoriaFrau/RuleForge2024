@@ -61,6 +61,10 @@ namespace UI
         {
             foreach (var thenEvent in thenEvents)
             {
+                if (thenEvent.Action.GetSubject() == null) // for instance when duplicating the gameobject does not exist yet
+                {
+                    thenEvent.Action.SetSubject(GameObject.Find(thenEvent.Subject));
+                }
                 ruleEngine.ExecuteAction(thenEvent.Action);
                 oppositeActions.Add(Utils.GetOppositeAction(thenEvent.Action, thenEvent.Verb));
             }

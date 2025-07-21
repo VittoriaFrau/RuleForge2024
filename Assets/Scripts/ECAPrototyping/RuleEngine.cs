@@ -1522,7 +1522,12 @@ namespace ECAPrototyping.RuleEngine
                     }
                 }
             }
-
+            if(type == ActionType.INVALID)
+            {
+                //If the type is still invalid, it means that no method was found for this action
+                //This is useful for debugging purposes
+                Debug.LogWarning("Action " + this + " is not valid");
+            }
             return type;
         }
     }

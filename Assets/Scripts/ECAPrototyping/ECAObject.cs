@@ -58,6 +58,7 @@ namespace ECAPrototyping.RuleEngine
 
         private int counter = 0;
         private Vector3 initialPosition;
+        private Quaternion initialRot => transform.rotation; // Store the initial rotation of the object
         
         // Store original materials for this object and its children
         private Material originalMaterial;
@@ -378,7 +379,13 @@ namespace ECAPrototyping.RuleEngine
             var rb = this.GetComponent<Rigidbody>();
             rb.isKinematic = false;
             rb.useGravity = true;
-            rb.AddForce(transform.forward * 10f, ForceMode.VelocityChange);
+            rb.constraints = RigidbodyConstraints.None; // Remove any constraints to allow movement
+            
+            // Imposta un angolo di lancio
+            transform.rotation = Quaternion.Euler(30f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+
+            // Applica una forza più bassa per un lancio più lento
+            rb.AddForce(transform.forward * 5f, ForceMode.VelocityChange);
         }
         
         /// <summary>
@@ -390,6 +397,7 @@ namespace ECAPrototyping.RuleEngine
         {
             Vector3 initialPos = GeneralUIController.Instance.GetInitialPosition(this.gameObject);
             gameObject.transform.position = initialPos;
+            gameObject.transform.rotation = initialRot;
             gameObject.SetActive(true);
 
             var rb = GetComponent<Rigidbody>();
@@ -420,6 +428,10 @@ namespace ECAPrototyping.RuleEngine
                     transform.position = targetPosition;
                     rb.MovePosition(targetPosition);
                 }
+            }
+            else
+            {
+                transform.position = targetObject.transform.position;
             }
         }
         
