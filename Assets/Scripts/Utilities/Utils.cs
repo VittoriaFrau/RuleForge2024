@@ -270,12 +270,12 @@ namespace UI
             if (floor != null)
             {
                 Vector3 upwardOffset = Vector3.up * 1f;
-                Vector3 forwardOffset = mainCamera.transform.forward * 2f;
+                Vector3 forwardOffset = mainCamera.transform.forward * 1f;
                 spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
             }
             else
             {
-                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
+                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 1f;
                 Debug.LogWarning("Floor not found, using camera position as reference");
             }
         }

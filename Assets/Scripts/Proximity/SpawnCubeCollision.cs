@@ -21,7 +21,6 @@ namespace UI
         public Material recordMaterial;
         public Material proximityMaterial;
         private Renderer rend;
-        public GeneralUIController _generalUIController;
         public EditModeController _editModeController;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
@@ -92,7 +91,7 @@ namespace UI
                 string proximityObjectName = ProximityGameObject1.name.Substring(0, 
                     ProximityGameObject1.name.Length-1).ToLower();
                 ChangeMaterial("proximity");
-                _generalUIController.SetDebugText("Do you want the " + selectedObjBaseName + 
+                GeneralUIController.Instance.SetDebugText("Do you want the " + selectedObjBaseName + 
                                                   " to move near to the " + proximityObjectName + "?");
                 interactionButtons.SetActive(true);
                 backButton.SetActive(false);

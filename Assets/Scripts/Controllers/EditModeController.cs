@@ -19,13 +19,11 @@ namespace UI
         
         public GameObject interactablesParent;
         private List<GameObject> interactables;
-        private GeneralUIController generalUIController;
         private CategoryController _categoryController;
         private RuleEngine _ruleEngine;
        
         private void Start()
         {
-            generalUIController = GetComponent<GeneralUIController>();
             _categoryController = GetComponent<CategoryController>();
             _ruleEngine = RuleEngine.GetInstance();
         }
@@ -40,7 +38,7 @@ namespace UI
         {
             UpdateInteractablesList();
             RemoveListenerToInteractables();
-            generalUIController.SetSelectedObject(null);
+            GeneralUIController.Instance.SetSelectedObject(null);
         }
         
         private void AddListenerToInteractables()
@@ -100,15 +98,15 @@ namespace UI
         {
             if (_ruleEngine == null) return;
             if(action==null) 
-                action = Utils.GetActionFromString(actionName, generalUIController.GetSelectedObject());
+                action = Utils.GetActionFromString(actionName,  GeneralUIController.Instance.GetSelectedObject());
             // If I'm recording, I need to save the action
             if (GeneralUIController.Instance.isRecording && actionName != "moves near")
             {
-                generalUIController.InteractionCreationController.SaveRecordedAction(action);
+                GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
             }else if (actionName.Equals("moves near"))
             {
                 // we need to assign to the action the proximity object
-                GameObject proximityObject = generalUIController.InteractionCreationController.spawnCube
+                GameObject proximityObject =  GeneralUIController.Instance.InteractionCreationController.spawnCube
                     .GetComponentInChildren<SpawnCubeCollision>(true).ProximityGameObject1;
                 action.SetObject(proximityObject);
             }

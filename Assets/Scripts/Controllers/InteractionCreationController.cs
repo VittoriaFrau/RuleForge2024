@@ -44,7 +44,6 @@ namespace UI
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         public HandMenuManager handMenuManager;
-        private GeneralUIController generalUIController;
         private CategoryController _categoryController;
 
         [FormerlySerializedAs("interactables")]
@@ -106,9 +105,7 @@ namespace UI
             handModelRight = OpenXRRightHandController.GetComponent<HandModel>();
             initialSpawnCubeTransform = spawnCube.transform;
             initialSpawnCubeParent = spawnCube.transform.parent;
-
-            generalUIController = GetComponent<GeneralUIController>();
-
+            
             StartCoroutine(CheckControllersWithDelay(2));
         }
 
@@ -1096,8 +1093,8 @@ namespace UI
         public void PrepareForMoveAction()
         {
             //Restore the initial position of the selected object
-            GameObject selectedObject = generalUIController.GetSelectedObject();
-            Vector3 initialPos = generalUIController.GetInitialPosition(selectedObject);
+            GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
+            Vector3 initialPos = GeneralUIController.Instance.GetInitialPosition(selectedObject);
             selectedObject.transform.position = initialPos;
 
             // Restore the initial position and properties of the spawn cube

@@ -44,7 +44,6 @@ namespace UI.RuleEditor
         public GameObject debugPanel;
         private Camera _mainCamera;
         private GameObject eventHandler;
-        private GeneralUIController generalUIController;
         private ObjectsMenuController objectsMenuController;
         public EditModeController editModeController;
         public GameObject menuContentCanvas;
@@ -67,7 +66,6 @@ namespace UI.RuleEditor
                 shapesMenu, colorPalette, chooseAnObjectMenu};
             _mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
             eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
-            generalUIController = eventHandler.GetComponent<GeneralUIController>();
             objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
         }
 
@@ -140,14 +138,14 @@ namespace UI.RuleEditor
         
         public void ShowMainMenu()
         {
-            generalUIController.DeActivatePreviousState(GeneralUIController.UIState.Default);
+            GeneralUIController.Instance.DeActivatePreviousState(GeneralUIController.UIState.Default);
             debugPanel.SetActive(true);
             mainMenu.SetActive(true);
         }
 
         public void ShowEditMenu()
         {
-            if (generalUIController.GetSelectedObject() != null)
+            if (GeneralUIController.Instance.GetSelectedObject() != null)
                 CustomizeEditModeMenu();
             else chooseAnObjectMenu.SetActive(true);
         }
@@ -158,7 +156,7 @@ namespace UI.RuleEditor
             HideEditMenuButtons();
             
             // Show the edit menu
-            string objectCategory = Utils.GetECALastScriptFromECAObject(generalUIController.GetSelectedObject());
+            string objectCategory = Utils.GetECALastScriptFromECAObject(GeneralUIController.Instance.GetSelectedObject());
             editObjectMenu.SetActive(true);
             ecaObjectButtons.ForEach(button => button.SetActive(true));
             switch (objectCategory)
@@ -266,17 +264,17 @@ namespace UI.RuleEditor
             {
                 case KeyboardMode.EditText:
                     GameObject keyboard = objectsMenuController.NewKeyboard("Keyboard");
-                    generalUIController.SetDebugText("Please, type the text you want to insert in the text box.");
+                    GeneralUIController.Instance.SetDebugText("Please, type the text you want to insert in the text box.");
                     CloseButtonClicked(keyboard);
                     EnterButtonClicked(keyboard, (input) =>
                     {
-                        GameObject uiElement = generalUIController.GetSelectedObject();
+                        GameObject uiElement = GeneralUIController.Instance.GetSelectedObject();
                         if (uiElement != null)
                         {
                             Action action = new Action(GeneralUIController.Instance.GetSelectedObject(), "changes to", input);
                             editModeController.CreateAndPublishAction( "changes text", action);
                             Destroy(keyboard);
-                            generalUIController.EditModeState();
+                            GeneralUIController.Instance.EditModeState();
                             if (GeneralUIController.Instance.isRecording)
                             {
                                 HideRecordButtonInEditMenu();
@@ -310,7 +308,7 @@ namespace UI.RuleEditor
                 break;*/
                 case KeyboardMode.SetDuplicateCount:
                     GameObject numericKeyboardDuplicate = objectsMenuController.NewKeyboard("NumericPad");
-                    generalUIController.SetDebugText("Please, type the number of duplicates you want to create.");
+                    GeneralUIController.Instance.SetDebugText("Please, type the number of duplicates you want to create.");
                     CloseButtonClicked(numericKeyboardDuplicate);
                     EnterButtonClicked(numericKeyboardDuplicate, (input) =>
                     {
@@ -318,7 +316,7 @@ namespace UI.RuleEditor
                         editModeController.CreateAndPublishAction("duplicates", new Action(GeneralUIController.Instance.GetSelectedObject(),
                             "is duplicated", int.Parse(input)));
                         Destroy(numericKeyboardDuplicate.gameObject);
-                        generalUIController.EditModeState();
+                        GeneralUIController.Instance.EditModeState();
                         //hide record button if it's recording
                         if (GeneralUIController.Instance.isRecording)
                         {
@@ -340,7 +338,7 @@ namespace UI.RuleEditor
                 {
                     inputText = "";
                     Destroy(keyboard.gameObject);
-                    generalUIController.EditModeState();
+                    GeneralUIController.Instance.EditModeState();
                 });
             }
         }

@@ -17,7 +17,6 @@ namespace UI
         public Material recordMaterial;
         public Material proximityMaterial;
         private Renderer rend;
-        public GeneralUIController _generalUIController;
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         private GameObject ProximityGameObject1, ProximityGameObject2;
@@ -71,7 +70,7 @@ namespace UI
                         _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
                         Debug.Log("ProximityGameObject2: " + ProximityGameObject2.name);
                         ChangeMaterial("proximity");
-                        _generalUIController.SetDebugText("The " + ProximityGameObject2.name + " is near to the " + ProximityGameObject1.name);
+                        GeneralUIController.Instance.SetDebugText("The " + ProximityGameObject2.name + " is near to the " + ProximityGameObject1.name);
                         interactionCreationController.CreateProximityCube(ProximityGameObject1, ProximityGameObject2);
                        
                     }
