@@ -63,9 +63,7 @@ namespace UI
             }
         }
 
-
-
-        public void ActivateCombineRules()
+        public void ActivateCombineRules(bool startFromScratch = true)
         {
 
             if (GeneralUIController.Instance.recordedEvents.Count == 0)
@@ -80,15 +78,19 @@ namespace UI
             }
 
             //Set the rule plate visible
-            if (activeRulePlate == null)
+            if (activeRulePlate == null || startFromScratch)
             {
                 activeRulePlate = Instantiate(ruleEditorPlatePrefab, ruleEditorPlatePrefab.transform.parent);
                 activeRulePlate.SetActive(true);
                 CacheReferencesCurrentRulePlate();
             }
-            else
+            else // there is already a rule plate
             {
                 activeRulePlate.SetActive(true);
+                if (!startFromScratch)
+                {
+                    return;
+                }
             }
             
             // Position the rule plate using the view of the main camera and add a small offset for the upper view

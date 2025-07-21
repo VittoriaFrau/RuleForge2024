@@ -25,6 +25,7 @@ namespace UI
         public List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
         public Material spawnMaterial;
+        public GameObject existingRuleOptionsUI;
         
         public enum UIState
         {
@@ -142,12 +143,34 @@ namespace UI
             _interactionCreationController.ShowModalitiesBubbles();
         }
 
-        public void CombineRulesState()
+        public void HandleRuleCombinationState()
+        {
+            if (_combineRulesController.activeRulePlate != null)
+            {
+                // A rule has already been created, we ask the user if they want to continue with the current rule or create a new one
+                SetDebugText("A rule has already been created, do you want to continue with the current rule or create a new one?");
+                existingRuleOptionsUI.SetActive(true);
+                handMenuManager.mainMenu.SetActive(false);
+            }
+            else CreateNewRule();
+        }
+        
+        public void ContinueWithExistingRule()
         {
             DeActivatePreviousState(UIState.RuleComposition);
             _uiState = UIState.RuleComposition;
             handMenuManager.HandleHandMenu(_uiState);
-            _combineRulesController.ActivateCombineRules();
+            existingRuleOptionsUI.SetActive(false);
+            _combineRulesController.ActivateCombineRules(false);
+        }
+        
+        public void CreateNewRule()
+        {
+            DeActivatePreviousState(UIState.RuleComposition);
+            _uiState = UIState.RuleComposition;
+            handMenuManager.HandleHandMenu(_uiState);
+            existingRuleOptionsUI.SetActive(false);
+            _combineRulesController.ActivateCombineRules(true);
         }
         
         public void PlayState()
@@ -157,7 +180,7 @@ namespace UI
             handMenuManager.HandleHandMenu(_uiState);
             _combineRulesController.CalculateRule();
             _combineRulesController.activeRulePlate = null;
-            ClearRecordedEvents();
+            //ClearRecordedEvents();
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
             Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
