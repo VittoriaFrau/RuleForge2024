@@ -1092,7 +1092,11 @@ namespace UI
                     ECAColor ECAColor = new ECAColor("white");
                     return new Action(action.GetSubject(), "changes", "color", "to", ECAColor);
                 case "is duplicated":
-                    return new Action(action.GetSubject(), "delete duplicates");
+                    if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.EditMode)
+                    {
+                        return new Action(action.GetSubject(), "delete duplicates");
+                    }
+                    break;
                 case "follows":
                     return new Action(action.GetSubject(), "unfollows");
                 case "changes text": 
