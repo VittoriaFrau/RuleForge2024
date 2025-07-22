@@ -33,6 +33,11 @@ namespace UI
         }
 
         private Modalities _modality;
+        public Modalities Modality
+        {
+            get { return _modality; }
+            set { _modality = value; }
+        }
         public List<GameObject> modalitiesBubbles;
         private bool bubblesVisible = true;
         public GameObject recordInteractionButton, stopInteractionButton;

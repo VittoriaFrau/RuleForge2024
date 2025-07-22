@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Controllers;
 using ECAPrototyping.RuleEngine;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.UX;
@@ -708,6 +709,11 @@ namespace UI
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
             string[] labelTexts = { e.Subject, e.Verb + " " + e.EventStr, e.ObjectStr };
+            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+            }
 
             switch (e.Modality)
             {

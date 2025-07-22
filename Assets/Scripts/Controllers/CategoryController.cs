@@ -42,6 +42,7 @@ namespace Controllers
 
         public void ShowCategoryMenu()
         {
+            categoryObjectSelected = CategoryObjectSelected.SingleObject;
             CategoryMenu.SetActive(true);
             HandleCategoryButtons(SingleObjectButton);
         }
@@ -72,6 +73,15 @@ namespace Controllers
             {
                 categoryObjectSelected = categorySelected;
                 HandleCategoryButtons(buttons.FirstOrDefault(b => b.name.Equals(category)));
+                Debug.Log($"Category set to: {categoryObjectSelected}");
+                if (GeneralUIController.Instance.isRecording)
+                {
+                    // take the events recorded with the current modality and change their category
+                    GeneralUIController.Instance.recordedEvents
+                        .Where(e => e.Modality == GeneralUIController.Instance.InteractionCreationController.Modality)
+                        .ToList()
+                        .ForEach(e => e.ChangeObjectCategory(categoryObjectSelected));
+                }
             }
             else
             {

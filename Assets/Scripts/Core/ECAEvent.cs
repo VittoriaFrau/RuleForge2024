@@ -8,7 +8,7 @@ namespace UI
     public class ECAEvent
     {
         private InteractionCreationController.Modalities modality;
-        private CategoryController.CategoryObjectSelected eventCategory;
+        public CategoryController.CategoryObjectSelected EventCategory { get; set; }
         private static int _counter = 0;
         
         public string Subject { get; set; }
@@ -31,7 +31,7 @@ namespace UI
             this.ObjectRef = @object;
             this.modality = modality;
             this.EventStr = _event;
-            eventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
@@ -41,7 +41,7 @@ namespace UI
         
         public void ChangeObjectCategory(CategoryController.CategoryObjectSelected category)
         {
-            eventCategory = category;
+            EventCategory = category;
         }
         
         //Proximity
@@ -51,7 +51,7 @@ namespace UI
             this.ObjectRef = targetObject;
             this.modality = modality;
             this.EventStr = _event;
-            eventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;

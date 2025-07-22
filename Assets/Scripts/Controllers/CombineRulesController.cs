@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Controllers;
 using ECAPrototyping.RuleEngine;
 using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
@@ -488,12 +489,11 @@ namespace UI
             cubeHelp = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/CubeHelp").gameObject;
             ruleDebugText = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/RuleDebugText").gameObject;
         }
-
+        
         private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
             bool isEquivalence, MeanwhileRule meanwhileRule = null)
         {
             Action<ECAEvent> triggerAction;
-            
             if (meanwhileRule != null)
             {
                 triggerAction = (evt) => OnMeanwhileEventTriggered(evt, meanwhileRule);
@@ -505,6 +505,31 @@ namespace UI
                     : (evt) => tracker.EventTriggered(evt);
             }
 
+            if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            {
+                BindModalityEvent(target, eventToBind, triggerAction);
+            }
+            else if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(target);
+
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
+                    {
+                        BindModalityEvent(interactable.gameObject, eventToBind, triggerAction);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Unknown event category: {eventToBind.EventCategory}");
+            }
+        }
+
+        
+        private void BindModalityEvent(GameObject target, ECAEvent eventToBind, Action<ECAEvent> triggerAction)
+        {
             switch (eventToBind.Modality)
             {
                 case InteractionCreationController.Modalities.Touch:
@@ -526,7 +551,7 @@ namespace UI
                 case InteractionCreationController.Modalities.Proximity:
                     BindProximityEvent(target, eventToBind, triggerAction);
                     break;
-                
+
                 case InteractionCreationController.Modalities.Controller:
                     BindControllerEvent(eventToBind, triggerAction);
                     break;
@@ -536,6 +561,7 @@ namespace UI
                     break;
             }
         }
+
         
         private void BindTouchEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
@@ -580,6 +606,8 @@ namespace UI
 #else
             Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
 #endif
+            //DEMO
+            //StartCoroutine()
         }
 
         private void BindControllerEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
@@ -601,6 +629,11 @@ namespace UI
             {
                 Debug.LogWarning($"ObjectManipulator not found on {target.name}");
                 return;
+            }
+            
+            if(manipulator.enabled == false)
+            {
+                manipulator.enabled = true; // Ensure the manipulator is enabled
             }
 
             string verb = ecaEvent.EventStr.ToLower();
