@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Controllers;
@@ -364,7 +365,7 @@ namespace UI
                 BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
             }
             
-            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileRules.Count == 0)
+            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileRules.Count != 0)
             {
                 foreach (var meanwhileRule in meanwhileEvents)
                 {
@@ -375,8 +376,12 @@ namespace UI
                     }
                     foreach (var meanwhileEvent in meanwhileRule.events)
                     {
-                        GameObject eventGameObject = meanwhileEvent.ObjectRef;
-                        BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+                        {
+                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                            eventSequenceTracker = new EventSequenceTracker(new []{meanwhileEvent}, thenEvents, ruleEngine);
+                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                        }
                     }
                 }
             }
@@ -494,7 +499,33 @@ namespace UI
             bool isEquivalence, MeanwhileRule meanwhileRule = null)
         {
             Action<ECAEvent> triggerAction;
+            
+            //DEMO
             if (meanwhileRule != null)
+            {
+                ECAEvent laserEvent =
+                    meanwhileRule.events.FirstOrDefault(e =>
+                        e.Modality == InteractionCreationController.Modalities.Laser);
+                if (laserEvent != null &&
+                    laserEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
+                {
+                    triggerAction = (evt) => tracker.EventTriggered(evt);
+                    var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(laserEvent.ObjectRef);
+
+                    foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                    {
+                        if (Utils.GetECALastScriptFromECAObject(interactable.gameObject)
+                            .Equals(lastEcaScriptCategoryOfTarget))
+                        {
+                            BindModalityEvent(interactable.gameObject, laserEvent, triggerAction);
+                        }
+                    }
+
+                    return;
+                }
+            }
+
+            if (meanwhileRule != null && !meanwhileRule.events.Any(e => e.Modality == InteractionCreationController.Modalities.Speech))
             {
                 triggerAction = (evt) => OnMeanwhileEventTriggered(evt, meanwhileRule);
             }
@@ -640,12 +671,23 @@ namespace UI
 
             if (verb.Contains("points") || verb.Contains("is pointing"))
             {
-                manipulator.hoverEntered.AddListener(interactor => triggerAction(ecaEvent));
+                manipulator.hoverEntered.AddListener(interactor =>
+                {
+                    //DEMO
+                    Debug.Log($"Hover entered on {target.name}");
+                    StartCoroutine(WaitForSecondsAndTriggerPointing(3f, ecaEvent, triggerAction));
+                    //triggerAction(ecaEvent);
+                });
             }
             else if (verb.Contains("stops pointing"))
             {
                 manipulator.hoverExited.AddListener(interactor => triggerAction(ecaEvent));
             }
+        }
+        private IEnumerator WaitForSecondsAndTriggerPointing(float seconds, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
+        {
+            yield return new WaitForSeconds(seconds);
+            triggerAction(ecaEvent);
         }
 
         private void BindHeadGazeEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
