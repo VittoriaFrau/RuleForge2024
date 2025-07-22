@@ -784,7 +784,7 @@ namespace UI
 
             if (obj != null && secondVerbText != null && meanwhileText != null)
             {
-                return new[] { subject, verb, obj,  meanwhileText, secondVerbText };
+                return new[] { subject, verb,  meanwhileText, secondVerbText , obj};
             }
 
             if (obj != null && secondVerbText != null)
@@ -836,18 +836,38 @@ namespace UI
             {
                 events[1].EventStr = events[1].Verb;
             }
+
+            if (events[0].Modality == InteractionCreationController.Modalities.Speech)
+            {
+                events[0].EventStr = events[0].Verb;
+            }
+            
+            if (events[1].Modality == InteractionCreationController.Modalities.Speech)
+            {
+                events[1].EventStr = events[1].Verb;
+            }
             
             events[0].EventStr = ConvertToIngForm(events[0].EventStr);
             events[1].EventStr = ConvertToIngForm(events[1].EventStr);
             
             string[] labelTexts = { events[0].Subject, events[0].EventStr + " " + events[0].ObjectStr, "and", events[1].EventStr + " ", events[1].ObjectStr };
 
+            if(events[0].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                string objectNameWithoutNumber = Regex.Replace(events[0].ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[1] = events[0].EventStr + " " + "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+            } 
+            
+            if(events[1].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                string objectNameWithoutNumber = Regex.Replace(events[1].ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[4] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+            }
+            
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
             {
                 TextMeshProUGUI[] faceLabels = GetOrderedTextLabels(newCube, faceName);
-                //TextMeshProUGUI[] faceLabels = GetTextLabelsInCube(newCube, faceName);
-
                 
                 // Fill the text labels with the appropriate text
                 for (int i = 0; i < faceLabels.Length; i++)
@@ -859,71 +879,40 @@ namespace UI
         } 
         
         public static string ConvertToIngForm(string verb) {
-        if (string.IsNullOrEmpty(verb)) return verb;
-        
-        // Handle special phrase cases
-        if (verb.StartsWith("stops") || verb.StartsWith("is")) return verb; //already an ing form
-        
-        // Handle common irregular cases
-        Dictionary<string, string> irregularVerbs = new Dictionary<string, string>
-        {
-            { "say", "saying" },
-            { "be", "being" }
-        };
-        
-        if (irregularVerbs.ContainsKey(verb.ToLower()))
-            return "is " + irregularVerbs[verb.ToLower()];
-        
-        // Handle third-person singular (remove 's' or 'es')
-        if (verb.EndsWith("s") && !verb.EndsWith("ss"))
-        {
-            verb = verb.Substring(0, verb.Length - 1);
-        }
-        else if (verb.EndsWith("es") && (verb.EndsWith("ses") || verb.EndsWith("xes") || verb.EndsWith("zes") || verb.EndsWith("ches") || verb.EndsWith("shes")))
-        {
-            verb = verb.Substring(0, verb.Length - 2);
-        }
-        
-        // Handle final silent 'e': remove 'e' and add 'ing'
-        if (Regex.IsMatch(verb, "[aeiou][^aeiou]e$"))
-            return "is " + verb.Substring(0, verb.Length - 1) + "ing";
-        
-        // Handle consonant-vowel-consonant words (double the final consonant)
-        if (Regex.IsMatch(verb, "[^aeiou][aeiou][^aeiou]$"))
-            return "is " + verb + verb[verb.Length - 1] + "ing";
-        
-        // Default case: just add 'ing'
-        return "is " + verb + "ing";
-    }
+            if (string.IsNullOrEmpty(verb)) return verb;
 
-        public static string ConvertFromIngForm(string ingVerb)
-    {
-        if (string.IsNullOrEmpty(ingVerb)) return ingVerb;
-        
-        // Ensure "is" is removed before processing
-        ingVerb = ingVerb.ToLower().StartsWith("is ") ? ingVerb.Substring(3) : ingVerb;
-        
-        // Handle common irregular cases
-        Dictionary<string, string> reverseIrregularVerbs = new Dictionary<string, string>
-        {
-            { "saying", "say" },
-            { "being", "be" }
-        };
-        
-        if (reverseIrregularVerbs.ContainsKey(ingVerb.ToLower()))
-            return reverseIrregularVerbs[ingVerb.ToLower()];
-        
-        // Handle cases where final consonant was doubled
-        if (Regex.IsMatch(ingVerb, "(.)\\1ing$"))
-            return ingVerb.Substring(0, ingVerb.Length - 4);
-        
-        // Handle words that lost 'e'
-        if (Regex.IsMatch(ingVerb, ".*[^aeiou]ing$"))
-            return ingVerb.Substring(0, ingVerb.Length - 3) + "e";
-        
-        // Default case: just remove 'ing'
-        return ingVerb.Substring(0, ingVerb.Length - 3);
-    }
+            if (verb.StartsWith("stops") || verb.StartsWith("is")) return verb;
+
+            Dictionary<string, string> irregularVerbs = new Dictionary<string, string>
+            {
+                { "say", "saying" },
+                { "be", "being" }
+            };
+
+            // Handle third-person singular (remove 's' or 'es')
+            if (verb.EndsWith("s") && !verb.EndsWith("ss"))
+            {
+                verb = verb.Substring(0, verb.Length - 1);
+            }
+            else if (verb.EndsWith("es") && (verb.EndsWith("ses") || verb.EndsWith("xes") || verb.EndsWith("zes") || verb.EndsWith("ches") || verb.EndsWith("shes")))
+            {
+                verb = verb.Substring(0, verb.Length - 2);
+            }
+
+            // Re-check for irregular verbs after modification
+            if (irregularVerbs.ContainsKey(verb.ToLower()))
+                return "is " + irregularVerbs[verb.ToLower()];
+
+            if (Regex.IsMatch(verb, "[aeiou][^aeiou]e$"))
+                return "is " + verb.Substring(0, verb.Length - 1) + "ing";
+
+            if (Regex.IsMatch(verb, "[^aeiou][aeiou][^aeiou]$"))
+                return "is " + verb + verb[verb.Length - 1] + "ing";
+
+            return "is " + verb + "ing";
+        }
+
+
 
         public static string GetRuleDescriptionFromCubePrefab(GameObject cube)
         {
