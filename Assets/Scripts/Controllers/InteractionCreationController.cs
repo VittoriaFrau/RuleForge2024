@@ -129,7 +129,11 @@ namespace UI
 
         public void SelectModality(string modality)
         {
-            if (_modality != Modalities.None) DeActivateCurrentModality();
+            if (_modality != Modalities.None)
+            {
+                RemoveModalityListeners();
+                DeActivateCurrentModality();
+            }
 
             _modality = (Modalities)Enum.Parse(typeof(Modalities), modality);
             ShowModalitiesBubbles(false);
@@ -372,6 +376,19 @@ namespace UI
             Destroy(headGazePointerInstance);
         }
 
+        public void RemoveModalityListeners()
+        {
+            //Remove the listeners
+            foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
+            {
+                RemoveListener(go);
+            }
+
+            GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
+                                                                            + " use your modality to interact with any object in the scene");
+            _categoryController.ShowCategoryMenu();
+        }
+
         public void DeActivateCurrentModality()
         {
             switch (_modality)
@@ -396,15 +413,7 @@ namespace UI
                     break;
             }
 
-            //Remove the listeners
-            foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
-            {
-                RemoveListener(go);
-            }
-
-            GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
-                                                                            + " use your modality to interact with any object in the scene");
-            _categoryController.ShowCategoryMenu();
+            
         }
 
         private void ActivateTouchModality()
@@ -539,6 +548,7 @@ namespace UI
             else
             {
                 Debug.Log("You are not using a headset, speech modality is not available.");
+                StartCoroutine(WaitForSpeechDemo()); //TODO togli
             }
 //#endif
         }
@@ -605,6 +615,7 @@ namespace UI
             }
             
             
+            
             // if a modality bubble is already selected, hide it
             if (_modality != Modalities.None)
             {
@@ -655,8 +666,7 @@ namespace UI
 
             if (uiController.UIstate == GeneralUIController.UIState.NewInteraction)
             {
-                DeActivateCurrentModality();
-                HideModalitiesBubbles();
+                RemoveModalityListeners();
                 return;
             }
 
@@ -841,8 +851,9 @@ namespace UI
 
         public void DeActivateNewInteraction()
         {
-            _modality = Modalities.None;
             DeActivateCurrentModality();
+            RemoveModalityListeners();
+            _modality = Modalities.None;
             HideModalitiesBubbles();
             _categoryController.HideCategoryMenu();
         }
@@ -912,7 +923,7 @@ namespace UI
                 _categoryController.CustomizeCategoryMenu(gameObject);
             });
 
-            manipulator.hoverExited.AddListener(interactor =>
+            /*manipulator.hoverExited.AddListener(interactor =>
             {
                 Debug.Log(manipulator.gameObject.name + " Hover exited");
                 GeneralUIController.Instance.SetDebugText("You stopped pointing " + manipulator.gameObject.name);
@@ -926,7 +937,7 @@ namespace UI
                     GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Laser, ecaEvent);
                 }
-            });
+            });*/
         }
 
         private void AddTouchListener(ObjectManipulator manipulator)
