@@ -386,7 +386,7 @@ namespace UI
 
             GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
                                                                             + " use your modality to interact with any object in the scene");
-            _categoryController.ShowCategoryMenu();
+            if(_modality!= Modalities.Speech && _modality != Modalities.Controller) _categoryController.ShowCategoryMenu();
         }
 
         public void DeActivateCurrentModality()
@@ -495,6 +495,8 @@ namespace UI
                 Debug.LogWarning("Microphone or MRTKSpeech GameObject is not assigned.");
                 return;
             }
+            
+            _categoryController.HideCategoryMenu();
 
             microphone.SetActive(true);
             HideModalityBubble("Speech");
