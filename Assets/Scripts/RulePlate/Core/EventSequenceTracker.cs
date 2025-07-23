@@ -11,7 +11,7 @@ namespace UI
         private readonly ECAEvent[] sequence;
         private readonly ECAEvent[] thenEvents;
         private readonly RuleEngine ruleEngine;
-        private readonly List<Action> oppositeActions;
+        private List<Action> oppositeActions;
         private bool hasCompleted = false;
 
         public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] thenEvents, RuleEngine ruleEngine)
@@ -122,6 +122,9 @@ namespace UI
                 if (thenEvent.Verb == "is duplicated")
                 {
                     ruleEngine.ExecuteAction(action);
+                    //if opposite action is not already in the list, we add it
+                    if (!oppositeActions.Contains(Utils.GetOppositeAction(action, thenEvent.Verb)))
+                        oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
                     latestDuplicate = FindLatestDuplicate(baseNameForDuplicates);
                     continue;
                 }
@@ -137,7 +140,15 @@ namespace UI
                 }
 
                 ruleEngine.ExecuteAction(action);
-                oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
+                // the duplicates are not considered in the opposite actions because they will be destroyed 
+                //if the subject is not a duplicate, we can add the opposite action
+                // or if the UIState is in edit mode, in play we delete
+                if (!subject.GetComponent<ECAObject>().isACopy || 
+                    GeneralUIController.Instance.UIstate == GeneralUIController.UIState.EditMode) 
+                {
+                    if (!oppositeActions.Contains(Utils.GetOppositeAction(action, thenEvent.Verb)))
+                        oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
+                }
             }
         }
 
@@ -161,6 +172,12 @@ namespace UI
         
         public void ExecuteOppositeActions()
         {
+            Debug.Log("[Tracker] Executing opposite actions...");
+            //log the opposite actions
+            foreach (var action in oppositeActions)
+            {
+                Debug.Log($"[Tracker] Opposite Action: " + action.ToString());
+            }
             if (oppositeActions == null || oppositeActions.Count == 0) return;
 
             foreach (var action in oppositeActions)
@@ -175,7 +192,7 @@ namespace UI
         {
             hasCompleted = false;
             CurrentIndex = 0;
-            oppositeActions.Clear(); // opzionale: se vuoi resettare anche gli opposti
+            //oppositeActions.Clear(); 
         }
 
     }
