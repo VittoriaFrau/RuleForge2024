@@ -376,17 +376,23 @@ namespace ECAPrototyping.RuleEngine
         {
             initialPosition = transform.position;
             Unfollow();
-            var rb = this.GetComponent<Rigidbody>();
+
+            var rb = GetComponent<Rigidbody>();
             rb.isKinematic = false;
             rb.useGravity = true;
-            rb.constraints = RigidbodyConstraints.None; // Remove any constraints to allow movement
-            
-            // Imposta un angolo di lancio
-            transform.rotation = Quaternion.Euler(30f, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+            rb.constraints = RigidbodyConstraints.None;
 
-            // Applica una forza più bassa per un lancio più lento
-            rb.AddForce(transform.forward * 5f, ForceMode.VelocityChange);
+            // Angolo di lancio in gradi
+            float launchAngle = 45f;
+            float launchSpeed = 10f;
+
+            // Calcola la direzione del lancio in base all'angolo
+            Vector3 launchDirection = Quaternion.Euler(-launchAngle, 0, 0) * transform.forward;
+
+            // Applica la forza
+            rb.velocity = launchDirection.normalized * launchSpeed;
         }
+
         
         /// <summary>
         /// <b>ResetObject</b> restore the initial properties of the object.
