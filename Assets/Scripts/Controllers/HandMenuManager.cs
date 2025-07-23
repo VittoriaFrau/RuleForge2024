@@ -141,6 +141,7 @@ namespace UI.RuleEditor
             GeneralUIController.Instance.DeActivatePreviousState(GeneralUIController.UIState.Default);
             debugPanel.SetActive(true);
             mainMenu.SetActive(true);
+            GeneralUIController.Instance.SetDebugText("Choose if you want to create an object, modify an existing one or create a rule");
         }
 
         public void ShowEditMenu()
