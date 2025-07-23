@@ -91,6 +91,12 @@ namespace UI
                 activeRulePlate.SetActive(true);
                 if (!startFromScratch)
                 {
+                    List<ECAEvent> recordedEventsNotInRulePlate = GeneralUIController.Instance.recordedEvents
+                        .Where(x => x.CubeID == 0).ToList();
+                    Debug.Log($"Recorded events not in rule plate: {recordedEventsNotInRulePlate.Count}");
+                    Utils.GenerateCubesFromEventList(recordedEventsNotInRulePlate,
+                        modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate);
+                    removableBarrier.SetActive(false);
                     return;
                 }
             }
