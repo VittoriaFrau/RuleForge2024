@@ -54,8 +54,6 @@ namespace ECAPrototyping.RuleEngine
         
         public ECABoolean isACopy = new(ECABoolean.BoolType.NO);
         
-        private ObjectsMenuController _objectsMenuController;
-
         private int counter = 0;
         private Vector3 initialPosition;
         private Quaternion initialRot => transform.rotation; // Store the initial rotation of the object
@@ -90,9 +88,6 @@ namespace ECAPrototyping.RuleEngine
             if(gameRenderer == null)
                 gameRenderer = this.gameObject.AddComponent<MeshRenderer>();
             color = gameRenderer.material.color;
-            
-            var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
-            _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
             
             SaveOriginalMaterials();
         }
@@ -246,7 +241,7 @@ namespace ECAPrototyping.RuleEngine
             {
                 //with this method we can spawn the objects in a line on the right
                 Vector3 spawnPosition = new Vector3(spacing * i, basePosition.y, basePosition.z);
-                GameObject duplicate = _objectsMenuController.Spawn(baseName, spawnPosition, objCategory);
+                GameObject duplicate = GeneralUIController.Instance.ObjectsMenuController.Spawn(baseName, spawnPosition, objCategory);
                 duplicate.GetComponent<ECAObject>().isACopy.Assign(ECABoolean.BoolType.YES);
 
                 if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
@@ -255,10 +250,19 @@ namespace ECAPrototyping.RuleEngine
                     foreach (Renderer r in duplicateRenderers)
                         r.material = GeneralUIController.Instance.spawnMaterial;
                     //in edit mode we need to add the listener to edit the object
-                    GeneralUIController.Instance._editModeController.AddListenerToSingleInteractable(duplicate);
+                    GeneralUIController.Instance.EditModeController.AddListenerToSingleInteractable(duplicate);
                 }
 
-                duplicate.name = "new" + baseName;
+                //if it's the first duplicate, we set the name to "new" + baseName
+                if (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count == 1)
+                {
+                    duplicate.name = "new" + baseName;
+                }else 
+                {
+                    //if it's not the first duplicate, we set the name to "new" + baseName + counter
+                    duplicate.name = "new" + baseName + (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count - 1);
+                }
+                
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);
@@ -271,7 +275,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "delete duplicates")]
         public void DeleteDuplicates()
         {
-            foreach (var obj in _objectsMenuController.spawnedObjects)
+            foreach (var obj in GeneralUIController.Instance.ObjectsMenuController.spawnedObjects)
             {
                 Destroy(obj);
             }
@@ -334,11 +338,7 @@ namespace ECAPrototyping.RuleEngine
                     Rigidbody rb = GetComponent<Rigidbody>();
                     if (rb != null)
                     {
-                        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY 
-                                                                              | RigidbodyConstraints.FreezeRotationZ 
-                                                                              | RigidbodyConstraints.FreezePositionZ
-                                                                              | RigidbodyConstraints.FreezePositionY
-                                                                              | RigidbodyConstraints.FreezePositionX;
+                        rb.constraints = RigidbodyConstraints.FreezeAll;
                     }
                 }
             }
@@ -363,7 +363,7 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECAObject), "unfollows")]
         public void Unfollow()
         {
-            transform.SetParent(_objectsMenuController.interactables.transform);
+            transform.SetParent(GeneralUIController.Instance.ObjectsMenuController.interactables.transform);
             ResetObject();
         }
         

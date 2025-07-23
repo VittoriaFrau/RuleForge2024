@@ -14,11 +14,6 @@ namespace UI
 
         private GameObject textGo;
         public GameObject eventHandler;
-        public EditModeController _editModeController;
-        private InteractionCreationController _interactionCreationController;
-        private CombineRulesController _combineRulesController;
-        public HandMenuManager handMenuManager;
-        private Prototypation _prototypation;
         public bool isRecording = false;
         private GameObject _selectedObject;
         public List<ECAEvent> recordedEvents = new();
@@ -26,6 +21,45 @@ namespace UI
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
         public Material spawnMaterial;
         public GameObject existingRuleOptionsUI;
+        
+        //All controllers TODO have one of each and always call them in all the files
+        private EditModeController _editModeController;
+        public EditModeController EditModeController
+        {
+            get => _editModeController;
+            set => _editModeController = value;
+        }
+
+        private CombineRulesController _combineRulesController;
+        public CombineRulesController CombineRulesController
+        {
+            get => _combineRulesController;
+            set => _combineRulesController = value;
+        }
+
+        private InteractionCreationController _interactionCreationController;
+        public InteractionCreationController InteractionCreationController
+        {
+            get => _interactionCreationController;
+            set => _interactionCreationController = value;
+        }
+
+        private Prototypation _prototypation;
+        public Prototypation Prototypation
+        {
+            get => _prototypation;
+            set => _prototypation = value;
+        }
+
+        private ObjectsMenuController _objectsMenuController;
+        public ObjectsMenuController ObjectsMenuController
+        {
+            get => _objectsMenuController;
+            set => _objectsMenuController = value;
+        }
+        
+        public HandMenuManager _handMenuManager;
+
         
         public enum UIState
         {
@@ -44,11 +78,6 @@ namespace UI
         }
         private TextMeshProUGUI text;
         
-        public InteractionCreationController InteractionCreationController
-        {
-            get => _interactionCreationController;
-            set => _interactionCreationController = value;
-        }
         
         void Awake()
         {
@@ -60,6 +89,7 @@ namespace UI
         {
             textGo = GameObject.FindGameObjectWithTag("debugText");
             text = textGo.GetComponent<TextMeshProUGUI>();
+            _objectsMenuController = eventHandler.GetComponent<ObjectsMenuController>();
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
@@ -98,7 +128,7 @@ namespace UI
                     _combineRulesController.DeActivateRuleComposition();
                     break;
                 case UIState.Play:
-                    handMenuManager.DeActivatePlayStateMenu();
+                    _handMenuManager.DeActivatePlayStateMenu();
                     _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
                     break;
             }
@@ -108,7 +138,7 @@ namespace UI
         {
             DeActivatePreviousState(UIState.Default);
             _uiState = UIState.Default;
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
             text.text = "Choose if you want to create an object, modify an existing one or create a rule";
         }
         
@@ -117,7 +147,7 @@ namespace UI
             DeActivatePreviousState(UIState.NewObject);
             _uiState = UIState.NewObject;
             text.text = "Please, select the object you want to create";
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
         }
         
         public void EditModeState()
@@ -131,7 +161,7 @@ namespace UI
                 RegisterInitialPosition(_selectedObject);
             }
             _editModeController.UpdateAndAddListeners();
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
         }
         
         public void NewInteractionState()
@@ -139,7 +169,7 @@ namespace UI
             DeActivatePreviousState(UIState.NewInteraction);
             _uiState = UIState.NewInteraction;
             text.text = "Please, grab the modality you want to use to create the rule"; 
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
             _interactionCreationController.ShowModalitiesBubbles();
         }
 
@@ -150,7 +180,7 @@ namespace UI
                 // A rule has already been created, we ask the user if they want to continue with the current rule or create a new one
                 SetDebugText("A rule has already been created, do you want to continue with the current rule or create a new one?");
                 existingRuleOptionsUI.SetActive(true);
-                handMenuManager.mainMenu.SetActive(false);
+                _handMenuManager.mainMenu.SetActive(false);
             }
             else CreateNewRule();
         }
@@ -159,7 +189,7 @@ namespace UI
         {
             DeActivatePreviousState(UIState.RuleComposition);
             _uiState = UIState.RuleComposition;
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
             existingRuleOptionsUI.SetActive(false);
             _combineRulesController.ActivateCombineRules(false);
         }
@@ -168,7 +198,7 @@ namespace UI
         {
             DeActivatePreviousState(UIState.RuleComposition);
             _uiState = UIState.RuleComposition;
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
             existingRuleOptionsUI.SetActive(false);
             _combineRulesController.ActivateCombineRules(true);
         }
@@ -177,7 +207,7 @@ namespace UI
         {
             DeActivatePreviousState(UIState.Play);
             _uiState = UIState.Play;
-            handMenuManager.HandleHandMenu(_uiState);
+            _handMenuManager.HandleHandMenu(_uiState);
             _combineRulesController.CalculateRule();
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);

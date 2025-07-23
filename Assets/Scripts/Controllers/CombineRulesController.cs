@@ -45,12 +45,10 @@ namespace UI
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
-        private HandMenuManager handMenuManager;
         private InteractionCreationController interactionCreationController;
 
         private void Start()
         {
-            handMenuManager = GeneralUIController.Instance.handMenuManager;
             interactionCreationController = GetComponent<InteractionCreationController>();
         }
         
@@ -72,9 +70,9 @@ namespace UI
             {
                 GeneralUIController.Instance.SetDebugText(
                     "No recorded actions, please use the record button to record actions");
-                handMenuManager.menuContentCanvas.SetActive(true);
-                handMenuManager.debugPanel.SetActive(true);
-                handMenuManager.mainMenu.SetActive(true);
+                GeneralUIController.Instance._handMenuManager.menuContentCanvas.SetActive(true);
+                GeneralUIController.Instance._handMenuManager.debugPanel.SetActive(true);
+                GeneralUIController.Instance._handMenuManager.mainMenu.SetActive(true);
                 GeneralUIController.Instance.UIstate = GeneralUIController.UIState.Default;
                 return;
             }
@@ -432,7 +430,7 @@ namespace UI
             foreach (var whenEvent in whenEvents)
             {
                 GameObject whenGameObject = whenEvent.ObjectRef;
-                Debug.Log($"Binding 'when' event: {whenEvent} on GameObject: {whenGameObject.name}");
+                Debug.Log($"Binding 'when' event: {whenEvent} on GameObject: {(whenGameObject != null ? whenGameObject.name : "null")}");
                 BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
             }
 

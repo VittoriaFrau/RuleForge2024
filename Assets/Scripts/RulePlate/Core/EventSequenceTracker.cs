@@ -57,7 +57,7 @@ namespace UI
             ExecuteActions();
         }
 
-        private void ExecuteActions()
+        /*private void ExecuteActions()
         {
             foreach (var thenEvent in thenEvents)
             {
@@ -65,16 +65,90 @@ namespace UI
                 {
                     thenEvent.Action.SetSubject(GameObject.Find(thenEvent.Subject));
                 }
+
+                if (thenEvent.Action.GetSubject().GetComponent<ECAObject>().isACopy)
+                {
+                    Debug.Log("Action subject is duplicated, we need to find the newest instance.");
+                    thenEvent.Action.SetSubject(GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.FindLast(x=>
+                        x.name.Contains(thenEvent.Action.GetSubject().name)));
+                    Debug.Log($"New subject for action: {thenEvent.Action.GetSubject().name}");
+                }
                 ruleEngine.ExecuteAction(thenEvent.Action);
                 oppositeActions.Add(Utils.GetOppositeAction(thenEvent.Action, thenEvent.Verb));
             }
 
             hasCompleted = true;
             CurrentIndex = 0;
-            
+
             // Reset so the rule can be triggered again
             ResetTracker();
+        }*/
+        
+        private void ExecuteActions()
+        {
+            hasCompleted = true;
+            CurrentIndex = 0;
+
+            GameObject latestDuplicate = null;
+            string baseNameForDuplicates = "";
+
+            DetectBaseNameForDuplicates(ref baseNameForDuplicates);
+            ExecuteThenEvents(ref latestDuplicate, baseNameForDuplicates);
+
+            ResetTracker();
         }
+
+        private void DetectBaseNameForDuplicates(ref string baseNameForDuplicates)
+        {
+            foreach (var thenEvent in thenEvents)
+            {
+                var action = thenEvent.Action;
+                var subject = action.GetSubject();
+
+                if (thenEvent.Verb == "is duplicated" &&  action.GetSubject() != null)
+                {
+                    baseNameForDuplicates = subject.name.Substring(0, subject.name.Length - 1);
+                }
+            }
+        }
+
+        private void ExecuteThenEvents(ref GameObject latestDuplicate, string baseNameForDuplicates)
+        {
+            foreach (var thenEvent in thenEvents)
+            {
+                var action = thenEvent.Action;
+                var subject = action.GetSubject();
+
+                if (thenEvent.Verb == "is duplicated")
+                {
+                    ruleEngine.ExecuteAction(action);
+                    latestDuplicate = FindLatestDuplicate(baseNameForDuplicates);
+                    continue;
+                }
+
+                // only assign if subject is missing or marked as a duplicate
+                if (subject == null || subject.GetComponent<ECAObject>().isACopy)
+                {
+                    if (latestDuplicate != null)
+                    {
+                        action.SetSubject(latestDuplicate);
+                        subject = latestDuplicate;
+                    }
+                }
+
+                ruleEngine.ExecuteAction(action);
+                oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
+            }
+        }
+
+        private GameObject FindLatestDuplicate(string baseName)
+        {
+            return GeneralUIController.Instance.ObjectsMenuController.spawnedObjects
+                .FindLast(obj => obj.name.StartsWith("new" + baseName));
+        }
+
+
+
         
         public void ExecuteMeanwhileAction(MeanwhileRule rule)
         {
