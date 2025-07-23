@@ -71,6 +71,9 @@ namespace UI
 
             hasCompleted = true;
             CurrentIndex = 0;
+            
+            // Reset so the rule can be triggered again
+            ResetTracker();
         }
         
         public void ExecuteMeanwhileAction(MeanwhileRule rule)
@@ -93,6 +96,14 @@ namespace UI
 
             oppositeActions.Clear();
         }
+        
+        public void ResetTracker()
+        {
+            hasCompleted = false;
+            CurrentIndex = 0;
+            oppositeActions.Clear(); // opzionale: se vuoi resettare anche gli opposti
+        }
+
     }
 
 
