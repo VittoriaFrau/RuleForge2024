@@ -342,7 +342,7 @@ namespace UI
         }
 
 
-        public void CalculateRule()
+        public void CalculateRuleOLD()
         {
             RuleEngine ruleEngine = RuleEngine.GetInstance();
 
@@ -382,6 +382,7 @@ namespace UI
                     }
                     foreach (var meanwhileEvent in meanwhileRule.events)
                     {
+                        //DEMO
                         if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
                         {
                             GameObject eventGameObject = meanwhileEvent.ObjectRef;
@@ -401,6 +402,95 @@ namespace UI
                 BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
             }
         }
+        
+        public void CalculateRule()
+        {
+            Debug.Log("Starting CalculateRule...");
+
+            RuleEngine ruleEngine = RuleEngine.GetInstance();
+
+            ECAEvent[] whenEvents = GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+            ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
+
+            MeanwhileRule[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            MeanwhileRule[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+
+            currentThenEvents = thenEvents;
+
+            Debug.Log($"Found {whenEvents.Length} 'when' events, {equivalenceEvents.Length} 'equivalence' events, and {thenEvents.Length} 'then' events.");
+            Debug.Log($"Found {meanwhileEventsSequential.Length} sequential meanwhile rules and {meanwhileEventsEquivalence.Length} equivalence meanwhile rules.");
+
+            if (whenEvents.Length == 0 && meanwhileEventsSequential.Length == 0)
+            {
+                Debug.LogWarning("No 'when' events or sequential meanwhile rules found. Aborting rule calculation.");
+                return;
+            }
+
+            eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
+
+            foreach (var whenEvent in whenEvents)
+            {
+                GameObject whenGameObject = whenEvent.ObjectRef;
+                Debug.Log($"Binding 'when' event: {whenEvent} on GameObject: {whenGameObject.name}");
+                BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
+            }
+
+            if ((meanwhileEventsSequential.Length > 0 || meanwhileEventsEquivalence.Length > 0) &&
+                GeneralUIController.Instance.activeMeanwhileRules.Count != 0)
+            {
+                foreach (var meanwhileRule in meanwhileEventsSequential)
+                {
+                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    {
+                        activeMeanwhileRules.Add(meanwhileRule);
+                        Debug.Log($"Added sequential meanwhile rule: {meanwhileRule}");
+                    }
+
+                    foreach (var meanwhileEvent in meanwhileRule.events)
+                    {
+                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+                        {
+                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                            Debug.Log($"Binding sequential meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
+                            eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
+                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                        }
+                    }
+                }
+
+                foreach (var meanwhileRule in meanwhileEventsEquivalence)
+                {
+                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    {
+                        activeMeanwhileRules.Add(meanwhileRule);
+                        Debug.Log($"Added equivalence meanwhile rule: {meanwhileRule}");
+                    }
+
+                    foreach (var meanwhileEvent in meanwhileRule.events)
+                    {
+                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+                        {
+                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                            Debug.Log($"Binding equivalence meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
+                            eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
+                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                        }
+                    }
+                }
+            }
+
+            if (equivalenceEvents.Length > 0)
+            {
+                ECAEvent equivalenceEvent = equivalenceEvents[0];
+                GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
+                Debug.Log($"Binding equivalence event: {equivalenceEvent} on GameObject: {equivalenceGameObject.name}");
+                BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
+            }
+
+            Debug.Log("Finished CalculateRule.");
+        }
+
 
 
         private MeanwhileRule[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
@@ -408,17 +498,17 @@ namespace UI
             var allContainers = GetAllCubeContainers(row, containerNames);
 
             return allContainers
-            .Select(container =>
-                Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileRules))
-            .Where(rule => rule != null)
-            .ToArray();
+                .Select(container =>
+                    Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileRules))
+                .Where(rule => rule != null)
+                .ToArray();
         }
 
 
         private ECAEvent[] GetEventsFromContainers(GameObject row, string[] containerNames)
         {
             var allContainers = GetAllCubeContainers(row, containerNames);
-                new List<CubeContainer>();
+            new List<CubeContainer>();
                 
             return allContainers
                 .Select(container =>

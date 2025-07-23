@@ -179,8 +179,6 @@ namespace UI
             _uiState = UIState.Play;
             handMenuManager.HandleHandMenu(_uiState);
             _combineRulesController.CalculateRule();
-            //_combineRulesController.activeRulePlate = null;
-            //ClearRecordedEvents();
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
             Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
