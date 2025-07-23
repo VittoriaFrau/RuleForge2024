@@ -11,6 +11,7 @@ using MixedReality.Toolkit.Subsystems;
 using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace UI
@@ -26,6 +27,7 @@ namespace UI
         private List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
+        private Dictionary<GameObject, InteractionCreationController.Modalities> gameObjectsWithBindings = new ();
 
         public enum ContainerType
         {
@@ -46,6 +48,7 @@ namespace UI
         private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
         private InteractionCreationController interactionCreationController;
+
 
         private void Start()
         {
@@ -655,6 +658,8 @@ namespace UI
         
         private void BindModalityEvent(GameObject target, ECAEvent eventToBind, Action<ECAEvent> triggerAction)
         {
+            if(target!=null)  gameObjectsWithBindings.Add(target, eventToBind.Modality); // Store the modality for unbinding later
+            
             switch (eventToBind.Modality)
             {
                 case InteractionCreationController.Modalities.Touch:
@@ -698,6 +703,9 @@ namespace UI
             }
 
             string verb = ecaEvent.EventStr.ToLower();
+            UnityAction touchAction = () => triggerAction(ecaEvent);
+            
+
 
             if (verb.Contains("clicks") || verb.Contains("is clicking"))
             {
@@ -848,5 +856,55 @@ namespace UI
                 triggerAction(ecaEvent);
             };
         }
+        
+        
+        public void UnbindAllEvents()
+        {
+
+            foreach (GameObject go in gameObjectsWithBindings.Keys)
+            {
+                ObjectManipulator manipulator = go.GetComponent<ObjectManipulator>();
+                switch (gameObjectsWithBindings[go])
+                {
+                    case InteractionCreationController.Modalities.Touch:
+                        if (manipulator != null)
+                        {
+                            manipulator.OnClicked.RemoveAllListeners();
+                            manipulator.selectEntered.RemoveAllListeners();
+                            manipulator.selectExited.RemoveAllListeners();
+                        }
+                        break;
+                    case InteractionCreationController.Modalities.Laser:
+                        if (manipulator != null)
+                        {
+                            manipulator.hoverEntered.RemoveAllListeners();
+                            manipulator.hoverExited.RemoveAllListeners();
+                        }
+                        break;
+                        case InteractionCreationController.Modalities.Headgaze:
+                        var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+                        if (gazeInteractor != null)
+                        {
+                            gazeInteractor.hoverEntered.RemoveAllListeners();
+                            gazeInteractor.hoverExited.RemoveAllListeners();
+                        }
+
+                        break;
+                            
+                }
+                
+            }
+            // controllers
+            var triggerInput = interactionCreationController.GetTriggerActionReference();
+            if (triggerInput != null && triggerInput.action != null)
+            {
+                triggerInput.action.Disable();
+            }
+            
+            //TODO proximity unbind
+        }
+        
+       
+
     }
 }

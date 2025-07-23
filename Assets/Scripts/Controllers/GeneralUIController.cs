@@ -130,6 +130,7 @@ namespace UI
                 case UIState.Play:
                     _handMenuManager.DeActivatePlayStateMenu();
                     _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
+                    _combineRulesController.UnbindAllEvents();
                     break;
             }
         }
