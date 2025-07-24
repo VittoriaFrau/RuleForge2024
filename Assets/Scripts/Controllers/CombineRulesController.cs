@@ -28,6 +28,9 @@ namespace UI
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
         private Dictionary<GameObject, InteractionCreationController.Modalities> gameObjectsWithBindings = new ();
+        private Dictionary<GameObject, Coroutine> pointingCoroutines = new();
+        private bool isLaunching = false;
+
 
         public enum ContainerType
         {
@@ -776,21 +779,33 @@ namespace UI
                 manipulator.hoverEntered.AddListener(interactor =>
                 {
                     //DEMO
-                    Debug.Log($"Hover entered on {target.name}");
-                    StartCoroutine(WaitForSecondsAndTriggerPointing(3f, ecaEvent, triggerAction));
-                    //triggerAction(ecaEvent);
+                    if (!isLaunching)
+                    {
+                        isLaunching = true;
+                        StartCoroutine(WaitForSecondsAndTriggerPointing(3f, ecaEvent, triggerAction, target));
+                    }
                 });
             }
             else if (verb.Contains("stops pointing"))
             {
-                manipulator.hoverExited.AddListener(interactor => triggerAction(ecaEvent));
+                
+                manipulator.hoverExited.AddListener(interactor =>
+                {
+                    //DEMO
+                    isLaunching = false; // Reset the launching state
+                    triggerAction(ecaEvent);
+                });
             }
         }
-        private IEnumerator WaitForSecondsAndTriggerPointing(float seconds, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
+        //DEMO
+        private IEnumerator WaitForSecondsAndTriggerPointing(float seconds, ECAEvent ecaEvent, Action<ECAEvent> triggerAction, GameObject target)
         {
             yield return new WaitForSeconds(seconds);
+            //pointingCoroutines.Remove(target); // cleanup after completion
+            Debug.Log($"[Laser] Triggered after wait on {target.name}");
             triggerAction(ecaEvent);
         }
+
 
         private void BindHeadGazeEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
