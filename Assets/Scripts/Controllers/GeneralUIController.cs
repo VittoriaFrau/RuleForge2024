@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace UI
 {
+    
     public class GeneralUIController: MonoBehaviour
     {
         public static GeneralUIController Instance;
@@ -17,7 +18,7 @@ namespace UI
         public bool isRecording = false;
         private GameObject _selectedObject;
         public List<ECAEvent> recordedEvents = new();
-        public List<MeanwhileRule> activeMeanwhileEvents = new List<MeanwhileRule>();
+        public List<MeanwhileEvent> activeMeanwhileEvents = new List<MeanwhileEvent>();
         public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
         public Material spawnMaterial;
         public GameObject existingRuleOptionsUI;

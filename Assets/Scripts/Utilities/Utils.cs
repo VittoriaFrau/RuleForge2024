@@ -544,7 +544,7 @@ namespace UI
             return e;
         }
 
-        public static MeanwhileRule GetMeanwhileRuleFromCube(GameObject cube, List<MeanwhileRule> recordedMeanwhiles)
+        public static MeanwhileEvent GetMeanwhileRuleFromCube(GameObject cube, List<MeanwhileEvent> recordedMeanwhiles)
         {
             MeanwhileCubeController cubeController = cube.GetComponent<MeanwhileCubeController>();
             if (cubeController == null)
@@ -552,13 +552,13 @@ namespace UI
                 return null;
             }
             int cubeID = cubeController.cubeID;
-            MeanwhileRule rule = recordedMeanwhiles.Find(m => m.CubeID == cubeID);
-            if (rule == null)
+            MeanwhileEvent @event = recordedMeanwhiles.Find(m => m.CubeID == cubeID);
+            if (@event == null)
             {
-                Debug.LogError($"MeanwhileRule not found for cube ID {cubeID}");
+                Debug.LogError($"MeanwhileEvent not found for cube ID {cubeID}");
             }
 
-            return rule;
+            return @event;
         }
 
         public static InteractionCreationController.Modalities GetModalityFromVerb(string verb)

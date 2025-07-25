@@ -143,9 +143,9 @@ public class CubeController : MonoBehaviour
 
         _combineRulesController.DeactivateRuleDebugText();
         
-        MeanwhileRule rule = new MeanwhileRule(new [] {cubeLeftEcaEvent, cubeRightEcaEvent});
-        rule.CubeID = mergedCube.GetInstanceID();
-        GeneralUIController.Instance.activeMeanwhileEvents.Add(rule);
+        MeanwhileEvent @event = new MeanwhileEvent(new [] {cubeLeftEcaEvent, cubeRightEcaEvent});
+        @event.CubeID = mergedCube.GetInstanceID();
+        GeneralUIController.Instance.activeMeanwhileEvents.Add(@event);
 
         MeanwhileCubeController meanwhileCubeController = mergedCube.AddComponent<MeanwhileCubeController>();
         meanwhileCubeController.cubeID = mergedCube.GetInstanceID();

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UI.RuleEditor
 {
-    public class MeanwhileRule
+    public class MeanwhileEvent
     {
         public ECAEvent[] events;
         public float timeWindow = 5.0f;
@@ -14,7 +14,7 @@ namespace UI.RuleEditor
         public bool TimerRunning { get; private set; }        
         public bool IsComplete => triggeredEvents.Count == events.Length;
 
-        public MeanwhileRule(ECAEvent[] events)
+        public MeanwhileEvent(ECAEvent[] events)
         {
             this.events = events;
             timer = 0f;

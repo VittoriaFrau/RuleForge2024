@@ -24,7 +24,7 @@ namespace UI
         [FormerlySerializedAs("ruleEditorPlate")] public GameObject ruleEditorPlatePrefab;
         public GameObject activeRulePlate;
         public GameObject modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
-        private List<MeanwhileRule> activeMeanwhileRules = new List<MeanwhileRule>();
+        private List<MeanwhileEvent> activeMeanwhileRules = new List<MeanwhileEvent>();
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
         private Dictionary<GameObject, InteractionCreationController.Modalities> gameObjectsWithBindings = new ();
@@ -356,7 +356,7 @@ namespace UI
                 GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
                 new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
-            MeanwhileRule [] meanwhileEvents = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            MeanwhileEvent [] meanwhileEvents = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
 
             currentThenEvents = thenEvents;
 
@@ -417,8 +417,8 @@ namespace UI
             ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
-            MeanwhileRule[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
-            MeanwhileRule[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+            MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
 
             currentThenEvents = thenEvents;
 
@@ -497,7 +497,7 @@ namespace UI
 
 
 
-        private MeanwhileRule[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
+        private MeanwhileEvent[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
         {
             var allContainers = GetAllCubeContainers(row, containerNames);
 
@@ -549,24 +549,24 @@ namespace UI
         }
 
         
-        private void OnMeanwhileEventTriggered(ECAEvent triggeredEvent, MeanwhileRule rule)
+        private void OnMeanwhileEventTriggered(ECAEvent triggeredEvent, MeanwhileEvent @event)
         {
-            if (rule.HasTriggered(triggeredEvent))
+            if (@event.HasTriggered(triggeredEvent))
                 return;
 
-            rule.RegisterTrigger(triggeredEvent);
+            @event.RegisterTrigger(triggeredEvent);
             Debug.Log($"Meanwhile event triggered: {triggeredEvent.EventStr}");
 
-            if (rule.IsComplete)
+            if (@event.IsComplete)
             {
                 Debug.Log("All Meanwhile events triggered within time window! Executing actions...");
                 ExecuteMeanwhileAction();
-                rule.Reset();
+                @event.Reset();
             }
-            else if (!rule.TimerRunning)
+            else if (!@event.TimerRunning)
             {
-                rule.StartTimer();
-                Debug.Log($"Started timer for MeanwhileRule: {rule.timer}s");
+                @event.StartTimer();
+                Debug.Log($"Started timer for MeanwhileEvent: {@event.timer}s");
             }
         }
 
@@ -596,15 +596,15 @@ namespace UI
         }
         
         private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
-            bool isEquivalence, MeanwhileRule meanwhileRule = null)
+            bool isEquivalence, MeanwhileEvent meanwhileEvent = null)
         {
             Action<ECAEvent> triggerAction;
             
             //DEMO
-            if (meanwhileRule != null)
+            if (meanwhileEvent != null)
             {
                 ECAEvent laserEvent =
-                    meanwhileRule.events.FirstOrDefault(e =>
+                    meanwhileEvent.events.FirstOrDefault(e =>
                         e.Modality == InteractionCreationController.Modalities.Laser);
                 if (laserEvent != null &&
                     laserEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
@@ -625,9 +625,9 @@ namespace UI
                 }
             }
 
-            if (meanwhileRule != null && !meanwhileRule.events.Any(e => e.Modality == InteractionCreationController.Modalities.Speech))
+            if (meanwhileEvent != null && !meanwhileEvent.events.Any(e => e.Modality == InteractionCreationController.Modalities.Speech))
             {
-                triggerAction = (evt) => OnMeanwhileEventTriggered(evt, meanwhileRule);
+                triggerAction = (evt) => OnMeanwhileEventTriggered(evt, meanwhileEvent);
             }
             else
             {

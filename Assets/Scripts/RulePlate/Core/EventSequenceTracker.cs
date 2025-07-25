@@ -161,7 +161,7 @@ namespace UI
 
 
         
-        public void ExecuteMeanwhileAction(MeanwhileRule rule)
+        public void ExecuteMeanwhileAction(MeanwhileEvent @event)
         {
             // Azione: scateni le azioni di THEN
             // Ad esempio:
