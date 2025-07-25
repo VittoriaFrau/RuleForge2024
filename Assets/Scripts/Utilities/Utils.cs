@@ -768,6 +768,10 @@ namespace UI
                         string formattedText = labelTexts[i].Replace(" ", "\n"); 
                         faceLabels[i].text =formattedText;
                     }
+                    else 
+                    {
+                        faceLabels[i].text = labelTexts[i];
+                    }
                 }
             }
         }
