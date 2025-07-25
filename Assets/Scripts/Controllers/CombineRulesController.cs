@@ -375,11 +375,11 @@ namespace UI
                 BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
             }
             
-            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileRules.Count != 0)
+            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
             {
                 foreach (var meanwhileRule in meanwhileEvents)
                 {
-                    // Add the rule to activeMeanwhileRules 
+                    // Add the rule to activeMeanwhileEvents 
                     if (!activeMeanwhileRules.Contains(meanwhileRule))
                     {
                         activeMeanwhileRules.Add(meanwhileRule);
@@ -441,7 +441,7 @@ namespace UI
             }
 
             if ((meanwhileEventsSequential.Length > 0 || meanwhileEventsEquivalence.Length > 0) &&
-                GeneralUIController.Instance.activeMeanwhileRules.Count != 0)
+                GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
             {
                 foreach (var meanwhileRule in meanwhileEventsSequential)
                 {
@@ -503,7 +503,7 @@ namespace UI
 
             return allContainers
                 .Select(container =>
-                    Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileRules))
+                    Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileEvents))
                 .Where(rule => rule != null)
                 .ToArray();
         }
