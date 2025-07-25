@@ -709,11 +709,6 @@ namespace UI
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
             string[] labelTexts = { e.Subject, e.Verb + " " + e.EventStr, e.ObjectStr };
-            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
-            {
-                string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
-                labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
-            }
 
             switch (e.Modality)
             {
@@ -745,6 +740,19 @@ namespace UI
                     labelTexts[1] = e.EventStr; 
                     break;
             }
+            
+            
+            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                //if the modality is proximity, we do the same for the subject
+                if (e.Modality == InteractionCreationController.Modalities.Proximity)
+                {
+                    string subjectNameWithoutNumber = Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
+                    labelTexts[0] = "any " + subjectNameWithoutNumber; //if it's a category, we use "any" instead of the subject
+                }
+            }
 
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
@@ -754,9 +762,12 @@ namespace UI
                 // Fill the text labels with the appropriate text
                 for (int i = 0; i < faceLabels.Length; i++)
                 {
-                    //To read the text better we replace the spaces with new lines
-                    string formattedText = labelTexts[i].Replace(" ", "\n"); 
-                    faceLabels[i].text =formattedText;
+                    //To read the text better we replace the spaces with new lines, only if labelTexts[i] has more than 10 ch
+                    if (labelTexts[i].Length > 10)
+                    {
+                        string formattedText = labelTexts[i].Replace(" ", "\n"); 
+                        faceLabels[i].text =formattedText;
+                    }
                 }
             }
         }

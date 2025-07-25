@@ -51,6 +51,12 @@ namespace UI
         public HandMenuManager handMenuManager;
         private CategoryController _categoryController;
 
+        public CategoryController CategoryController
+        {
+            get => _categoryController;
+            set => _categoryController = value;
+        }
+
         [FormerlySerializedAs("interactables")]
         public GameObject interactablesParent;
 
@@ -1115,22 +1121,30 @@ namespace UI
         private void AddProximityListener(ObjectManipulator manipulator)
         {
             proximityCube.GetComponentInChildren<ObjectManipulator>().enabled = false;
-
-            foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
-            {
-                //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
+            var go = manipulator.gameObject;
+//Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
                 if (go.gameObject.GetComponent<Collider>() != null)
                 {
                     go.gameObject.GetComponent<Collider>().isTrigger = false;
                     // block the object in the position otherwise it will fall
                     Rigidbody rb = go.gameObject.GetComponent<Rigidbody>();
                     rb.isKinematic = false;
-                    rb.useGravity = true;
-                    rb.constraints = RigidbodyConstraints.None;
+                    //DEMO, if not demo anymore use only the content of the first if
+                    if(!manipulator.gameObject.name.Contains("Bullet"))
+                    {
+                        rb.useGravity = true;
+                        rb.constraints = RigidbodyConstraints.None;
+                    }
+                    else //if it's bullet
+                    {
+                        rb.useGravity = false;
+                        rb.isKinematic = true;
+                    }
+                    
 
                     Physics.SyncTransforms();
                 }
-            }
+            
         }
 
         public void CreateProximityCube(GameObject proximityGameObject1, GameObject proximityGameObject2)

@@ -72,7 +72,8 @@ namespace UI
                         ChangeMaterial("proximity");
                         GeneralUIController.Instance.SetDebugText("The " + ProximityGameObject2.name + " is near to the " + ProximityGameObject1.name);
                         interactionCreationController.CreateProximityCube(ProximityGameObject1, ProximityGameObject2);
-                       
+                        GeneralUIController.Instance.InteractionCreationController.CategoryController.CustomizeCategoryMenu(ProximityGameObject2);
+
                     }
                 }
                 else
@@ -81,7 +82,8 @@ namespace UI
                     ProximityGameObject1 = other.gameObject; //set the object to be used in the rule creation
                     Debug.Log("ProximityGameObject1: " + ProximityGameObject1.name);
                     ChangeMaterial("highlight");
-
+                    // Activate CategoryMenu
+                    GeneralUIController.Instance.InteractionCreationController.CategoryController.CustomizeCategoryMenu(ProximityGameObject1);
                 }
                 
             }
