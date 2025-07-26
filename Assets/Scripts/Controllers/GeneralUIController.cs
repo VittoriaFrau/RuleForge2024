@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Controllers;
+using RulePlate.Core;
 using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
@@ -18,10 +19,16 @@ namespace UI
         public bool isRecording = false;
         private GameObject _selectedObject;
         public List<ECAEvent> recordedEvents = new();
-        public List<MeanwhileEvent> activeMeanwhileEvents = new List<MeanwhileEvent>();
-        public Dictionary<GameObject, Vector3> initialPositions = new Dictionary<GameObject, Vector3>();
+        public List<MeanwhileEvent> activeMeanwhileEvents = new ();
+        public Dictionary<GameObject, Vector3> initialPositions = new ();
         public Material spawnMaterial;
         public GameObject existingRuleOptionsUI;
+        private List<ECARule> activeRules = new();
+        public List<ECARule> ActiveRules
+        {
+            get => activeRules;
+            set => activeRules = value;
+        }
         
         //All controllers TODO have one of each and always call them in all the files
         private EditModeController _editModeController;
@@ -216,8 +223,6 @@ namespace UI
             Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
         }
         
-        
-
         public void SetSelectedObject(GameObject _selectedObject)
         {
             this._selectedObject = _selectedObject;
@@ -235,6 +240,7 @@ namespace UI
             this.text.text = text;
         }
         
+        //TODO remove and use the ones in ECAObject
         private void RegisterInitialPosition(GameObject obj)
         {
             if (!initialPositions.ContainsKey(obj))

@@ -8,6 +8,7 @@ using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
 using MixedReality.Toolkit.Subsystems;
+using RulePlate.Core;
 using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
@@ -27,8 +28,7 @@ namespace UI
         private List<MeanwhileEvent> activeMeanwhileRules = new List<MeanwhileEvent>();
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
-        private Dictionary<GameObject, InteractionCreationController.Modalities> gameObjectsWithBindings = new ();
-        private Dictionary<GameObject, Coroutine> pointingCoroutines = new();
+        private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
         private bool isLaunching = false;
 
 
@@ -71,54 +71,88 @@ namespace UI
 
         public void ActivateCombineRules(bool startFromScratch = true)
         {
+            var recordedEvents = GeneralUIController.Instance.recordedEvents;
 
-            if (GeneralUIController.Instance.recordedEvents.Count == 0)
+            // If there are no recorded events, show a message and display the UI menu
+            if (recordedEvents.Count == 0)
             {
-                GeneralUIController.Instance.SetDebugText(
-                    "No recorded actions, please use the record button to record actions");
-                GeneralUIController.Instance._handMenuManager.menuContentCanvas.SetActive(true);
-                GeneralUIController.Instance._handMenuManager.debugPanel.SetActive(true);
-                GeneralUIController.Instance._handMenuManager.mainMenu.SetActive(true);
+                GeneralUIController.Instance.SetDebugText("No recorded actions, please use the record button to record actions");
+        
+                var menuManager = GeneralUIController.Instance._handMenuManager;
+                menuManager.menuContentCanvas.SetActive(true);
+                menuManager.debugPanel.SetActive(true);
+                menuManager.mainMenu.SetActive(true);
                 GeneralUIController.Instance.UIstate = GeneralUIController.UIState.Default;
                 return;
             }
 
-            //Set the rule plate visible
-            if (activeRulePlate == null || startFromScratch)
+            // Determine which events to use:
+            // - If creating a rule for the first time, use all recorded events
+            // - If a rule plate already exists, and startingFromScratch is true,
+            // use only events that are not already in the plate
+            // - Otherwise, only generate cubes for events not already in the plate (CubeID == 0)
+            List<ECAEvent> eventsToGenerate;
+            if (activeRulePlate == null)
             {
+                // Case 1: First time creating a rule — use all events
+                eventsToGenerate = recordedEvents;
+            }
+            else
+            {
+                // Case 2 & 3: Only generate cubes for events not already in the plate
+                eventsToGenerate = recordedEvents.Where(e => e.CubeID == 0).ToList();
+            }
+
+            // If starting from scratch, create a new ruleplate and set it as active
+            if (startFromScratch)
+            {
+                // Instantiate a new rule plate and cache its references
                 activeRulePlate = Instantiate(ruleEditorPlatePrefab, ruleEditorPlatePrefab.transform.parent);
-                activeRulePlate.SetActive(true);
                 CacheReferencesCurrentRulePlate();
-            }
-            else // there is already a rule plate
-            {
                 activeRulePlate.SetActive(true);
-                if (!startFromScratch)
-                {
-                    List<ECAEvent> recordedEventsNotInRulePlate = GeneralUIController.Instance.recordedEvents
-                        .Where(x => x.CubeID == 0).ToList();
-                    Debug.Log($"Recorded events not in rule plate: {recordedEventsNotInRulePlate.Count}");
-                    Utils.GenerateCubesFromEventList(recordedEventsNotInRulePlate,
-                        modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate);
-                    removableBarrier.SetActive(false);
-                    return;
-                }
+
+                // Position the rule plate in front of the camera and enable the physical barrier
+                PositionRulePlateInFrontOfUser();
+                removableBarrier.SetActive(true);
             }
-            
-            // Position the rule plate using the view of the main camera and add a small offset for the upper view
-            activeRulePlate.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 3.0f;
-            activeRulePlate.transform.localPosition = new Vector3(activeRulePlate.transform.localPosition.x, -1036f,
-                activeRulePlate.transform.localPosition.z);
+            else
+            {
+                // If not starting from scratch, a rule plate already exists
+                activeRulePlate.SetActive(true);
+            }
 
-            //Barrier to prevent the cubes from falling
-            removableBarrier.SetActive(true);
+            Debug.Log($"Generating {eventsToGenerate.Count} cube(s) for rule plate");
 
-            Utils.GenerateCubesFromEventList(GeneralUIController.Instance.recordedEvents,
-                modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant, cubePlate);
+            // Generate cubes in the UI from the selected list of events
+            Utils.GenerateCubesFromEventList(
+                eventsToGenerate,
+                modalityRuleCubePrefab,
+                actionRuleCubePrefab,
+                actionRuleCubePrefabVariant,
+                cubePlate);
 
+            // Hide the physical barrier after generation
             removableBarrier.SetActive(false);
 
-            InitializeVariables();
+            // Initialize any rule-specific state variables if we are starting from scratch
+            if (startFromScratch)
+            {
+                InitializeVariables();
+            }
+        }
+
+        
+        private void PositionRulePlateInFrontOfUser()
+        {
+            // Place the rule plate 3 units in front of the camera and slightly offset vertically
+            Vector3 cameraForward = Camera.main.transform.forward;
+            Vector3 cameraPosition = Camera.main.transform.position;
+
+            activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
+            activeRulePlate.transform.localPosition = new Vector3(
+                activeRulePlate.transform.localPosition.x,
+                -1036f,
+                activeRulePlate.transform.localPosition.z);
         }
 
 
@@ -411,7 +445,23 @@ namespace UI
         {
             Debug.Log("Starting CalculateRule...");
 
-            RuleEngine ruleEngine = RuleEngine.GetInstance();
+            ECARule rule = BuildECARule();
+            GeneralUIController.Instance.ActiveRules.Add(rule);
+
+            foreach (var r in GeneralUIController.Instance.ActiveRules)
+            {
+                if (r != null)
+                {
+                    Debug.Log(r.ToString());
+                    BindECARule(r);
+                }
+            }
+
+            Debug.Log("Finished CalculateRule.");
+        }
+        
+        private ECARule BuildECARule()
+        {
 
             ECAEvent[] whenEvents = GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
             ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
@@ -428,73 +478,161 @@ namespace UI
             if (whenEvents.Length == 0 && meanwhileEventsSequential.Length == 0)
             {
                 Debug.LogWarning("No 'when' events or sequential meanwhile rules found. Aborting rule calculation.");
-                return;
+                return null;
             }
 
-            eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
+            List<MeanwhileEvent> allMeanwhileEvents = new List<MeanwhileEvent>();
+            allMeanwhileEvents.AddRange(meanwhileEventsSequential);
+            allMeanwhileEvents.AddRange(meanwhileEventsEquivalence);
 
-            foreach (var whenEvent in whenEvents)
+            ECARule rule;
+            if (allMeanwhileEvents.Count > 0)
             {
-                GameObject whenGameObject = whenEvent.ObjectRef;
-                Debug.Log($"Binding 'when' event: {whenEvent} on GameObject: {(whenGameObject != null ? whenGameObject.name : "null")}");
-                BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
+                rule = new ECARule(allMeanwhileEvents, new List<ECAEvent>(thenEvents));
             }
-
-            if ((meanwhileEventsSequential.Length > 0 || meanwhileEventsEquivalence.Length > 0) &&
-                GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
+            else
             {
-                foreach (var meanwhileRule in meanwhileEventsSequential)
-                {
-                    if (!activeMeanwhileRules.Contains(meanwhileRule))
-                    {
-                        activeMeanwhileRules.Add(meanwhileRule);
-                        Debug.Log($"Added sequential meanwhile rule: {meanwhileRule}");
-                    }
+                List<ECAEvent> allWhenEvents = new List<ECAEvent>(whenEvents);
+                if (equivalenceEvents.Length > 0)
+                    allWhenEvents.Add(equivalenceEvents[0]);
 
-                    foreach (var meanwhileEvent in meanwhileRule.events)
-                    {
-                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
-                        {
-                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
-                            Debug.Log($"Binding sequential meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
-                            eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
-                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
-                        }
-                    }
-                }
-
-                foreach (var meanwhileRule in meanwhileEventsEquivalence)
-                {
-                    if (!activeMeanwhileRules.Contains(meanwhileRule))
-                    {
-                        activeMeanwhileRules.Add(meanwhileRule);
-                        Debug.Log($"Added equivalence meanwhile rule: {meanwhileRule}");
-                    }
-
-                    foreach (var meanwhileEvent in meanwhileRule.events)
-                    {
-                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
-                        {
-                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
-                            Debug.Log($"Binding equivalence meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
-                            eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
-                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
-                        }
-                    }
-                }
+                rule = new ECARule(allWhenEvents, new List<ECAEvent>(thenEvents));
             }
 
-            if (equivalenceEvents.Length > 0)
-            {
-                ECAEvent equivalenceEvent = equivalenceEvents[0];
-                GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
-                Debug.Log($"Binding equivalence event: {equivalenceEvent} on GameObject: {equivalenceGameObject.name}");
-                BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
-            }
-
-            Debug.Log("Finished CalculateRule.");
+            return rule;
         }
 
+        private void BindECARule(ECARule rule)
+        {
+            if (rule == null)
+                return;
+
+            RuleEngine ruleEngine = RuleEngine.GetInstance();
+            eventSequenceTracker = new EventSequenceTracker(rule.Actions.ToArray(), rule.Actions.ToArray(), ruleEngine);
+
+            // Bind normali ECAEvent
+            if (rule.Events != null)
+            {
+                foreach (var ecaEvent in rule.Events)
+                {
+                    GameObject obj = ecaEvent.ObjectRef;
+                    Debug.Log($"Binding 'when/equivalence' event: {ecaEvent} on GameObject: {(obj != null ? obj.name : "null")}");
+                    BindEvent(obj, ecaEvent, eventSequenceTracker, true);  // true se vuoi trattarlo come equivalence, puoi modularlo
+                }
+            }
+
+            // Bind MeanwhileEvent
+            if (rule.MeanwhileEvents != null)
+            {
+                foreach (var meanwhileRule in rule.MeanwhileEvents)
+                {
+                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    {
+                        activeMeanwhileRules.Add(meanwhileRule);
+                        Debug.Log($"Added meanwhile rule: {meanwhileRule}");
+                    }
+
+                    foreach (var mEvent in meanwhileRule.events)
+                    {
+                        if (mEvent.Modality != InteractionCreationController.Modalities.Speech)
+                        {
+                            GameObject obj = mEvent.ObjectRef;
+                            Debug.Log($"Binding meanwhile event: {mEvent} on GameObject: {obj.name}");
+                            eventSequenceTracker = new EventSequenceTracker(new[] { mEvent }, rule.Actions.ToArray(), ruleEngine);
+                            BindEvent(obj, mEvent, eventSequenceTracker, false, meanwhileRule);
+                        }
+                    }
+                }
+            }
+        }
+        
+        /* public void CalculateRule()
+         {
+             Debug.Log("Starting CalculateRule...");
+
+             RuleEngine ruleEngine = RuleEngine.GetInstance();
+
+             ECAEvent[] whenEvents = GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+             ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
+
+             MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+             MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+
+             currentThenEvents = thenEvents;
+
+             Debug.Log($"Found {whenEvents.Length} 'when' events, {equivalenceEvents.Length} 'equivalence' events, and {thenEvents.Length} 'then' events.");
+             Debug.Log($"Found {meanwhileEventsSequential.Length} sequential meanwhile rules and {meanwhileEventsEquivalence.Length} equivalence meanwhile rules.");
+
+             if (whenEvents.Length == 0 && meanwhileEventsSequential.Length == 0)
+             {
+                 Debug.LogWarning("No 'when' events or sequential meanwhile rules found. Aborting rule calculation.");
+                 return;
+             }
+
+             eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
+
+             foreach (var whenEvent in whenEvents)
+             {
+                 GameObject whenGameObject = whenEvent.ObjectRef;
+                 Debug.Log($"Binding 'when' event: {whenEvent} on GameObject: {(whenGameObject != null ? whenGameObject.name : "null")}");
+                 BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
+             }
+
+             if ((meanwhileEventsSequential.Length > 0 || meanwhileEventsEquivalence.Length > 0) &&
+                 GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
+             {
+                 foreach (var meanwhileRule in meanwhileEventsSequential)
+                 {
+                     if (!activeMeanwhileRules.Contains(meanwhileRule))
+                     {
+                         activeMeanwhileRules.Add(meanwhileRule);
+                         Debug.Log($"Added sequential meanwhile rule: {meanwhileRule}");
+                     }
+
+                     foreach (var meanwhileEvent in meanwhileRule.events)
+                     {
+                         if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+                         {
+                             GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                             Debug.Log($"Binding sequential meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
+                             eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
+                             BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                         }
+                     }
+                 }
+
+                 foreach (var meanwhileRule in meanwhileEventsEquivalence)
+                 {
+                     if (!activeMeanwhileRules.Contains(meanwhileRule))
+                     {
+                         activeMeanwhileRules.Add(meanwhileRule);
+                         Debug.Log($"Added equivalence meanwhile rule: {meanwhileRule}");
+                     }
+
+                     foreach (var meanwhileEvent in meanwhileRule.events)
+                     {
+                         if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+                         {
+                             GameObject eventGameObject = meanwhileEvent.ObjectRef;
+                             Debug.Log($"Binding equivalence meanwhile event: {meanwhileEvent} on GameObject: {eventGameObject.name}");
+                             eventSequenceTracker = new EventSequenceTracker(new[] { meanwhileEvent }, thenEvents, ruleEngine);
+                             BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+                         }
+                     }
+                 }
+             }
+
+             if (equivalenceEvents.Length > 0)
+             {
+                 ECAEvent equivalenceEvent = equivalenceEvents[0];
+                 GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
+                 Debug.Log($"Binding equivalence event: {equivalenceEvent} on GameObject: {equivalenceGameObject.name}");
+                 BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
+             }
+
+             Debug.Log("Finished CalculateRule.");
+         }*/
 
 
         private MeanwhileEvent[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
@@ -661,9 +799,24 @@ namespace UI
         
         private void BindModalityEvent(GameObject target, ECAEvent eventToBind, Action<ECAEvent> triggerAction)
         {
-            if(target!=null)  gameObjectsWithBindings.Add(target, eventToBind.Modality); // Store the modality for unbinding later
+            if (target == null)
+            {
+                Debug.LogWarning("Target is null in BindModalityEvent.");
+                return;
+            }
             
-            switch (eventToBind.Modality)
+            var modality = eventToBind.Modality;
+
+            if (HasBinding(target, modality))
+            {
+                Debug.Log($"Modality {modality} already bound for {target.name}, skipping.");
+                return;
+            }
+
+            // Store the modality for unbinding later
+            AddBinding(target, modality);
+            
+            switch (modality)
             {
                 case InteractionCreationController.Modalities.Touch:
                     BindTouchEvent(target, eventToBind, triggerAction);
@@ -876,39 +1029,44 @@ namespace UI
         public void UnbindAllEvents()
         {
 
-            foreach (GameObject go in gameObjectsWithBindings.Keys)
+            foreach (var pair in gameObjectsWithBindings)
             {
-                ObjectManipulator manipulator = go.GetComponent<ObjectManipulator>();
-                switch (gameObjectsWithBindings[go])
-                {
-                    case InteractionCreationController.Modalities.Touch:
-                        if (manipulator != null)
-                        {
-                            manipulator.OnClicked.RemoveAllListeners();
-                            manipulator.selectEntered.RemoveAllListeners();
-                            manipulator.selectExited.RemoveAllListeners();
-                        }
-                        break;
-                    case InteractionCreationController.Modalities.Laser:
-                        if (manipulator != null)
-                        {
-                            manipulator.hoverEntered.RemoveAllListeners();
-                            manipulator.hoverExited.RemoveAllListeners();
-                        }
-                        break;
-                        case InteractionCreationController.Modalities.Headgaze:
-                        var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
-                        if (gazeInteractor != null)
-                        {
-                            gazeInteractor.hoverEntered.RemoveAllListeners();
-                            gazeInteractor.hoverExited.RemoveAllListeners();
-                        }
+                GameObject go = pair.Key;
+                var modalities = pair.Value;
 
-                        break;
-                            
+                foreach (var modality in modalities)
+                {
+                    var manipulator = go.GetComponent<ObjectManipulator>();
+                    switch (modality)
+                    {
+                        case InteractionCreationController.Modalities.Touch:
+                            if (manipulator != null)
+                            {
+                                manipulator.OnClicked.RemoveAllListeners();
+                                manipulator.selectEntered.RemoveAllListeners();
+                                manipulator.selectExited.RemoveAllListeners();
+                            }
+                            break;
+                        case InteractionCreationController.Modalities.Laser:
+                            if (manipulator != null)
+                            {
+                                manipulator.hoverEntered.RemoveAllListeners();
+                                manipulator.hoverExited.RemoveAllListeners();
+                            }
+                            break;
+                        case InteractionCreationController.Modalities.Headgaze:
+                            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+                            if (gazeInteractor != null)
+                            {
+                                gazeInteractor.hoverEntered.RemoveAllListeners();
+                                gazeInteractor.hoverExited.RemoveAllListeners();
+                            }
+
+                            break;
+                    }
                 }
-                
             }
+            
             // controllers
             var triggerInput = interactionCreationController.GetTriggerActionReference();
             if (triggerInput != null && triggerInput.action != null)
@@ -917,7 +1075,24 @@ namespace UI
             }
             
             //TODO proximity unbind
+            
+            gameObjectsWithBindings.Clear();
         }
+        
+        public void AddBinding(GameObject go, InteractionCreationController.Modalities modality)
+        {
+            if (!gameObjectsWithBindings.ContainsKey(go))
+            {
+                gameObjectsWithBindings[go] = new HashSet<InteractionCreationController.Modalities>();
+            }
+            gameObjectsWithBindings[go].Add(modality);
+        }
+
+        public bool HasBinding(GameObject go, InteractionCreationController.Modalities modality)
+        {
+            return gameObjectsWithBindings.ContainsKey(go) && gameObjectsWithBindings[go].Contains(modality);
+        }
+
         
        
 
