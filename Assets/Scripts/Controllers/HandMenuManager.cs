@@ -175,6 +175,11 @@ namespace UI.RuleEditor
                     ecaPropsButtons.ForEach(button => button.SetActive(true));
                     break;
             }
+
+            if (GeneralUIController.Instance.isRecording)
+            {
+                HideRecordButtonInEditMenu();
+            } 
         }
 
         public void HideRecordButtonInEditMenu()
