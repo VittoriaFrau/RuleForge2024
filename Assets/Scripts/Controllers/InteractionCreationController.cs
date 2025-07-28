@@ -1149,17 +1149,20 @@ namespace UI
 
         public void CreateProximityCube(GameObject proximityGameObject1, GameObject proximityGameObject2)
         {
+            //DEMO, if not demo use null instead of load png
             ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near",
-                proximityGameObject2, null, false);
+                proximityGameObject2, Utils.LoadPNG("Assets/Resources/Icons/bulletRockProximity.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch, ecaEvent);
+                //DEMO if not demo decomment
+                //PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch, ecaEvent);
             }
         }
 
         public void PrepareForActionScreenShot(GameObject gameObject)
         {
+            Debug.Log("Preparing for action screenshot for " + gameObject.name);
             handMenuManager.ChangeMenuVisibility(false); // makes the handmenu disappear
             _screenshotCamera.TakeActionScreenshot(gameObject, GeneralUIController.Instance.recordedEvents.Last());
             handMenuManager.ChangeMenuVisibility(true); // makes the handmenu reappear

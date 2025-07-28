@@ -26,7 +26,7 @@ namespace UI
         [FormerlySerializedAs("ruleEditorPlate")] public GameObject ruleEditorPlatePrefab;
         public GameObject activeRulePlate;
         public GameObject modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
-        private List<MeanwhileEvent> activeMeanwhileRules = new List<MeanwhileEvent>();
+        private List<MeanwhileEvent> activeMeanwhileEvents = new();
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
         private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
@@ -61,7 +61,7 @@ namespace UI
         
         private void Update()
         {
-            foreach (var rule in activeMeanwhileRules)
+            foreach (var rule in activeMeanwhileEvents)
             {
                 if (rule != null)
                 {
@@ -145,15 +145,23 @@ namespace UI
         
         private void PositionRulePlateInFrontOfUser()
         {
-            // Place the rule plate 3 units in front of the camera and slightly offset vertically
-            Vector3 cameraForward = Camera.main.transform.forward;
-            Vector3 cameraPosition = Camera.main.transform.position;
+            if (GeneralUIController.Instance._handMenuManager.isUsingOculusLink)
+            {
+                activeRulePlate.transform.localPosition = new Vector3(-1118f, -973f, 5015f);
+                activeRulePlate.transform.localRotation = new Quaternion(0f,267.89386f,0f, activeRulePlate.transform.localRotation.w);
+            }
+            else
+            {
+                // Place the rule plate 3 units in front of the camera and slightly offset vertically
+                Vector3 cameraForward = Camera.main.transform.forward;
+                Vector3 cameraPosition = Camera.main.transform.position;
 
-            activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
-            activeRulePlate.transform.localPosition = new Vector3(
-                activeRulePlate.transform.localPosition.x,
-                -1036f,
-                activeRulePlate.transform.localPosition.z);
+                activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
+                activeRulePlate.transform.localPosition = new Vector3(
+                    activeRulePlate.transform.localPosition.x,
+                    -1036f,
+                    activeRulePlate.transform.localPosition.z);
+            }
         }
 
 
@@ -402,7 +410,7 @@ namespace UI
                 GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
                 new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
-            MeanwhileEvent [] meanwhileEvents = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            MeanwhileEvent [] meanwhileEvents = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
 
             currentThenEvents = thenEvents;
 
@@ -426,9 +434,9 @@ namespace UI
                 foreach (var meanwhileRule in meanwhileEvents)
                 {
                     // Add the rule to activeMeanwhileEvents 
-                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    if (!activeMeanwhileEvents.Contains(meanwhileRule))
                     {
-                        activeMeanwhileRules.Add(meanwhileRule);
+                        activeMeanwhileEvents.Add(meanwhileRule);
                     }
                     foreach (var meanwhileEvent in meanwhileRule.events)
                     {
@@ -479,8 +487,8 @@ namespace UI
             ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
-            MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
-            MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+            MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+            MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
 
             currentThenEvents = thenEvents;
 
@@ -500,7 +508,9 @@ namespace UI
             ECARule rule;
             if (allMeanwhileEvents.Count > 0)
             {
-                rule = new ECARule(allMeanwhileEvents, new List<ECAEvent>(thenEvents));
+                // If there are meanwhile events, we create a rule with them
+                rule = new ECARule(new List<ECAEvent>(whenEvents), new List<ECAEvent>(thenEvents));
+                rule.MeanwhileEvents = allMeanwhileEvents;
             }
             else
             {
@@ -542,9 +552,9 @@ namespace UI
             {
                 foreach (var meanwhileRule in rule.MeanwhileEvents)
                 {
-                    if (!activeMeanwhileRules.Contains(meanwhileRule))
+                    if (!activeMeanwhileEvents.Contains(meanwhileRule))
                     {
-                        activeMeanwhileRules.Add(meanwhileRule);
+                        activeMeanwhileEvents.Add(meanwhileRule);
                         Debug.Log($"Added meanwhile rule: {meanwhileRule}");
                     }
 
@@ -572,8 +582,8 @@ namespace UI
              ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
              ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
-             MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileRulesFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
-             MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileRulesFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+             MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+             MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
 
              currentThenEvents = thenEvents;
 
@@ -600,9 +610,9 @@ namespace UI
              {
                  foreach (var meanwhileRule in meanwhileEventsSequential)
                  {
-                     if (!activeMeanwhileRules.Contains(meanwhileRule))
+                     if (!activeMeanwhileEvents.Contains(meanwhileRule))
                      {
-                         activeMeanwhileRules.Add(meanwhileRule);
+                         activeMeanwhileEvents.Add(meanwhileRule);
                          Debug.Log($"Added sequential meanwhile rule: {meanwhileRule}");
                      }
 
@@ -620,9 +630,9 @@ namespace UI
 
                  foreach (var meanwhileRule in meanwhileEventsEquivalence)
                  {
-                     if (!activeMeanwhileRules.Contains(meanwhileRule))
+                     if (!activeMeanwhileEvents.Contains(meanwhileRule))
                      {
-                         activeMeanwhileRules.Add(meanwhileRule);
+                         activeMeanwhileEvents.Add(meanwhileRule);
                          Debug.Log($"Added equivalence meanwhile rule: {meanwhileRule}");
                      }
 
@@ -651,13 +661,13 @@ namespace UI
          }*/
 
 
-        private MeanwhileEvent[] GetMeanwhileRulesFromContainers(GameObject row, string[] containerNames)
+        private MeanwhileEvent[] GetMeanwhileEventsFromContainers(GameObject row, string[] containerNames)
         {
             var allContainers = GetAllCubeContainers(row, containerNames);
 
             return allContainers
                 .Select(container =>
-                    Utils.GetMeanwhileRuleFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileEvents))
+                    Utils.GetMeanwhileEventFromCube(container.currentCube, GeneralUIController.Instance.activeMeanwhileEvents))
                 .Where(rule => rule != null)
                 .ToArray();
         }
@@ -1052,41 +1062,41 @@ namespace UI
         
         public void UnbindAllEvents()
         {
-
             foreach (var pair in gameObjectsWithBindings)
             {
                 GameObject go = pair.Key;
                 var modalities = pair.Value;
 
-                foreach (var modality in modalities)
-                {
-                    var manipulator = go.GetComponent<ObjectManipulator>();
-                    switch (modality)
-                    {
-                        case InteractionCreationController.Modalities.Touch:
-                            if (manipulator != null)
-                            {
-                                manipulator.OnClicked.RemoveAllListeners();
-                                manipulator.selectEntered.RemoveAllListeners();
-                                manipulator.selectExited.RemoveAllListeners();
-                            }
-                            break;
-                        case InteractionCreationController.Modalities.Laser:
-                            if (manipulator != null)
-                            {
-                                manipulator.hoverEntered.RemoveAllListeners();
-                                manipulator.hoverExited.RemoveAllListeners();
-                            }
-                            break;
-                        case InteractionCreationController.Modalities.Headgaze:
-                            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
-                            if (gazeInteractor != null)
-                            {
-                                gazeInteractor.hoverEntered.RemoveAllListeners();
-                                gazeInteractor.hoverExited.RemoveAllListeners();
-                            }
+                if(go){
+                    foreach (var modality in modalities){
+                        var manipulator = go.GetComponent<ObjectManipulator>();
+                        switch (modality)
+                        {
+                            case InteractionCreationController.Modalities.Touch:
+                                if (manipulator != null)
+                                {
+                                    manipulator.OnClicked.RemoveAllListeners();
+                                    manipulator.selectEntered.RemoveAllListeners();
+                                    manipulator.selectExited.RemoveAllListeners();
+                                }
+                                break;
+                            case InteractionCreationController.Modalities.Laser:
+                                if (manipulator != null)
+                                {
+                                    manipulator.hoverEntered.RemoveAllListeners();
+                                    manipulator.hoverExited.RemoveAllListeners();
+                                }
+                                break;
+                            case InteractionCreationController.Modalities.Headgaze:
+                                var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+                                if (gazeInteractor != null)
+                                {
+                                    gazeInteractor.hoverEntered.RemoveAllListeners();
+                                    gazeInteractor.hoverExited.RemoveAllListeners();
+                                }
 
-                            break;
+                                break;
+                        }
                     }
                 }
             }

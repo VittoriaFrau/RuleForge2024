@@ -544,7 +544,7 @@ namespace UI
             return e;
         }
 
-        public static MeanwhileEvent GetMeanwhileRuleFromCube(GameObject cube, List<MeanwhileEvent> recordedMeanwhiles)
+        public static MeanwhileEvent GetMeanwhileEventFromCube(GameObject cube, List<MeanwhileEvent> recordedMeanwhiles)
         {
             MeanwhileCubeController cubeController = cube.GetComponent<MeanwhileCubeController>();
             if (cubeController == null)
@@ -597,6 +597,7 @@ namespace UI
             if (cubeLevel < 2)
             {
                 Material material = new Material(Shader.Find("Standard"));
+                Debug.Log("Texture array length: " + texture.Length);
                 material.mainTexture = texture[0];
                 Renderer renderer = cube.GetComponent<Renderer>();
                 renderer.material = material;
@@ -605,7 +606,7 @@ namespace UI
             }
             else
             {
-                
+                Debug.Log("Texture array length: " + texture.Length);
                 // Check if the texture array contains valid textures
                 if (texture == null || texture.Length < 2 || texture[0] == null || texture[1] == null)
                 {
