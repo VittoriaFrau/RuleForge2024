@@ -466,7 +466,10 @@ namespace UI
             Debug.Log("Starting CalculateRule...");
 
             ECARule rule = BuildECARule();
-            GeneralUIController.Instance.ActiveRules.Add(rule);
+            if(!GeneralUIController.Instance.ActiveRules.Contains(rule))
+            {
+                GeneralUIController.Instance.ActiveRules.Add(rule);
+            }
 
             foreach (var r in GeneralUIController.Instance.ActiveRules)
             {
