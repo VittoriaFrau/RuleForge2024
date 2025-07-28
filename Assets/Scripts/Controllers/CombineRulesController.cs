@@ -805,6 +805,7 @@ namespace UI
 
             if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
             {
+                //if the event is bound to a single object, we bind it directly to that object
                 BindModalityEvent(target, eventToBind, triggerAction);
             }
             else if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.Category)

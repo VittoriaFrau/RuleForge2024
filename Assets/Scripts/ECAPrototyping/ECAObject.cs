@@ -263,6 +263,12 @@ namespace ECAPrototyping.RuleEngine
                     duplicate.name = "new" + baseName + (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count - 1);
                 }
                 
+                //DEMO remove the block
+                if( duplicate.name.Contains("Bullet"))
+                {
+                    duplicate.AddComponent<ProximityTriggerListener>();
+                }
+                
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);

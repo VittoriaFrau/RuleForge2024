@@ -138,8 +138,13 @@ namespace UI
                         subject = latestDuplicate;
                     }
                 }
-
-                ruleEngine.ExecuteAction(action);
+    
+                //DEMO. if not needed, remove this block and leave the execute action only
+                if (thenEvent.Verb.Contains("explodes"))
+                {
+                    
+                }
+                else ruleEngine.ExecuteAction(action);
                 // the duplicates are not considered in the opposite actions because they will be destroyed 
                 //if the subject is not a duplicate, we can add the opposite action
                 // or if the UIState is in edit mode, in play we delete

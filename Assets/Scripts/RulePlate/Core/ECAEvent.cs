@@ -166,6 +166,9 @@ namespace UI
 
                 case InteractionCreationController.Modalities.Controller when ObjectRef == null:
                     return "The user presses the trigger";
+                
+                case InteractionCreationController.Modalities.Proximity:
+                    return Subject + Verb + ObjectStr;
             }
 
             if (EventStr != null && Verb != null && EventStr != null)
