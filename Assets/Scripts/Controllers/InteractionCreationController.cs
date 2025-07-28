@@ -777,25 +777,24 @@ namespace UI
 
         public void RecordInteraction()
         {
-            if (_modality == Modalities.Speech)
+            switch (_modality)
             {
-                GeneralUIController.Instance.SetDebugText("Recording started. Please, speak to the microphone");
+                case Modalities.Speech:
+                    GeneralUIController.Instance.SetDebugText("Recording started. Please, speak to the microphone");
+                    break;
+                case Modalities.Proximity:
+                    GeneralUIController.Instance.SetDebugText(
+                        "Recording started. Please, use the proximity cube as trigger");
+                    break;
+                case Modalities.None:
+                    Debug.Log("No modality selected");
+                    GeneralUIController.Instance.SetDebugText("No modality selected, please select one");
+                    return;
+                default:
+                    GeneralUIController.Instance.SetDebugText("Recording started. Please, interact with an object");
+                    break;
             }
-
-            if (_modality == Modalities.Proximity)
-            {
-                GeneralUIController.Instance.SetDebugText(
-                    "Recording started. Please, use the proximity cube as trigger");
-            }
-            else GeneralUIController.Instance.SetDebugText("Recording started. Please, interact with an object");
-
-            if (_modality == Modalities.None)
-            {
-                Debug.Log("No modality selected");
-                GeneralUIController.Instance.SetDebugText("No modality selected, please select one");
-                return;
-            }
-
+            
             recordInteractionButton.SetActive(false);
             stopInteractionButton.SetActive(true);
 
