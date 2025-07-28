@@ -506,7 +506,10 @@ namespace UI
             {
                 List<ECAEvent> allWhenEvents = new List<ECAEvent>(whenEvents);
                 if (equivalenceEvents.Length > 0)
+                {
+                    equivalenceEvents[0].IsEquivalenceEvent = true;
                     allWhenEvents.Add(equivalenceEvents[0]);
+                }
 
                 rule = new ECARule(allWhenEvents, new List<ECAEvent>(thenEvents));
             }
@@ -520,7 +523,7 @@ namespace UI
                 return;
 
             RuleEngine ruleEngine = RuleEngine.GetInstance();
-            eventSequenceTracker = new EventSequenceTracker(rule.Actions.ToArray(), rule.Actions.ToArray(), ruleEngine);
+            eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), rule.Actions.ToArray(), ruleEngine);
 
             // Bind normali ECAEvent
             if (rule.Events != null)
@@ -529,7 +532,8 @@ namespace UI
                 {
                     GameObject obj = ecaEvent.ObjectRef;
                     Debug.Log($"Binding 'when/equivalence' event: {ecaEvent} on GameObject: {(obj != null ? obj.name : "null")}");
-                    BindEvent(obj, ecaEvent, eventSequenceTracker, true);  // true se vuoi trattarlo come equivalence, puoi modularlo
+                    var isEquivalence = ecaEvent.IsEquivalenceEvent;
+                    BindEvent(obj, ecaEvent, eventSequenceTracker, isEquivalence); 
                 }
             }
 
@@ -811,14 +815,22 @@ namespace UI
         
         private void BindModalityEvent(GameObject target, ECAEvent eventToBind, Action<ECAEvent> triggerAction)
         {
-            if (target == null)
-            {
-                Debug.LogWarning("Target is null in BindModalityEvent.");
-                return;
-            }
-            
             var modality = eventToBind.Modality;
 
+            if (target == null)
+            {
+                // target can be null in case of controller or speech modality, where the event is not bound to a specific GameObject
+                if (modality == InteractionCreationController.Modalities.Controller || modality == InteractionCreationController.Modalities.Speech)
+                {
+                    target = this.gameObject; // Use the eventHandler itself
+                }
+                else
+                {
+                    Debug.LogWarning("Target GameObject is null, cannot bind event.");
+                    return;
+                }
+            }
+            
             if (HasBinding(target, modality))
             {
                 Debug.Log($"Modality {modality} already bound for {target.name}, skipping.");
