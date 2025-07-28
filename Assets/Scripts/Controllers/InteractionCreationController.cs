@@ -1130,7 +1130,7 @@ namespace UI
                     Rigidbody rb = go.gameObject.GetComponent<Rigidbody>();
                     rb.isKinematic = false;
                     //DEMO, if not demo anymore use only the content of the first if
-                    if(!manipulator.gameObject.name.Contains("Bullet"))
+                    if(!manipulator.gameObject.name.Contains("Bullet") && !manipulator.gameObject.name.Contains("Counter"))
                     {
                         rb.useGravity = true;
                         rb.constraints = RigidbodyConstraints.None;
