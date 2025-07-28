@@ -96,6 +96,23 @@ namespace UI
             {
                 return false;
             }
+            
+            // If it's category, we need to check the category and the subject
+            if (EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                if (Subject == e.Subject)
+                {
+                    if (modality == e.modality)
+                    {
+                        var latestECAScriptE = Utils.GetECALastScriptFromECAObject(e.ObjectRef);
+                        var latestECAScriptThis = Utils.GetECALastScriptFromECAObject(ObjectRef);
+                        if (latestECAScriptE != null && latestECAScriptThis != null)
+                        {
+                            return latestECAScriptE.Equals(latestECAScriptThis);
+                        }
+                    }
+                }
+            }
 
             if (!ReferenceEquals(ObjectRef, e.ObjectRef))
             {
@@ -124,29 +141,48 @@ namespace UI
 
         public override string ToString()
         {
-            if (modality == InteractionCreationController.Modalities.Microgesture)
-            {
-                return "The user performs " + EventStr + " microgesture";
-            }
-            if(modality == InteractionCreationController.Modalities.Speech)
-            {
-                return "The user says " + EventStr;
-            }
-
-            if (modality == InteractionCreationController.Modalities.Controller && ObjectRef == null)
-            {
-                return "The user presses the trigger";
-            }
             
             if (modality != InteractionCreationController.Modalities.None)
             {
-                if (EventStr != null && Verb != null && EventStr != null)
-                {
-                    return "The user " + EventStr + " " + Verb + " the " + ObjectRef.name + " object";
-                }
-                if (Verb != null) return "The user " + Verb + " the " + ObjectRef.name + " object";
-                if(EventStr == null && Verb == null) return "The user " + modality + " the " + ObjectRef.name + " object";
+                return ToStringModalityEvent();
             }
+            return ToStringActionEvent();
+        }
+
+        private string ToStringModalityEvent()
+        {
+            
+            // Handle specific modalities 
+            switch (modality)
+            {
+                case InteractionCreationController.Modalities.Microgesture:
+                    return $"The user performs {EventStr} microgesture";
+
+                case InteractionCreationController.Modalities.Speech:
+                    return $"The user says {EventStr}";
+
+                case InteractionCreationController.Modalities.Controller when ObjectRef == null:
+                    return "The user presses the trigger";
+            }
+
+            if (EventStr != null && Verb != null && EventStr != null)
+            {
+                return "The user " + EventStr + " " + Verb + " the " + ObjectRef.name + " object";
+            }
+            if (Verb != null) return "The user " + Verb + " the " + ObjectRef.name + " object";
+            if(EventStr == null && Verb == null) return "The user " + modality + " the " + ObjectRef.name + " object";
+            
+            return ObjectRef.name + " " + Verb + " " + ObjectStr;
+
+        }
+
+        private string ToStringActionEvent()
+        {
+            if(ObjectStr == null && ObjectRef == null)
+            {
+                return Subject + " " + Verb;
+            }
+            
             if(ObjectStr == null) return ObjectRef.name + " " + Verb;
             
             if(ObjectRef == null)
