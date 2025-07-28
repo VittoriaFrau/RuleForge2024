@@ -147,6 +147,10 @@ namespace UI
             }
             if(ObjectStr == null) return ObjectRef.name + " " + Verb;
             
+            if(ObjectRef == null)
+            {
+                return Subject + " " + Verb + " " + ObjectStr;
+            }
             return ObjectRef.name + " " + Verb + " " + ObjectStr;
         }
 
