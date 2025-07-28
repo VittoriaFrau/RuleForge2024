@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Controllers;
 using ECAPrototyping.RuleEngine;
 using MixedReality.Toolkit;
@@ -302,12 +303,23 @@ namespace UI
             UpdatePresentRule(); //Updates the textmeshpro variables with the current rule text
             string cubeDescription = Utils.GetRuleDescriptionFromCubePrefab(cube.gameObject);
             string formattedCubeDescription = cubeDescription.Replace("\n", " ");
+            //if we are adding text
             if (isAdded)
             {
                 string logicalOperator = containerType == ContainerType.Equivalence ? "OR" : ",";
                 Utils.GenerateTextFromCubePosition(rulePhase == RulePhase.When ? whenText : thenText,
                     formattedCubeDescription, logicalOperator);
+                if (rulePhase == RulePhase.Then)
+                {
+                    // Check if there is an any in the when phase
+                    if (whenText.text.Contains("any"))
+                    {
+                        // we remove the numbers from the then text, so it's more generic (e.g. "cube" instead of "cube1")
+                        thenText.text = Regex.Replace(thenText.text, @"\d+", "");
+                    }
+                }
             }
+            // if we are removing text
             else
             {
                 string logicalOperator = containerType == ContainerType.Equivalence ? "OR" : ",";
