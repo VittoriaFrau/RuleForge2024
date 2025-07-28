@@ -597,7 +597,6 @@ namespace UI
             if (cubeLevel < 2)
             {
                 Material material = new Material(Shader.Find("Standard"));
-                Debug.Log("Texture array length: " + texture.Length);
                 material.mainTexture = texture[0];
                 Renderer renderer = cube.GetComponent<Renderer>();
                 renderer.material = material;
@@ -606,7 +605,6 @@ namespace UI
             }
             else
             {
-                Debug.Log("Texture array length: " + texture.Length);
                 // Check if the texture array contains valid textures
                 if (texture == null || texture.Length < 2 || texture[0] == null || texture[1] == null)
                 {
@@ -745,8 +743,17 @@ namespace UI
             
             if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
             {
-                string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
-                labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                if (!string.IsNullOrEmpty(e.ObjectStr))
+                {
+                    string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
+                    labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                }
+                else
+                {
+                    string subjectNameWithoutNumber = Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
+                    labelTexts[2] = subjectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                }
+                
                 //if the modality is proximity, we do the same for the subject
                 if (e.Modality == InteractionCreationController.Modalities.Proximity)
                 {

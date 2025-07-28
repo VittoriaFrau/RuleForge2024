@@ -96,19 +96,22 @@ namespace UI
             {
                 return false;
             }
-            
-            // If it's category, we need to check the category and the subject
-            if (EventCategory == CategoryController.CategoryObjectSelected.Category)
+
+            if (e.modality != InteractionCreationController.Modalities.None)
             {
-                if (Subject == e.Subject)
+                // If it's category, we need to check the category and the subject
+                if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
                 {
-                    if (modality == e.modality)
+                    if (Subject == e.Subject)
                     {
-                        var latestECAScriptE = Utils.GetECALastScriptFromECAObject(e.ObjectRef);
-                        var latestECAScriptThis = Utils.GetECALastScriptFromECAObject(ObjectRef);
-                        if (latestECAScriptE != null && latestECAScriptThis != null)
+                        if (modality == e.modality)
                         {
-                            return latestECAScriptE.Equals(latestECAScriptThis);
+                            var latestECAScriptE = Utils.GetECALastScriptFromECAObject(e.ObjectRef);
+                            var latestECAScriptThis = Utils.GetECALastScriptFromECAObject(ObjectRef);
+                            if (latestECAScriptE != null && latestECAScriptThis != null)
+                            {
+                                return latestECAScriptE.Equals(latestECAScriptThis);
+                            }
                         }
                     }
                 }
