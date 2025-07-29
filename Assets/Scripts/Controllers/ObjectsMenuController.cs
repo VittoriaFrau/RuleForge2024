@@ -1,11 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
+using MixedReality.Toolkit.SpatialManipulation;
 using UI;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class ObjectsMenuController : MonoBehaviour
 {
@@ -90,17 +86,16 @@ public class ObjectsMenuController : MonoBehaviour
         uiElement.GetComponent<Rigidbody>().useGravity = false;
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
         uiElement.GetComponent<BoxCollider>().enabled = false;
-        uiElement.transform.position = new Vector3((float)-0.116, (float)1.575, (float)0.717);
+        uiElement.transform.localPosition = new Vector3((float)-0.116, (float)1.575, (float)0.717);
         
-        Transform[] children = uiElement.GetComponentsInChildren<Transform>(true);
-        foreach (Transform t in children)
-        {
-            if (t.name == "NonNativeKeyboard")
-            {
-                t.gameObject.SetActive(true);
-                break;
-            }
-        }
+        // Get the first child (NonNativeKeyboard) and set it active
+        var nonNativeKeyboard = uiElement.transform.GetChild(0).gameObject;
+        nonNativeKeyboard.SetActive(true);
+        nonNativeKeyboard.transform.GetChild(0).gameObject.SetActive(true);
+        //DEMO comfortable position
+        Destroy(nonNativeKeyboard.GetComponent<SolverHandler>());
+        nonNativeKeyboard.transform.localPosition = new Vector3(nonNativeKeyboard.transform.localPosition.x, 0, 3.26f);
+        //nonNativeKeyboard.AddComponent<SolverHandler>();
         return uiElement;
     }
     
