@@ -384,7 +384,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   minimumJoinTime: 2
   mergedCubePrefab: {fileID: 611475747482515778, guid: 0e30ef0c5d556bb45a8e8f20417963cc, type: 3}
-  scenarioMergedCubePrefab: {fileID: 0}
+  cubeID: 0
 --- !u!1 &957134968325256339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1907,11 +1907,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 96.661865
+      value: 94
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 51.007835
+      value: 49.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1951,6 +1955,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
+      propertyPath: m_SortingLayer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
