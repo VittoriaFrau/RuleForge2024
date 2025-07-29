@@ -134,7 +134,7 @@ public class CubeController : MonoBehaviour
         
         GameObject mergedCube = Utils.InstantiateRuleCube(mergedCubePrefab, 2, mergedPosition, cubePlate.transform, new []{copyTextureLeftCube, copyTextureRightCube});
 
-        mergedCube.transform.rotation = Quaternion.identity;
+        mergedCube.transform.rotation = new Quaternion(0, -190f, 0, 0);
         mergedCube.transform.localScale = new Vector3(25, 25, 25);
         mergedCube.transform.localPosition = mergedPosition;
         mergedCube.transform.localPosition = new Vector3(mergedCube.transform.position.x, mergedCube.transform.position.y, -36.8f);

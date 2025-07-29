@@ -30,8 +30,6 @@ namespace UI
         private ECAEvent[] currentThenEvents;
         public EventSequenceTracker eventSequenceTracker;
         private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
-        private bool isLaunching = false;
-
 
         public enum ContainerType
         {
@@ -51,13 +49,7 @@ namespace UI
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
-        private InteractionCreationController interactionCreationController;
-
-
-        private void Start()
-        {
-            interactionCreationController = GetComponent<InteractionCreationController>();
-        }
+        
         
         private void Update()
         {
@@ -152,7 +144,7 @@ namespace UI
             activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
             activeRulePlate.transform.localPosition = new Vector3(
                 activeRulePlate.transform.localPosition.x,
-                -1454f,
+                -1290f,
                 activeRulePlate.transform.localPosition.z);
             activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
             /*
@@ -954,7 +946,7 @@ namespace UI
 
         private void BindControllerEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
-            var triggerInput = interactionCreationController.GetTriggerActionReference();
+            var triggerInput = GeneralUIController.Instance.InteractionCreationController.GetTriggerActionReference();
             if (triggerInput == null || triggerInput.action == null)
             {
                 Debug.LogError("Trigger InputActionReference is not assigned.");
@@ -999,9 +991,9 @@ namespace UI
 
         private void BindHeadGazeEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {
-            interactionCreationController.InstantiateHeadGazePointer();
+            GeneralUIController.Instance.InteractionCreationController.InstantiateHeadGazePointer();
 
-            var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+            var gazeInteractor = GeneralUIController.Instance.InteractionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
             if (gazeInteractor == null)
             {
                 Debug.LogWarning($"FuzzyGazeInteractor not found");
@@ -1091,7 +1083,7 @@ namespace UI
                                 }
                                 break;
                             case InteractionCreationController.Modalities.Headgaze:
-                                var gazeInteractor = interactionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
+                                var gazeInteractor = GeneralUIController.Instance.InteractionCreationController.gazeInteractor.GetComponent<FuzzyGazeInteractor>();
                                 if (gazeInteractor != null)
                                 {
                                     gazeInteractor.hoverEntered.RemoveAllListeners();
@@ -1105,7 +1097,7 @@ namespace UI
             }
             
             // controllers
-            var triggerInput = interactionCreationController.GetTriggerActionReference();
+            var triggerInput = GeneralUIController.Instance.InteractionCreationController.GetTriggerActionReference();
             if (triggerInput != null && triggerInput.action != null)
             {
                 triggerInput.action.Disable();
