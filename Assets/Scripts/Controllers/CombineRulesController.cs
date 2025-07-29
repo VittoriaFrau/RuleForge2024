@@ -769,6 +769,10 @@ namespace UI
             
             //DEMO
             if (meanwhileEvent != null)
+                return;
+                
+            //DEMO
+            if (meanwhileEvent != null)
             {
                 ECAEvent laserEvent =
                     meanwhileEvent.events.FirstOrDefault(e =>
@@ -969,32 +973,16 @@ namespace UI
             {
                 manipulator.hoverEntered.AddListener(interactor =>
                 {
-                    //DEMO
-                    if (!isLaunching)
-                    {
-                        isLaunching = true;
-                        StartCoroutine(WaitForSecondsAndTriggerPointing(3f, ecaEvent, triggerAction, target));
-                    }
+                    triggerAction(ecaEvent);
                 });
             }
             else if (verb.Contains("stops pointing"))
             {
-                
                 manipulator.hoverExited.AddListener(interactor =>
                 {
-                    //DEMO
-                    isLaunching = false; // Reset the launching state
                     triggerAction(ecaEvent);
                 });
             }
-        }
-        //DEMO
-        private IEnumerator WaitForSecondsAndTriggerPointing(float seconds, ECAEvent ecaEvent, Action<ECAEvent> triggerAction, GameObject target)
-        {
-            yield return new WaitForSeconds(seconds);
-            //pointingCoroutines.Remove(target); // cleanup after completion
-            Debug.Log($"[Laser] Triggered after wait on {target.name}");
-            triggerAction(ecaEvent);
         }
 
 
