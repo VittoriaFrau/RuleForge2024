@@ -277,12 +277,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0, g: 0, b: 0, a: 0}
-  isLocked:
-    choice: 0
   isVisible:
     choice: 0
   isUsingGravity:
     choice: 3
+  isDuplicated:
+    choice: 3
+  isACopy:
+    choice: 3
+  shouldFloat:
+    choice: 0
 --- !u!54 &843930867448127226
 Rigidbody:
   m_ObjectHideFlags: 0

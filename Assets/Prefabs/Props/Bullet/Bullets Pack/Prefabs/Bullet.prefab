@@ -60,6 +60,8 @@ MonoBehaviour:
     choice: 3
   isACopy:
     choice: 3
+  shouldFloat:
+    choice: 0
 --- !u!114 &2851765778546201232
 MonoBehaviour:
   m_ObjectHideFlags: 0
