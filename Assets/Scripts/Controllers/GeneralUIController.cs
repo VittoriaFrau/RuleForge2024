@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Controllers;
 using RulePlate.Core;
 using TMPro;
 using UI.RuleEditor;
@@ -254,6 +252,5 @@ namespace UI
             return initialPositions.TryGetValue(obj, out var pos) ? pos : obj.transform.position;
         }
         
-
     }
 }

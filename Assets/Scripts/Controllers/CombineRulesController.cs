@@ -145,6 +145,17 @@ namespace UI
         
         private void PositionRulePlateInFrontOfUser()
         {
+            // Place the rule plate 3 units in front of the camera and slightly offset vertically
+            Vector3 cameraForward = Camera.main.transform.forward;
+            Vector3 cameraPosition = Camera.main.transform.position;
+
+            activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
+            activeRulePlate.transform.localPosition = new Vector3(
+                activeRulePlate.transform.localPosition.x,
+                -1454f,
+                activeRulePlate.transform.localPosition.z);
+            activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
+            /*
             if (GeneralUIController.Instance._handMenuManager.isUsingOculusLink)
             {
                 activeRulePlate.transform.localPosition = new Vector3(-1118f, -973f, 5015f);
@@ -161,7 +172,7 @@ namespace UI
                     activeRulePlate.transform.localPosition.x,
                     -1036f,
                     activeRulePlate.transform.localPosition.z);
-            }
+            }*/
         }
 
 

@@ -20,20 +20,26 @@ namespace UI
         
         private void OnCollisionEnter(Collision collision)
         {
-            Debug.Log($"Collision detected with {collision.gameObject.name}");
-            collidedGameObject = collision.gameObject;
-            OnProximityEnter?.Invoke(collision.gameObject);
-            
-            //DEMO
-            if (collidedGameObject.name.Contains("Rock"))
+            if (collision.gameObject.CompareTag("Interactable"))
             {
-                RuleEngine ruleEngine = RuleEngine.singleton;
-                if (ruleEngine != null)
+                //DEMO: to undemo remove the comment from the next line
+                //OnProximityEnter?.Invoke(collision.gameObject);
+            
+                //DEMO
+                if (collision.gameObject.name.Contains("Rock"))
                 {
-                    ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(collidedGameObject, "explodes"));
-                    ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(this.gameObject, "explodes"));
+                    Debug.Log($"Collision detected with {collision.gameObject.name}");
+                    collidedGameObject = collision.gameObject;
+                    RuleEngine ruleEngine = RuleEngine.singleton;
+                    if (ruleEngine != null)
+                    {
+                        ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(collidedGameObject, "explodes"));
+                        ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "increases by one"));
+                        ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(this.gameObject, "explodes"));
+                    }
                 }
             }
+            
         }
     }
 }

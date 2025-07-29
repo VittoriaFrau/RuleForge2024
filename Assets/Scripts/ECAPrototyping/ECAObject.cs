@@ -1,16 +1,8 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.SpatialManipulation;
-using MixedReality.Toolkit.UX;
-using MixedReality.Toolkit.UX.Experimental;
-using TMPro;
 using UI;
-using UI.RuleEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
 
 
@@ -53,6 +45,8 @@ namespace ECAPrototyping.RuleEngine
         public ECABoolean isDuplicated = new(ECABoolean.BoolType.NO);
         
         public ECABoolean isACopy = new(ECABoolean.BoolType.NO);
+        
+        public ECABoolean shouldFloat = new(ECABoolean.BoolType.NO);
         
         private int counter = 0;
         private Vector3 initialPosition;
@@ -298,8 +292,7 @@ namespace ECAPrototyping.RuleEngine
         public void Explode()
         {
             int fragments = 10; 
-            float explosionForce = 500f; 
-            float explosionRadius = 3f;
+            float explosionForce = 250f; 
             initialPosition = transform.position;
             for (int i = 0; i < fragments; i++)
             {
@@ -314,7 +307,7 @@ namespace ECAPrototyping.RuleEngine
                     rb.AddForce(explosionDir * explosionForce);
                 }
 
-                Destroy(frag, 5f); // Auto-destroy after 5 seconds
+                Destroy(frag, 1f); // Auto-destroy after 5 seconds
             }
 
             gameObject.SetActive(false); 

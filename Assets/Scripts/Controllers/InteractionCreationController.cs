@@ -771,7 +771,16 @@ namespace UI
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 Debug.Log("Saved action: " + ecaEvent);
                 GeneralUIController.Instance.SetDebugText(ecaEvent.ToString());
-                PrepareForActionScreenShot(selectedObject);
+                //DEMO, remove block and leave only prepareforactionscreenshot
+                if (ecaEvent.Subject.Contains("Bullet") && ecaEvent.Verb.Contains("is duplicated"))
+                {
+                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BlasterGame/Duplication.png");
+                }
+                else if (ecaEvent.Subject.Contains("Bullet") && ecaEvent.Verb.Contains("moves"))
+                {
+                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BlasterGame/BulletMovesGun.png");
+                }
+                else PrepareForActionScreenShot(selectedObject);
             }
         }
 
@@ -986,7 +995,7 @@ namespace UI
 
             });
 
-            manipulator.selectExited.AddListener(interactor =>
+            /*manipulator.selectExited.AddListener(interactor =>
             {
                 Debug.Log(manipulator.gameObject.name + " Select exited");
                 GeneralUIController.Instance.SetDebugText("You deselected " + manipulator.gameObject.name);
@@ -998,7 +1007,7 @@ namespace UI
                     GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                 }
-            });
+            });*/
         }
 
         private void AddControllersListener(ObjectManipulator manipulator)
@@ -1120,37 +1129,45 @@ namespace UI
         private void AddProximityListener(ObjectManipulator manipulator)
         {
             proximityCube.GetComponentInChildren<ObjectManipulator>().enabled = false;
-            var go = manipulator.gameObject;
-//Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
-                if (go.gameObject.GetComponent<Collider>() != null)
+            GameObject go = manipulator.gameObject;
+            //Check if the gameobject has a collider component (can be boxcollider, spherecollider, meshcollider)
+            if (go.GetComponent<Collider>() != null)
+            {
+                go.GetComponent<Collider>().isTrigger = false;
+                // block the object in the position otherwise it will fall
+                Rigidbody rb = go.GetComponent<Rigidbody>();
+                rb.isKinematic = false;
+                //don't drop the object if it should float
+                ECAObject ecaObject = go.GetComponent<ECAObject>();
+                bool shouldFloat = ecaObject.shouldFloat;
+                if(!shouldFloat)
                 {
-                    go.gameObject.GetComponent<Collider>().isTrigger = false;
-                    // block the object in the position otherwise it will fall
-                    Rigidbody rb = go.gameObject.GetComponent<Rigidbody>();
-                    rb.isKinematic = false;
-                    //DEMO, if not demo anymore use only the content of the first if
-                    if(!manipulator.gameObject.name.Contains("Bullet") && !manipulator.gameObject.name.Contains("Counter"))
-                    {
-                        rb.useGravity = true;
-                        rb.constraints = RigidbodyConstraints.None;
-                    }
-                    else //if it's bullet
-                    {
-                        rb.useGravity = false;
-                        rb.isKinematic = true;
-                    }
+                    rb.useGravity = true;
+                    rb.constraints = RigidbodyConstraints.None;
+                }
+                else 
+                {
+                    rb.useGravity = false;
+                    rb.isKinematic = true;
+                }
                     
 
-                    Physics.SyncTransforms();
-                }
+                Physics.SyncTransforms();
+            }
             
         }
 
         public void CreateProximityCube(GameObject proximityGameObject1, GameObject proximityGameObject2)
         {
+            //DEMO, I force the bullet to be proximity object one, if not demo remove if
+            if (proximityGameObject1.name.Contains("Bullet"))
+            {
+                //Swap the proximity game objects if the first one is not a bullet
+                (proximityGameObject1, proximityGameObject2) = (proximityGameObject2, proximityGameObject1);
+            }
             //DEMO, if not demo use null instead of load png
             ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near",
-                proximityGameObject2, Utils.LoadPNG("Assets/Resources/Icons/bulletRockProximity.png"), false);
+                proximityGameObject2, Utils.LoadPNG("Assets/Resources/Scenario/BlasterGame/bulletRockProximity.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);

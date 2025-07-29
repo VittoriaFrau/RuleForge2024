@@ -220,11 +220,13 @@ namespace UI
             switch (i)
             {
                case 0:
-                   return new Vector3(-5.3f, -65.0f, -16.3f);
+                   return new Vector3(-5.3f, -77.9f, -16.3f);
                case 1:
-                   return new Vector3(-5.3f, 65.0f, -16.3f);
+                   return new Vector3(-5.3f, -42.5f, -16.3f);
                case 2:
-                   return new Vector3(-5.3f, 0.0f, -16.3f);
+                   return new Vector3(-5.3f, -8.4f, -16.3f);
+               case 3:
+                   return new Vector3(-5.3f, 31.2f, -15.0f);
             }
             return new Vector3(-5.3f, 0.0f, -16.3f);
         }
@@ -594,6 +596,7 @@ namespace UI
             cube.transform.rotation = Quaternion.identity;
             cube.transform.localScale = new Vector3(25, 25, 25);
             cube.transform.localPosition = position;
+            cube.transform.localRotation = new Quaternion(-90.0f, cube.transform.rotation.y, cube.transform.rotation.z, cube.transform.rotation.w);
             if (cubeLevel < 2)
             {
                 Material material = new Material(Shader.Find("Standard"));

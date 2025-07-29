@@ -140,7 +140,7 @@ namespace UI
                 }
     
                 //DEMO. if not needed, remove this block and leave the execute action only
-                if (thenEvent.Verb.Contains("explodes"))
+                if (thenEvent.Verb.Contains("explodes") || thenEvent.Verb.Contains("is duplicated"))
                 {
                     
                 }
