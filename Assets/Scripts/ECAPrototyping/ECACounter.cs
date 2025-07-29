@@ -15,58 +15,44 @@ namespace ECAPrototyping.RuleEngine
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ECAObject))]
+    [RequireComponent(typeof(TextMeshPro))]
     [ECARules4All("counter")]
     public class ECACounter : MonoBehaviour
     {
         [SerializeField] private int counter = 0;
-        
-        
+        [SerializeField] private TextMeshPro textMeshPro;
+
+        private void Start()
+        {
+            textMeshPro = gameObject.GetComponentInChildren<TextMeshPro>();
+        }
+
         [Action(typeof(ECACounter), "increases by one")]
         public void IncreaseCounter()
         {
-            if (gameObject.GetComponentInChildren<TextMeshPro>())
-            {
-                counter++;
-                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "" + counter;
-            }
-            else Debug.LogError("The object does not have a TextMeshPro component.");
+            counter++;
+            textMeshPro.text = "" + counter;
         }
 
         [Action(typeof(ECACounter), "decreases by one")]
         public void DecreaseCounter()
         {
-            if (gameObject.GetComponentInChildren<TextMeshPro>())
-            {
-                counter = counter == 0 ? 0 : --counter;
-                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "" + counter;
-            }
-            else Debug.LogError("The object does not have a TextMeshPro component.");
+            counter = counter == 0 ? 0 : --counter;
+            textMeshPro.text = "" + counter;
         }
         
         [Action(typeof(ECACounter), "doubles")]
         public void DoubleCounter()
         {
-            if (gameObject.GetComponentInChildren<TextMeshPro>())
-            {
-                counter = 2*counter;
-                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "" + counter;
-            }
-            else Debug.LogError("The object does not have a TextMeshPro component.");
+            counter = 2*counter;
+            textMeshPro.text = "" + counter;
         }
         
         [Action(typeof(ECACounter), "resets counter")]
         public void ResetCounter()
         {
-            if (gameObject.GetComponentInChildren<TextMeshPro>())
-            {
-                counter = 0;
-                var text = gameObject.GetComponentInChildren<TextMeshPro>(); 
-                text.text = "0";
-            }
-            else Debug.LogError("The object does not have a TextMeshPro component.");
+            counter = 0;
+            textMeshPro.text = "0";
         }
     }
 }
