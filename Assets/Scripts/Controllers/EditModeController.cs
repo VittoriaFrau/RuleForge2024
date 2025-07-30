@@ -66,7 +66,7 @@ namespace UI
             {
                 interactable.GetComponent<Prototypation>().ShowEditMenu();
                 // DEMO
-                if(interactable.name.Contains("gun")) _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                if(interactable.name.Contains("hammer")) _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
             });
         }
         

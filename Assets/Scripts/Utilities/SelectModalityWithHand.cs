@@ -46,6 +46,9 @@ public class SelectModalityWithHand : MonoBehaviour
                 case "GameController":
                     _interactionCreationController.SelectModality("Controller");
                     break;
+                case "Timer":
+                    _interactionCreationController.SelectModality("Timer");
+                    break;
             }
             StartRedistribution(); // Prevents new triggers until redistribution ends
         }

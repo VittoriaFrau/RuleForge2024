@@ -1224,5 +1224,12 @@ namespace UI
             InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Controller, devices);
             return devices.Count > 0;
         }
+
+        public static string CalculateTimerText(int timeInSeconds)
+        {
+            int minutes = Mathf.FloorToInt(timeInSeconds / 60);
+            int seconds = Mathf.FloorToInt(timeInSeconds % 60);
+            return string.Format("{0:D2}:{1:D2}", minutes, seconds);
+        }
     }
 }

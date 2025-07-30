@@ -24,6 +24,7 @@ TagManager:
   - NonNativeKeyboard
   - HandMenu
   - SpawnCube
+  - Timer
   layers:
   - Default
   - TransparentFX

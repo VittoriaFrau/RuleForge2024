@@ -65,11 +65,12 @@ public class ObjectsMenuController : MonoBehaviour
         Utils.InstantiateObject(type, environmentPrefabs, mainCamera, interactables.transform);
     }
     
-    public void NewUIElement(string type)
+    public GameObject NewUIElement(string type)
     {
         GameObject uiElement = Utils.InstantiateObject(type, UIPrefabs, mainCamera, interactables.transform);
         uiElement.GetComponent<Rigidbody>().useGravity = false;
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
+        return uiElement;
     }
     
     public GameObject Spawn(string type, Vector3 position, string prefabKey)
@@ -93,6 +94,7 @@ public class ObjectsMenuController : MonoBehaviour
         nonNativeKeyboard.SetActive(true);
         nonNativeKeyboard.transform.GetChild(0).gameObject.SetActive(true);
         //DEMO comfortable position
+        Destroy(nonNativeKeyboard.GetComponent<RadialView>());
         Destroy(nonNativeKeyboard.GetComponent<SolverHandler>());
         nonNativeKeyboard.transform.localPosition = new Vector3(nonNativeKeyboard.transform.localPosition.x, 0, 3.26f);
         //nonNativeKeyboard.AddComponent<SolverHandler>();

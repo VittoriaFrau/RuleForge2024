@@ -250,12 +250,7 @@ namespace UI.RuleEditor
             HideMenus();
             uiMenu.SetActive(true);
         }
-
-       /* public void ShowKeyboard(string s)
-        {
-        }*/
         
-
         public void ShowKeyboard(string keyboardMode)
         {
             if (string.IsNullOrEmpty(keyboardMode)) return;
@@ -293,7 +288,20 @@ namespace UI.RuleEditor
                     CloseButtonClicked(numericKeyboardSeconds);
                     EnterButtonClicked(numericKeyboardSeconds, (input) =>
                     {
-                        //TODO timer
+                        // Create UI element with text of input
+                        int nSeconds = int.Parse(input);
+                        GeneralUIController.Instance.InteractionCreationController.TimerSeconds = nSeconds;
+                        GeneralUIController.Instance.InteractionCreationController.TimerText.text = Utils.CalculateTimerText(nSeconds);
+                        if (GeneralUIController.Instance.isRecording)
+                        {
+                            ECAEvent ecaEvent = new ECAEvent(GeneralUIController.Instance.GetSelectedObject(), 
+                                InteractionCreationController.Modalities.Timer, "hits" + nSeconds + " seconds", 
+                                Utils.LoadPNG("Assets/Resources/Modalities/timer.png"), false);
+                            if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+                            {
+                                GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                            }
+                        }
                         Destroy(numericKeyboardSeconds.gameObject);
                     });
                     break;

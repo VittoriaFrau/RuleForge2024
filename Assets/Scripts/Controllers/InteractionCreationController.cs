@@ -10,6 +10,7 @@ using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
 using MixedReality.Toolkit.Subsystems;
 using MixedReality.Toolkit.UX;
+using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -29,7 +30,8 @@ namespace UI
             Microgesture,
             Speech,
             Proximity,
-            Controller
+            Controller,
+            Timer
         }
 
         private Modalities _modality;
@@ -86,12 +88,14 @@ namespace UI
         //Speech
         [Header("Speech Modality")] public GameObject MRTKSpeech;
         public GameObject microphone;
-        private List<string> keywords = new() { "fire", "leviosa", "change", "abracadabra" };
+        private List<string> keywords = new() { "fire", "star", "leviosa", "change", "abracadabra" };
         private Transform microphoneOriginalTransform;
         
 
         // Proximity
         [Header("Proximity Modality")] public GameObject proximityCube;
+        public GameObject spawnCube;
+        private Transform initialSpawnCubeTransform, initialSpawnCubeParent;
 
         [Header("Controller Modality")] public GameObject controllerPrefabLeft;
         public GameObject controllerPrefabRight;
@@ -101,10 +105,25 @@ namespace UI
         [SerializeField] private InputActionReference triggerAction;
         private Dictionary<GameObject, Material> originalMaterials = new();
         public GameObject controllerLeftReference, controllerRightReference;
+        
+        [Header("Timer modality")]
+        public GameObject resetTimerButton;
 
+        public GameObject addTimerButton;
+        private GameObject timer;
+        private TextMeshPro timerText;
+        private int timerSeconds = 0;
+        public int TimerSeconds
+        {
+            get => timerSeconds;
+            set { timerSeconds = value; }
+        }
 
-        public GameObject spawnCube;
-        private Transform initialSpawnCubeTransform, initialSpawnCubeParent;
+        public TextMeshPro TimerText
+        {
+            get => timerText;
+            set => timerText = value;
+        }
 
         private void Start()
         {
@@ -165,6 +184,9 @@ namespace UI
                 case Modalities.Controller:
                     ActivateControllerModality();
                     break;
+                case Modalities.Timer:
+                    ActivateTimerModality();
+                    break;
             }
 
             //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
@@ -173,6 +195,66 @@ namespace UI
                 RecordInteraction();
             }
 
+        }
+        
+        private void ActivateTimerModality()
+        {
+            HideModalityBubble("Timer");
+            
+            // Show the reset timer button in the menu
+            addTimerButton.SetActive(true);
+            resetTimerButton.SetActive(true);
+            
+            GeneralUIController.Instance.SetDebugText("Choose the timer action you want to perform");
+        }
+        
+        private void DeActivateTimerModality()
+        {
+            // Hide the reset timer button in the menu
+            addTimerButton.SetActive(false);
+            resetTimerButton.SetActive(false);
+            
+            timer.SetActive(false);
+        }
+
+        public void AddTimer()
+        {
+            if (timer != null)
+            {
+                handMenuManager.ShowKeyboard("SetTimerSeconds");
+                return;
+            }
+            
+            timer = GeneralUIController.Instance.ObjectsMenuController.NewUIElement("Text");
+            GeneralUIController.Instance.SetSelectedObject(timer);
+            timerText = timer.GetComponentInChildren<TextMeshPro>();
+            if(timerText != null)
+            {
+                GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
+                timerText.text = "0:00";
+                timerText.fontSize = 2.5f;
+                timerText.color = Color.white;
+                handMenuManager.ShowKeyboard("SetTimerSeconds");
+            }
+            else
+            {
+                Debug.LogWarning("Timer text component not found.");
+            }
+        }
+        
+        public void ResetTimer()
+        {
+            // Reset the timer to the initial state
+            GeneralUIController.Instance.SetDebugText("Timer reset to 0");
+            if (timerText != null)
+            {
+                timerText.text = "0:00";
+                timerSeconds = 0;
+            }
+            else
+            {
+                Debug.LogWarning("Timer text component not found.");
+            }
         }
 
         private void ActivateControllers()
@@ -193,8 +275,7 @@ namespace UI
             handMenuManager.transform.localRotation = Quaternion.Euler(78.0503616f, 151.163528f, 139.339493f);
 
         }
-
-
+        
         private void ActivateControllerModality()
         {
             // Hides modality bubble
@@ -304,8 +385,7 @@ namespace UI
                 originalMaterials.Remove(controllerInstance);
             }
         }
-
-
+        
         private void ActivateProximityModality()
         {
             HideModalityBubble("Proximity");
@@ -416,6 +496,9 @@ namespace UI
                     break;
                 case Modalities.Controller:
                     DeActivateControllerModality();
+                    break;
+                case Modalities.Timer:
+                    DeActivateTimerModality();
                     break;
             }
 
@@ -565,8 +648,8 @@ namespace UI
         public IEnumerator WaitForSpeechDemo()
         {
             yield return new WaitForSeconds(5f);
-            GeneralUIController.Instance.SetDebugText("You said \"Fire\"");
-            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "fire",
+            GeneralUIController.Instance.SetDebugText("You said \"Star\"");
+            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "star",
                 Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
