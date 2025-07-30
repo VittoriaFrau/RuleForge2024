@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.029190823, g: 0.042615782, b: 0.031795923, a: 1}
+  m_IndirectSpecularColor: {r: 0.029232737, g: 0.04259627, b: 0.031818897, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -551,6 +551,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 607159369133769202, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: isUsingOculusLink
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 677259685401022267, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -903,6 +907,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2194082105424733081, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.455958
+      objectReference: {fileID: 0}
     - target: {fileID: 2232094681366266695, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -918,6 +926,10 @@ PrefabInstance:
     - target: {fileID: 2232094681366266695, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2520954511821832177, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -1290
       objectReference: {fileID: 0}
     - target: {fileID: 2673069889678067183, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_SizeDelta.x

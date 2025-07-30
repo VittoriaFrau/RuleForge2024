@@ -1082,7 +1082,7 @@ namespace UI
                 triggerAction.action.Disable();
             }
         }
-
+        
 
         private void OnTriggerPressed(InputAction.CallbackContext ctx)
         {

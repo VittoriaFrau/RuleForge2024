@@ -14,6 +14,7 @@ using TMPro;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
 namespace UI
@@ -49,6 +50,8 @@ namespace UI
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
+        private Action<InputAction.CallbackContext> controllerHandler;
+
         
         
         private void Update()
@@ -952,7 +955,9 @@ namespace UI
                 Debug.LogError("Trigger InputActionReference is not assigned.");
                 return;
             }
-            triggerInput.action.performed += ctx => triggerAction(ecaEvent);
+            controllerHandler = ctx => triggerAction(ecaEvent);
+            triggerInput.action.performed += controllerHandler;
+
             triggerInput.action.Enable();
         }
 
@@ -1097,11 +1102,9 @@ namespace UI
             }
             
             // controllers
-            var triggerInput = GeneralUIController.Instance.InteractionCreationController.GetTriggerActionReference();
-            if (triggerInput != null && triggerInput.action != null)
-            {
-                triggerInput.action.Disable();
-            }
+            GeneralUIController.Instance.InteractionCreationController.DisableControllerTrigger();
+            var triggerActionReference = GeneralUIController.Instance.InteractionCreationController.GetTriggerActionReference();
+            triggerActionReference.action.performed -= controllerHandler;
             
             //TODO proximity unbind
             

@@ -199,6 +199,9 @@ namespace UI
             _handMenuManager.HandleHandMenu(_uiState);
             existingRuleOptionsUI.SetActive(false);
             _combineRulesController.ActivateCombineRules(false);
+            // we need to remove the last rule to make sure we are not duplicating it
+            activeRules.RemoveAt(activeRules.Count - 1);
+            _combineRulesController.UnbindAllEvents();
         }
         
         public void CreateNewRule()

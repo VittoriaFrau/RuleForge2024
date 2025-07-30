@@ -70,5 +70,16 @@ namespace RulePlate.Core
             return ruleString;
         }
         
+        public override bool Equals(object obj)
+        {
+            if (obj is ECARule otherRule)
+            {
+                return (events == otherRule.events && actions == otherRule.actions) ||
+                       (events == otherRule.events && meanwhileEvents == otherRule.meanwhileEvents 
+                                                   && actions == otherRule.actions);
+            }
+            return false;
+        }
+        
     }
 }
