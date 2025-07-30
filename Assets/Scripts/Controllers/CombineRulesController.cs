@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Controllers;
 using ECAPrototyping.RuleEngine;
-using MixedReality.Toolkit;
 using MixedReality.Toolkit.Input;
 using MixedReality.Toolkit.SpatialManipulation;
 using MixedReality.Toolkit.Subsystems;
@@ -51,6 +50,8 @@ namespace UI
         private GameObject ruleDebugText, cubeHelp;
         public GameObject interactables;
         private Action<InputAction.CallbackContext> controllerHandler;
+        [SerializeField]
+        private float offsetY = 0.2f;// Offset for the rule plate position
 
         
         
@@ -140,16 +141,36 @@ namespace UI
         
         private void PositionRulePlateInFrontOfUser()
         {
-            // Place the rule plate 3 units in front of the camera and slightly offset vertically
+            // Get the forward direction and position of the main camera
             Vector3 cameraForward = Camera.main.transform.forward;
             Vector3 cameraPosition = Camera.main.transform.position;
 
-            activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
-            activeRulePlate.transform.localPosition = new Vector3(
-                activeRulePlate.transform.localPosition.x,
-                -1290f,
-                activeRulePlate.transform.localPosition.z);
+            // Get the Y position from the CameraOffset GameObject (parent of the main camera)
+            float cameraOffsetY = Camera.main.transform.parent.position.y;
+
+            // Calculate the target position 3 units in front of the camera
+            Vector3 targetPosition = cameraPosition + cameraForward * 3.0f;
+
+            // Set the object's position slightly below the camera's height
+            activeRulePlate.transform.position = new Vector3(
+                targetPosition.x,
+                cameraOffsetY - offsetY, // lower by 0.5 units from CameraOffset height
+                targetPosition.z
+            );
+
+            // Rotate the object to face the camera
             activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
+
+            /* // Place the rule plate 3 units in front of the camera and slightly offset vertically
+             Vector3 cameraForward = Camera.main.transform.forward;
+             Vector3 cameraPosition = Camera.main.transform.position;
+
+             activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
+             activeRulePlate.transform.localPosition = new Vector3(
+                 activeRulePlate.transform.localPosition.x,
+                 -1290f,
+                 activeRulePlate.transform.localPosition.z);
+             activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);*/
             /*
             if (GeneralUIController.Instance._handMenuManager.isUsingOculusLink)
             {
