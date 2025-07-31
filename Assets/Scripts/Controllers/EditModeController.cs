@@ -65,8 +65,10 @@ namespace UI
             _objectManipulator.OnClicked.AddListener(() =>
             {
                 interactable.GetComponent<Prototypation>().ShowEditMenu();
-                // DEMO
-                if(interactable.name.Contains("hammer")) _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+                // if it's equipable, freeze all
+                string lastEcaScript = Utils.GetECALastScriptFromECAObject(interactable);
+                if(lastEcaScript.Equals("Prop") && interactable.GetComponent<ECAProp>().isEquipable)
+                    _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
             });
         }
         

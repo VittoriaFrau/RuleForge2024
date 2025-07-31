@@ -11,6 +11,7 @@ using MixedReality.Toolkit.Subsystems;
 using RulePlate.Core;
 using TMPro;
 using UI.RuleEditor;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -553,6 +554,8 @@ namespace UI
 
                 rule = new ECARule(allWhenEvents, new List<ECAEvent>(thenEvents));
             }
+            
+            rule.MarkDynamicSubjects();
 
             return rule;
         }
@@ -929,16 +932,20 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
             UnityAction touchAction = () => triggerAction(ecaEvent);
-            
-
 
             if (verb.Contains("clicks") || verb.Contains("is clicking"))
             {
-                manipulator.OnClicked.AddListener(() => triggerAction(ecaEvent));
+                manipulator.OnClicked.AddListener(() =>
+                {
+                    triggerAction(ecaEvent);
+                });
             }
             else if (verb.Contains("selects") || verb.Contains("is selecting"))
             {
-                manipulator.selectEntered.AddListener(interactor => triggerAction(ecaEvent));
+                manipulator.selectEntered.AddListener(interactor =>
+                {
+                    triggerAction(ecaEvent);
+                });
             }
             else if (verb.Contains("deselects") || verb.Contains("is deselecting"))
             {
@@ -977,6 +984,7 @@ namespace UI
                 return;
             }
             controllerHandler = ctx => triggerAction(ecaEvent);
+            
             triggerInput.action.performed += controllerHandler;
 
             triggerInput.action.Enable();

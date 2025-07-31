@@ -33,7 +33,7 @@ namespace UI
             if (triggeredEvent == expectedEvent)
             {
                 Debug.Log($"[Tracker] Event {CurrentIndex} ({triggeredEvent.EventStr}) triggered correctly on {triggeredEvent.ObjectRef?.name ?? "null object"}");
-
+                
                 CurrentIndex++;
 
                 if (CurrentIndex >= sequence.Length)
@@ -118,6 +118,27 @@ namespace UI
             {
                 var action = thenEvent.Action;
                 var subject = action.GetSubject();
+                var lastTriggeredObjects = GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects;
+                
+                if (action.IsDynamicSubject)
+                {
+                    // we need to find the last triggered object using the list
+                    string ecaCategory = Utils.GetECALastScriptFromECAObject(action.GetSubject());
+                    foreach (var ob in lastTriggeredObjects)
+                    {
+                        string obCategory = Utils.GetECALastScriptFromECAObject(ob);
+                        if(obCategory.Equals(ecaCategory))
+                        {
+                            action.SetSubject(ob);
+                            // remove from the list so it is not used again
+                            lastTriggeredObjects.Remove(ob);
+                            Debug.Log($"[Tracker] Assigned dynamic subject {ob.name} to action {thenEvent.Verb}");
+                            break;
+                        }
+                    }
+                    // Clear the list
+                    lastTriggeredObjects.Clear();
+                }
 
                 if (thenEvent.Verb == "is duplicated")
                 {
@@ -140,7 +161,7 @@ namespace UI
                 }
     
                 //DEMO. if not needed, remove this block and leave the execute action only
-                if (thenEvent.Verb.Contains("explodes") || thenEvent.Verb.Contains("is duplicated"))
+                if (thenEvent.Verb.Contains("is duplicated"))
                 {
                     
                 }

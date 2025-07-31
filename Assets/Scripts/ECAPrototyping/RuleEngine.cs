@@ -939,6 +939,8 @@ namespace ECAPrototyping.RuleEngine
         private List<Component> subject = new List<Component>(), objct = new List<Component>();
         private bool objects = false;
         private ActionType type;
+        public bool IsDynamicSubject { get; set; }
+
 
         public Action(){}
 

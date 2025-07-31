@@ -106,6 +106,12 @@ MonoBehaviour:
     choice: 0
   isUsingGravity:
     choice: 0
+  isDuplicated:
+    choice: 3
+  isACopy:
+    choice: 3
+  shouldFloat:
+    choice: 3
 --- !u!114 &1357815596130958109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,3 +398,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a01e545503b47c393e1e91edaf29ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEquipable:
+    choice: 0

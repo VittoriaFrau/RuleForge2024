@@ -1,3 +1,4 @@
+using ECAPrototyping.Utils;
 using UnityEngine;
 
 namespace ECAPrototyping.RuleEngine
@@ -7,6 +8,10 @@ namespace ECAPrototyping.RuleEngine
     [ECARules4All("prop")]
     public class ECAProp : MonoBehaviour
     {
+        
+        [StateVariable("equipable", ECARules4AllType.Boolean)] 
+        public ECABoolean isEquipable = new(ECABoolean.BoolType.NO);
+        
         [Action(typeof(ECAProp), "turns on")]
         public void TurnOnConveyor()
         {

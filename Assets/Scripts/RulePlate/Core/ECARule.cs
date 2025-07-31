@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using Controllers;
 using UI;
 using UI.RuleEditor;
+using UnityEngine;
 
 namespace RulePlate.Core
 {
@@ -80,6 +82,40 @@ namespace RulePlate.Core
             }
             return false;
         }
+
+        public void MarkDynamicSubjects()
+        {
+            if (Events == null || Actions == null) return;
+
+            foreach (var when in Events)
+            {
+                if (when.EventCategory == CategoryController.CategoryObjectSelected.Category)
+                {
+                    string categoryNameSubject = (when.Subject.Equals("user") ? "user" : Utils.GetECALastScriptFromECAObject(GameObject.Find(when.Subject))); 
+                    string categoryNameObject = when.ObjectRef == null ? "" : Utils.GetECALastScriptFromECAObject(when.ObjectRef); 
+                    
+                    foreach (var then in Actions)
+                    {
+                        var action = then.Action;
+                        var target = action.GetSubject();
+                        string targetCategoryName = Utils.GetECALastScriptFromECAObject(target);
+
+                        // Caso 1: target nullo (nessun oggetto specifico impostato)
+                        if (target == null)
+                        {
+                            action.IsDynamicSubject = true;
+                            Debug.Log($"[ECARule] Marked action '{then.Verb}' as dynamic (no specific target, category: '{targetCategoryName}')");
+                        }
+                        // Caso 2: il target ha un tag o tipo che matcha la categoria
+                        else if (targetCategoryName == categoryNameSubject || targetCategoryName == categoryNameObject){
+                            action.IsDynamicSubject = true;
+                            Debug.Log($"[ECARule] Marked action '{then.Verb}' as dynamic (tag match: '{targetCategoryName}')");
+                        }
+                    }
+                }
+            }
+        }
+
         
     }
 }

@@ -287,7 +287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: 0
   rulePhase: 1
-  containerType: 1
+  containerType: 0
   currentCube: {fileID: 0}
 --- !u!1 &4232191386392457628
 GameObject:
@@ -448,18 +448,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 4204398553410018896}
     m_Modifications:
-    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
-      propertyPath: m_SortingLayer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: e561c457d5b156542a656c28ea2c1b8b, type: 2}
     - target: {fileID: -8679921383154817045, guid: 00347b7d1821c43bb8710b7da57c070e, type: 3}
       propertyPath: m_LocalScale.x
       value: 100.109245
@@ -512,6 +500,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a2b7f91405345e24d8637d5dba43747d, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: e561c457d5b156542a656c28ea2c1b8b, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

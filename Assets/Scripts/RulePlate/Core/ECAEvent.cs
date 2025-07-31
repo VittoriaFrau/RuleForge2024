@@ -26,6 +26,7 @@ namespace UI
         public bool IsActionEvent { get; set; }
         public bool IsEquivalenceEvent { get; set; }
 
+
         
         public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event, 
             [CanBeNull] Texture2D screenshot, bool isActionEvent)

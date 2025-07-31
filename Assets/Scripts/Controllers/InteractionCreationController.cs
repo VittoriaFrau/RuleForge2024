@@ -52,6 +52,12 @@ namespace UI
         private ScreenshotCamera _screenshotCamera;
         public HandMenuManager handMenuManager;
         private CategoryController _categoryController;
+        private List<GameObject> lastTriggeredObjects = new();
+        public List<GameObject> LastTriggeredObjects
+        {
+            get => lastTriggeredObjects;
+            set => lastTriggeredObjects = value;
+        }
 
         public CategoryController CategoryController
         {

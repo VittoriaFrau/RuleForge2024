@@ -292,7 +292,7 @@ namespace UI
         GameObject go = null;
         try
         {
-            go = Object.Instantiate(prefab, spawnPosition, Quaternion.identity);
+            go = Object.Instantiate(prefab, spawnPosition, prefab.transform.localRotation);
             if (go == null)
             {
                 Debug.LogError("Failed to instantiate object!");
