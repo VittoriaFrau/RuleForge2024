@@ -953,15 +953,19 @@ namespace UI
             return ruleDescription;
         }
 
-        public static void ClearTextDescription(TextMeshProUGUI whenText, TextMeshProUGUI thenText)
+        public static void ClearTextDescription(TextMeshProUGUI whenText, TextMeshProUGUI ifText, TextMeshProUGUI thenText)
         {
             whenText.text = "...";
+            ifText.text = "...";
             thenText.text = "...";
         }
 
         //Delete all the unnecessary containers
         public static void ResetCubeContainers()
         {
+
+            //WHEN
+
             Transform whenContainer = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "When").transform;
             Transform whenFrontplate = whenContainer.Find("Frontplate");
             GameObject whenSequentialRow = whenFrontplate.Find("SequentialRow").gameObject;
@@ -976,7 +980,28 @@ namespace UI
             {
                 if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
             }
-            
+
+
+            //IF
+
+            Transform ifContainer = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "If").transform;
+            Transform ifFrontplate = ifContainer.Find("Frontplate");
+            GameObject ifSequentialRow = ifFrontplate.Find("SequentialRow").gameObject;
+            GameObject ifEquivalenceRow = ifFrontplate.Find("EquivalenceRow").gameObject;
+            //Delete all the gameobject that are called "Cube Container (Clone)"
+            foreach (Transform child in ifSequentialRow.transform)
+            {
+                if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
+            }
+
+            foreach (Transform child in ifEquivalenceRow.transform)
+            {
+                if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
+            }
+
+
+            //THEN
+
             Transform thenContainer = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "Then").transform;
             Transform thenFrontplate = thenContainer.Find("Frontplate");
             GameObject thenSequentialRow = thenFrontplate.Find("SequentialRow").gameObject;
@@ -1034,6 +1059,7 @@ namespace UI
                     return "Icon 54";
                 case "Environment":
                 case "Furniture":
+                case "Door":
                     return "Assets/Resources/door.png";
                 case "Music":
                     return "Icon 22";

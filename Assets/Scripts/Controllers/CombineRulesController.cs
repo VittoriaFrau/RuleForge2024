@@ -22,13 +22,14 @@ namespace UI
     public class CombineRulesController : MonoBehaviour
     {
         //Rule composition
-        private GameObject removableBarrier, cubePlate, whenSequentialRow, whenEquivalenceRow, thenSequentialRow;
-        private TextMeshProUGUI whenText, thenText;
+        private GameObject removableBarrier, cubePlate, whenSequentialRow, whenEquivalenceRow, ifSequentialRow, thenSequentialRow;
+        private TextMeshProUGUI whenText, ifText, thenText;
         [FormerlySerializedAs("ruleEditorPlate")] public GameObject ruleEditorPlatePrefab;
         public GameObject activeRulePlate;
         public GameObject modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
         private List<MeanwhileEvent> activeMeanwhileEvents = new();
         private ECAEvent[] currentThenEvents;
+        private ECAEvent[] currentIfEvents;
         public EventSequenceTracker eventSequenceTracker;
         private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
 
@@ -41,11 +42,13 @@ namespace UI
         public enum RulePhase
         {
             When,
+            If,
             Then,
             None
         }
 
         private List<CubeContainerClass> whenContainers;
+        private List<CubeContainerClass> ifContainers;
         private List<CubeContainerClass> thenContainers;
         public GameObject modalityContainerPrefab, actionContainerPrefab;
         private GameObject ruleDebugText, cubeHelp;
@@ -217,7 +220,7 @@ namespace UI
                 cube.transform.localPosition = recordedEvent.CubeInitialPosition;
             }
 
-            Utils.ClearTextDescription(whenText, thenText);
+            Utils.ClearTextDescription(whenText, ifText, thenText);
 
             Utils.ResetCubeContainers();
         }
@@ -301,6 +304,8 @@ namespace UI
         {
             whenText = GameObject.FindGameObjectsWithTag("RuleText")
                 .ToList().Find(x => x.name == "WhenText" && x.activeSelf).GetComponent<TextMeshProUGUI>();
+            ifText = GameObject.FindGameObjectsWithTag("RuleText")
+                .ToList().Find(x => x.name == "IfText" && x.activeSelf).GetComponent<TextMeshProUGUI>();
             thenText = GameObject.FindGameObjectsWithTag("RuleText")
                 .ToList().Find(x => x.name == "ThenText" && x.activeSelf).GetComponent<TextMeshProUGUI>();
 
@@ -308,6 +313,9 @@ namespace UI
             whenContainers = new List<CubeContainerClass>();
             GameObject firstWhenContainer = whenSequentialRow.transform.Find("CubeContainer").gameObject;
             AddContainer(RulePhase.When, firstWhenContainer);
+            ifContainers = new List<CubeContainerClass>();
+            GameObject firstIfContainer = ifSequentialRow.transform.Find("ActionCubeContainer").gameObject;
+            AddContainer(RulePhase.If, firstIfContainer);
             thenContainers = new List<CubeContainerClass>();
             GameObject firstThenContainer = thenSequentialRow.transform.Find("ActionCubeContainer").gameObject;
             AddContainer(RulePhase.Then, firstThenContainer);
@@ -321,6 +329,11 @@ namespace UI
                 whenContainers.Add(new CubeContainerClass(whenContainers.Count, cubeContainer));
                 cubeContainer.id = whenContainers.Count;
             }
+            else if(rulePhase== RulePhase.If)
+            {
+                ifContainers.Add(new CubeContainerClass(ifContainers.Count, cubeContainer));
+                cubeContainer.id = ifContainers.Count;
+            }
             else
             {
                 thenContainers.Add(new CubeContainerClass(thenContainers.Count, cubeContainer));
@@ -333,8 +346,8 @@ namespace UI
         /**
          * cube: the cube that has been moved (in or out)
          */
-        public void CalculateRuleText(GameObject cube, RulePhase rulePhase, bool isAdded, ContainerType containerType,
-            int id)
+
+        public void CalculateRuleText(GameObject cube, RulePhase rulePhase, bool isAdded, ContainerType containerType, int id)
         {
             UpdatePresentRule(); //Updates the textmeshpro variables with the current rule text
             string cubeDescription = Utils.GetRuleDescriptionFromCubePrefab(cube.gameObject);
@@ -343,8 +356,13 @@ namespace UI
             if (isAdded)
             {
                 string logicalOperator = containerType == ContainerType.Equivalence ? "OR" : ",";
-                Utils.GenerateTextFromCubePosition(rulePhase == RulePhase.When ? whenText : thenText,
-                    formattedCubeDescription, logicalOperator);
+                if (rulePhase == RulePhase.When)
+                    Utils.GenerateTextFromCubePosition(whenText, formattedCubeDescription, logicalOperator);
+                else if (rulePhase == RulePhase.If)
+                    Utils.GenerateTextFromCubePosition(ifText, formattedCubeDescription, logicalOperator);
+                else
+                    Utils.GenerateTextFromCubePosition(thenText, formattedCubeDescription, logicalOperator);
+
                 if (rulePhase == RulePhase.Then)
                 {
                     // Check if there is an any in the when phase
@@ -363,22 +381,27 @@ namespace UI
                 {
                     case RulePhase.When:
                         CubeContainerClass whenContainer = FindContainerById(id, whenContainers);
-                        //Look in the when text for the cube description and remove it
                         Utils.RemoveTextFromCubePosition(whenText, formattedCubeDescription, logicalOperator);
                         if (string.IsNullOrWhiteSpace(whenText.text) || whenText.text == logicalOperator)
                         {
                             whenText.text = "...";
                         }
-
+                        break;
+                    case RulePhase.If:
+                        CubeContainerClass ifContainer = FindContainerById(id, ifContainers);
+                        Utils.RemoveTextFromCubePosition(ifText, formattedCubeDescription, logicalOperator);
+                        if (string.IsNullOrWhiteSpace(ifText.text) || ifText.text == logicalOperator)
+                        {
+                            ifText.text = "...";
+                        }
                         break;
                     case RulePhase.Then:
                         CubeContainerClass thenContainer = FindContainerById(id, thenContainers);
                         Utils.RemoveTextFromCubePosition(thenText, formattedCubeDescription, logicalOperator);
-                        if (string.IsNullOrWhiteSpace(thenText.text) || whenText.text == logicalOperator)
+                        if (string.IsNullOrWhiteSpace(thenText.text) || thenText.text == logicalOperator)
                         {
                             thenText.text = "...";
                         }
-
                         break;
                 }
             }
@@ -387,6 +410,7 @@ namespace UI
         private void UpdatePresentRule()
         {
             whenText = whenText.GetComponent<TextMeshProUGUI>();
+            ifText = ifText.GetComponent<TextMeshProUGUI>();
             thenText = thenText.GetComponent<TextMeshProUGUI>();
         }
 
@@ -396,6 +420,11 @@ namespace UI
             {
                 CubeContainerClass container = FindContainerById(whenContainers.Count, whenContainers);
                 if (container != null) whenContainers.Remove(container);
+            }
+            else if(rulePhase == RulePhase.If)
+            {
+                CubeContainerClass container = FindContainerById(ifContainers.Count, ifContainers);
+                if (container != null) ifContainers.Remove(container);
             }
             else
             {
@@ -428,67 +457,68 @@ namespace UI
         }
 
 
-        public void CalculateRuleOLD()
-        {
-            RuleEngine ruleEngine = RuleEngine.GetInstance();
+        //public void CalculateRuleOLD()
+        //{
+        //    RuleEngine ruleEngine = RuleEngine.GetInstance();
 
-            ECAEvent[] whenEvents =
-                GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
-            ECAEvent[] equivalenceEvents =
-                GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
-            ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
-                new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
-            MeanwhileEvent [] meanwhileEvents = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+        //    ECAEvent[] whenEvents =
+        //        GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
+        //    ECAEvent[] equivalenceEvents =
+        //        GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+        //    ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow,
+        //        new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
+        //    MeanwhileEvent [] meanwhileEvents = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
 
-            currentThenEvents = thenEvents;
+        //    currentThenEvents = thenEvents;
 
-            if (whenEvents.Length == 0 && meanwhileEvents.Length == 0)
-            {
-                Debug.LogWarning("No 'when' events found!");
-                return;
-            }
+        //    if (whenEvents.Length == 0 && meanwhileEvents.Length == 0)
+        //    {
+        //        Debug.LogWarning("No 'when' events found!");
+        //        return;
+        //    }
 
-            eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
+        //    eventSequenceTracker = new EventSequenceTracker(whenEvents, thenEvents, ruleEngine);
 
-            // Bind dei whenEvents normali
-            foreach (var whenEvent in whenEvents)
-            {
-                GameObject whenGameObject = whenEvent.ObjectRef;
-                BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
-            }
+        //    // Bind dei whenEvents normali
+        //    foreach (var whenEvent in whenEvents)
+        //    {
+        //        GameObject whenGameObject = whenEvent.ObjectRef;
+        //        BindEvent(whenGameObject, whenEvent, eventSequenceTracker, false);
+        //    }
             
-            if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
-            {
-                foreach (var meanwhileRule in meanwhileEvents)
-                {
-                    // Add the rule to activeMeanwhileEvents 
-                    if (!activeMeanwhileEvents.Contains(meanwhileRule))
-                    {
-                        activeMeanwhileEvents.Add(meanwhileRule);
-                    }
-                    foreach (var meanwhileEvent in meanwhileRule.events)
-                    {
-                        //DEMO
-                        if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
-                        {
-                            GameObject eventGameObject = meanwhileEvent.ObjectRef;
-                            eventSequenceTracker = new EventSequenceTracker(new []{meanwhileEvent}, thenEvents, ruleEngine);
-                            BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
-                        }
-                    }
-                }
-            }
+        //    if (meanwhileEvents.Length > 0 && GeneralUIController.Instance.activeMeanwhileEvents.Count != 0)
+        //    {
+        //        foreach (var meanwhileRule in meanwhileEvents)
+        //        {
+        //            // Add the rule to activeMeanwhileEvents 
+        //            if (!activeMeanwhileEvents.Contains(meanwhileRule))
+        //            {
+        //                activeMeanwhileEvents.Add(meanwhileRule);
+        //            }
+        //            foreach (var meanwhileEvent in meanwhileRule.events)
+        //            {
+        //                //DEMO
+        //                if (meanwhileEvent.Modality != InteractionCreationController.Modalities.Speech)
+        //                {
+        //                    GameObject eventGameObject = meanwhileEvent.ObjectRef;
+        //                    eventSequenceTracker = new EventSequenceTracker(new []{meanwhileEvent}, thenEvents, ruleEngine);
+        //                    BindEvent(eventGameObject, meanwhileEvent, eventSequenceTracker, false, meanwhileRule);
+        //                }
+        //            }
+        //        }
+        //    }
 
 
-            // Bind dell'equivalenceEvent (ne gestiamo uno solo per ora)
-            if (equivalenceEvents.Length > 0)
-            {
-                ECAEvent equivalenceEvent = equivalenceEvents[0];
-                GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
-                BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
-            }
-        }
-        
+        //    // Bind dell'equivalenceEvent (ne gestiamo uno solo per ora)
+        //    if (equivalenceEvents.Length > 0)
+        //    {
+        //        ECAEvent equivalenceEvent = equivalenceEvents[0];
+        //        GameObject equivalenceGameObject = equivalenceEvent.ObjectRef;
+        //        BindEvent(equivalenceGameObject, equivalenceEvent, eventSequenceTracker, true);
+        //    }
+        //}
+
+
         public void CalculateRule()
         {
             Debug.Log("Starting CalculateRule...");
@@ -511,19 +541,21 @@ namespace UI
             Debug.Log("Finished CalculateRule.");
         }
         
+
         private ECARule BuildECARule()
         {
-
             ECAEvent[] whenEvents = GetEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
             ECAEvent[] equivalenceEvents = GetEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
+            ECAEvent[] ifEvents = GetEventsFromContainers(ifSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
             ECAEvent[] thenEvents = GetEventsFromContainers(thenSequentialRow, new[] { "ActionCubeContainer", "ActionCubeContainer(Clone)" });
 
             MeanwhileEvent[] meanwhileEventsSequential = GetMeanwhileEventsFromContainers(whenSequentialRow, new[] { "CubeContainer", "CubeContainer(Clone)" });
             MeanwhileEvent[] meanwhileEventsEquivalence = GetMeanwhileEventsFromContainers(whenEquivalenceRow, new[] { "CubeContainer(Clone)" });
 
+            currentIfEvents = ifEvents;
             currentThenEvents = thenEvents;
 
-            Debug.Log($"Found {whenEvents.Length} 'when' events, {equivalenceEvents.Length} 'equivalence' events, and {thenEvents.Length} 'then' events.");
+            Debug.Log($"Found {whenEvents.Length} 'when' events, {equivalenceEvents.Length} 'equivalence' events, {ifEvents.Length} 'if' events, and {thenEvents.Length} 'then' events.");
             Debug.Log($"Found {meanwhileEventsSequential.Length} sequential meanwhile rules and {meanwhileEventsEquivalence.Length} equivalence meanwhile rules.");
 
             if (whenEvents.Length == 0 && meanwhileEventsSequential.Length == 0)
@@ -536,11 +568,14 @@ namespace UI
             allMeanwhileEvents.AddRange(meanwhileEventsSequential);
             allMeanwhileEvents.AddRange(meanwhileEventsEquivalence);
 
+            // Unisci THEN e IF in un'unica lista di azioni
+            List<ECAEvent> allActions = new List<ECAEvent>(thenEvents);
+            allActions.AddRange(ifEvents);
+
             ECARule rule;
             if (allMeanwhileEvents.Count > 0)
             {
-                // If there are meanwhile events, we create a rule with them
-                rule = new ECARule(new List<ECAEvent>(whenEvents), new List<ECAEvent>(thenEvents));
+                rule = new ECARule(new List<ECAEvent>(whenEvents), allActions);
                 rule.MeanwhileEvents = allMeanwhileEvents;
             }
             else
@@ -552,14 +587,13 @@ namespace UI
                     allWhenEvents.Add(equivalenceEvents[0]);
                 }
 
-                rule = new ECARule(allWhenEvents, new List<ECAEvent>(thenEvents));
+                rule = new ECARule(allWhenEvents, allActions);
             }
             
             rule.MarkDynamicSubjects();
 
             return rule;
         }
-
         private void BindECARule(ECARule rule)
         {
             if (rule == null)
@@ -568,7 +602,7 @@ namespace UI
             RuleEngine ruleEngine = RuleEngine.GetInstance();
             eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), rule.Actions.ToArray(), ruleEngine);
 
-            // Bind normali ECAEvent
+            // Bind normali ECAEvent (WHEN/EQUIVALENCE)
             if (rule.Events != null)
             {
                 foreach (var ecaEvent in rule.Events)
@@ -604,7 +638,7 @@ namespace UI
                 }
             }
         }
-        
+
         /* public void CalculateRule()
          {
              Debug.Log("Starting CalculateRule...");
@@ -894,9 +928,9 @@ namespace UI
                     BindTouchEvent(target, eventToBind, triggerAction);
                     break;
 
-                case InteractionCreationController.Modalities.Speech:
-                    BindSpeechEvent(eventToBind, triggerAction);
-                    break;
+                //case InteractionCreationController.Modalities.Speech:
+                //    BindSpeechEvent(eventToBind, triggerAction);
+                //    break;
 
                 case InteractionCreationController.Modalities.Laser:
                     BindLaserEvent(target, eventToBind, triggerAction);
@@ -953,27 +987,27 @@ namespace UI
             }
         }
 
-        private void BindSpeechEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
-        {
-#if !UNITY_EDITOR
-    MRTKSpeech.SetActive(true);
+//        private void BindSpeechEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
+//        {
+//#if !UNITY_EDITOR
+//    MRTKSpeech.SetActive(true);
 
-    var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
-    if (keywordRecognitionSubsystem == null)
-    {
-        Debug.LogWarning("No running KeywordRecognitionSubsystem found");
-        return;
-    }
+//    var keywordRecognitionSubsystem = XRSubsystemHelpers.GetFirstRunningSubsystem<KeywordRecognitionSubsystem>();
+//    if (keywordRecognitionSubsystem == null)
+//    {
+//        Debug.LogWarning("No running KeywordRecognitionSubsystem found");
+//        return;
+//    }
 
-    string keyword = ecaEvent.EventStr; // comando di attivazione
-    keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword)
-        .AddListener(() => triggerAction(ecaEvent));
-#else
-            Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
-#endif
-            //DEMO
-            //StartCoroutine()
-        }
+//    string keyword = ecaEvent.EventStr; // comando di attivazione
+//    keywordRecognitionSubsystem.CreateOrGetEventForKeyword(keyword)
+//        .AddListener(() => triggerAction(ecaEvent));
+//#else
+//            Debug.LogWarning("Speech modality requires an XR headset and cannot be tested in the Unity Editor.");
+//#endif
+//            //DEMO
+//            //StartCoroutine()
+//        }
 
         private void BindControllerEvent(ECAEvent ecaEvent, Action<ECAEvent> triggerAction)
         {

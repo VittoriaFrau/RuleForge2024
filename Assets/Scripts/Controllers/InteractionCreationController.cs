@@ -1138,20 +1138,20 @@ namespace UI
 
             });
 
-            manipulator.selectExited.AddListener(interactor =>
-            {
-                Debug.Log(manipulator.gameObject.name + " Select exited");
-                GeneralUIController.Instance.SetDebugText("You deselected " + manipulator.gameObject.name);
-                //Note: event should be added before starting the coroutine
-                //Add the event only if it doesn't exist already
-                ECAEvent ecaEvent =
-                    new ECAEvent(manipulator.gameObject, Modalities.Controller, "deselects", null, false);
-                if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
-                {
-                    GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
-                    PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
-                }
-            });
+            //manipulator.selectExited.AddListener(interactor =>
+            //{
+            //    Debug.Log(manipulator.gameObject.name + " Select exited");
+            //    GeneralUIController.Instance.SetDebugText("You deselected " + manipulator.gameObject.name);
+            //    //Note: event should be added before starting the coroutine
+            //    //Add the event only if it doesn't exist already
+            //    ECAEvent ecaEvent =
+            //        new ECAEvent(manipulator.gameObject, Modalities.Controller, "deselects", null, false);
+            //    if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+            //    {
+            //        GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+            //        PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Controller, ecaEvent);
+            //    }
+            //});
         }
 
         public void EnableControllerTrigger()
