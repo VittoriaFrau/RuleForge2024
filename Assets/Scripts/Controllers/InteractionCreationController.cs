@@ -231,7 +231,7 @@ namespace UI
                 return;
             }
             
-            timer = GeneralUIController.Instance.ObjectsMenuController.NewUIElement("Text");
+            timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
             GeneralUIController.Instance.SetSelectedObject(timer);
             timerText = timer.GetComponentInChildren<TextMeshPro>();
             if(timerText != null)

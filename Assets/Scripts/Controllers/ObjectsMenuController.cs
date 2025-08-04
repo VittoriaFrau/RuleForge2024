@@ -65,12 +65,17 @@ public class ObjectsMenuController : MonoBehaviour
         Utils.InstantiateObject(type, environmentPrefabs, mainCamera, interactables.transform);
     }
     
-    public GameObject NewUIElement(string type)
+    public GameObject CreateUIElement(string type)
     {
         GameObject uiElement = Utils.InstantiateObject(type, UIPrefabs, mainCamera, interactables.transform);
         uiElement.GetComponent<Rigidbody>().useGravity = false;
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
         return uiElement;
+    }
+
+    public void NewUIElement(string type)
+    {
+        CreateUIElement(type);
     }
     
     public GameObject Spawn(string type, Vector3 position, string prefabKey)
