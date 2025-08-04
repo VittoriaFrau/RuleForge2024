@@ -145,8 +145,15 @@ namespace UI
         
         private void PositionRulePlateInFrontOfUser()
         {
+            // optimize for unity editor
+            activeRulePlate.transform.localPosition = new Vector3(
+                147.0f,
+                -1290f,
+                6324.0f);
+            activeRulePlate.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            
             // Get the forward direction and position of the main camera
-            Vector3 cameraForward = Camera.main.transform.forward;
+            /*Vector3 cameraForward = Camera.main.transform.forward;
             Vector3 cameraPosition = Camera.main.transform.position;
 
             // Get the Y position from the CameraOffset GameObject (parent of the main camera)
@@ -163,7 +170,8 @@ namespace UI
             );
 
             // Rotate the object to face the camera
-            activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
+            activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);*/
+            
 
             /* // Place the rule plate 3 units in front of the camera and slightly offset vertically
              Vector3 cameraForward = Camera.main.transform.forward;
