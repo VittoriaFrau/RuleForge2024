@@ -66,8 +66,7 @@ namespace UI
             {
                 interactable.GetComponent<Prototypation>().ShowEditMenu();
                 // if it's equipable, freeze all
-                string lastEcaScript = Utils.GetECALastScriptFromECAObject(interactable);
-                if(lastEcaScript.Equals("Prop") && interactable.GetComponent<ECAProp>().isEquipable)
+                if(Utils.IsEquipable(interactable))
                     _objectManipulator.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
             });
         }

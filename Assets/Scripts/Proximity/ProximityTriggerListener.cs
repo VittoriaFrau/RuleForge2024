@@ -14,12 +14,15 @@ namespace UI
         {
             if (collision.gameObject.CompareTag("Interactable"))
             {
-                if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
+                if (!Utils.IsEquipable(collision.gameObject))
                 {
-                    GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
-                    GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
+                    if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
+                    {
+                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
+                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
+                    }
+                    OnProximityEnter?.Invoke(collision.gameObject);
                 }
-                OnProximityEnter?.Invoke(collision.gameObject);
             }
             
         }

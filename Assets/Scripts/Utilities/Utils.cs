@@ -1231,5 +1231,13 @@ namespace UI
             int seconds = Mathf.FloorToInt(timeInSeconds % 60);
             return string.Format("{0:D2}:{1:D2}", minutes, seconds);
         }
+
+        public static bool IsEquipable(GameObject gameObject)
+        {
+            string lastEcaScript = GetECALastScriptFromECAObject(gameObject);
+            if (lastEcaScript.Equals("Prop") && gameObject.GetComponent<ECAProp>().isEquipable)
+                return true;
+            return false;
+        }
     }
 }
