@@ -755,6 +755,11 @@ namespace UI
                     labelTexts[1] = "presses";
                     labelTexts[2] = "trigger";
                     break;
+                case InteractionCreationController.Modalities.Timer:
+                    labelTexts[0] = "timer";
+                    labelTexts[1] = "hits";
+                    labelTexts[2] = e.ObjectStr + " seconds"; 
+                    break;
                 case InteractionCreationController.Modalities.None: // action cube
                     labelTexts[1] = e.Verb;
                     if (e.Verb.Equals("is duplicated"))

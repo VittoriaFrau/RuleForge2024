@@ -64,6 +64,21 @@ namespace UI
             _counter++;
         }
         
+        // Timer
+        public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event, int nSeconds,
+            [CanBeNull] Texture2D screenshot, bool isActionEvent)
+        {
+            this.ObjectRef = @object;
+            this.modality = modality;
+            this.EventStr = _event;
+            ObjectStr = "" + nSeconds;
+            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            if(screenshot != null) Texture = screenshot;
+            else Texture = null;
+            IsActionEvent = isActionEvent;
+            SetModalityRule();
+            _counter++;
+        }
         
         public ECAEvent(GameObject @object)
         {
@@ -138,6 +153,11 @@ namespace UI
                 return Verb == e.Verb;
             }
 
+            if (modality == InteractionCreationController.Modalities.Timer)
+            {
+                return ObjectStr == e.ObjectStr;
+            }
+
             // ModalityEvent:
             return ObjectRef == e.ObjectRef && modality == e.modality && EventStr == e.EventStr;
         }
@@ -170,6 +190,9 @@ namespace UI
                 
                 case InteractionCreationController.Modalities.Proximity:
                     return Subject + Verb + ObjectStr;
+                
+                case InteractionCreationController.Modalities.Timer:
+                    return Subject + " " + Verb + " " + ObjectStr + " seconds";
             }
 
             if (EventStr != null && Verb != null && EventStr != null)
@@ -211,6 +234,10 @@ namespace UI
                 case InteractionCreationController.Modalities.Speech:
                     Verb = "says";
                     ObjectStr = EventStr;
+                    break;
+                case InteractionCreationController.Modalities.Timer:
+                    Subject = ObjectRef.name;
+                    Verb = "hits";
                     break;
                 default:   
                     Verb = modality.ToString();

@@ -137,6 +137,7 @@ namespace UI
                     _handMenuManager.DeActivatePlayStateMenu();
                     _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
                     _combineRulesController.UnbindAllEvents();
+                    _interactionCreationController.ResetTimer();
                     break;
             }
         }

@@ -295,7 +295,7 @@ namespace UI.RuleEditor
                         if (GeneralUIController.Instance.isRecording)
                         {
                             ECAEvent ecaEvent = new ECAEvent(GeneralUIController.Instance.GetSelectedObject(), 
-                                InteractionCreationController.Modalities.Timer, "hits" + nSeconds + " seconds", 
+                                InteractionCreationController.Modalities.Timer, "hits " + nSeconds + " seconds", nSeconds,
                                 Utils.LoadPNG("Assets/Resources/Modalities/timer.png"), false);
                             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                             {

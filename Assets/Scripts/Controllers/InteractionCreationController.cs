@@ -117,6 +117,12 @@ namespace UI
 
         public GameObject addTimerButton;
         private GameObject timer;
+
+        public GameObject Timer
+        {
+            get => timer;
+            set => timer = value;
+        }
         private TextMeshPro timerText;
         private int timerSeconds = 0;
         public int TimerSeconds
@@ -220,7 +226,6 @@ namespace UI
             addTimerButton.SetActive(false);
             resetTimerButton.SetActive(false);
             
-            timer.SetActive(false);
         }
 
         public void AddTimer()
@@ -232,7 +237,9 @@ namespace UI
             }
             
             timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
+            timer.AddComponent<ECATimer>();
             GeneralUIController.Instance.SetSelectedObject(timer);
+            timer.name = "Timer";
             timerText = timer.GetComponentInChildren<TextMeshPro>();
             if(timerText != null)
             {
@@ -478,7 +485,12 @@ namespace UI
 
             GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
                                                                             + " use your modality to interact with any object in the scene");
-            if(_modality!= Modalities.Speech && _modality != Modalities.Controller) _categoryController.ShowCategoryMenu();
+            if(_modality!= Modalities.Speech && _modality != Modalities.Controller && _modality != Modalities.Timer) _categoryController.ShowCategoryMenu();
+
+            if (_modality == Modalities.Timer)
+            {
+                ResetTimer();
+            }
         }
 
         public void DeActivateCurrentModality()

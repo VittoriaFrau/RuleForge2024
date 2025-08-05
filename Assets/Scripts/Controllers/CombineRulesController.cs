@@ -58,8 +58,8 @@ namespace UI
         
 
         
-        
-        private void Update()
+        //DEMO, remove comment when using meanwhile
+        /*private void Update()
         {
             foreach (var rule in activeMeanwhileEvents)
             {
@@ -68,7 +68,7 @@ namespace UI
                     rule.UpdateTimer(Time.deltaTime);
                 }
             }
-        }
+        }*/
 
         public void ActivateCombineRules(bool startFromScratch = true)
         {
@@ -145,25 +145,40 @@ namespace UI
         
         private void PositionRulePlateInFrontOfUser()
         {
-            // Get the forward direction and position of the main camera
-            Vector3 cameraForward = Camera.main.transform.forward;
-            Vector3 cameraPosition = Camera.main.transform.position;
+            if (GeneralUIController.Instance._handMenuManager.isUsingOculusLink)
+            {
+                // Get the forward direction and position of the main camera
+                Vector3 cameraForward = Camera.main.transform.forward;
+                Vector3 cameraPosition = Camera.main.transform.position;
 
-            // Get the Y position from the CameraOffset GameObject (parent of the main camera)
-            float cameraOffsetY = Camera.main.transform.parent.position.y;
+                // Get the Y position from the CameraOffset GameObject (parent of the main camera)
+                float cameraOffsetY = Camera.main.transform.parent.position.y;
 
-            // Calculate the target position 3 units in front of the camera
-            Vector3 targetPosition = cameraPosition + cameraForward * 3.0f;
+                // Calculate the target position 3 units in front of the camera
+                Vector3 targetPosition = cameraPosition + cameraForward * 3.0f;
 
-            // Set the object's position slightly below the camera's height
-            activeRulePlate.transform.position = new Vector3(
-                targetPosition.x,
-                cameraOffsetY - offsetY, // lower by 0.5 units from CameraOffset height
-                targetPosition.z
-            );
+                // Set the object's position slightly below the camera's height
+                activeRulePlate.transform.position = new Vector3(
+                    targetPosition.x,
+                    cameraOffsetY - offsetY, // lower by 0.5 units from CameraOffset height
+                    targetPosition.z
+                );
 
-            // Rotate the object to face the camera
-            activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
+                // Rotate the object to face the camera
+                activeRulePlate.transform.localRotation = Quaternion.Euler(0f, -180f, 0f);
+            }else
+            {
+                // Place the rule plate 3 units in front of the camera and slightly offset vertically
+                Vector3 cameraForward = Camera.main.transform.forward;
+                Vector3 cameraPosition = Camera.main.transform.position;
+
+                activeRulePlate.transform.position = cameraPosition + cameraForward * 3.0f;
+                activeRulePlate.transform.localPosition = new Vector3(
+                    activeRulePlate.transform.localPosition.x,
+                    -1036f,
+                    activeRulePlate.transform.localPosition.z);
+            }
+            
 
             /* // Place the rule plate 3 units in front of the camera and slightly offset vertically
              Vector3 cameraForward = Camera.main.transform.forward;
@@ -830,12 +845,48 @@ namespace UI
                 case InteractionCreationController.Modalities.Controller:
                     BindControllerEvent(lastECAEvent, notifyTracker);
                     break;
+                
+                case InteractionCreationController.Modalities.Timer:
+                    BindTimerEvent();
+                    break;
 
                 default:
                     Debug.LogWarning($"Unknown modality: {lastECAEvent.Modality}");
                     break;
             }
         }
+        
+        private void BindTimerEvent()
+        {
+            float durationInSeconds = lastECAEvent.ObjectStr != null ? float.Parse(lastECAEvent.ObjectStr) : 0f;
+            if (durationInSeconds <= 0)
+            {
+                Debug.LogWarning("Timer duration is not set or is zero. Skipping timer binding.");
+                return;
+            }
+            StartCoroutine(TimerCoroutine(durationInSeconds));
+        }
+        
+        private IEnumerator TimerCoroutine(float seconds)
+        {
+            float timeElapsed = 0f;
+            var timerText = GeneralUIController.Instance.InteractionCreationController.TimerText;
+
+            while (timeElapsed < seconds)
+            {
+                if (timerText != null)
+                {
+                    timerText.text = Mathf.FloorToInt(timeElapsed).ToString();
+                }
+
+                yield return new WaitForSeconds(1f);
+                timeElapsed += 1f;
+            }
+
+            
+            notifyTracker(lastECAEvent);
+        }
+
 
         
         private void BindTouchEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
