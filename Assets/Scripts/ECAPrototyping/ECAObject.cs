@@ -257,11 +257,8 @@ namespace ECAPrototyping.RuleEngine
                     duplicate.name = "new" + baseName + (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count - 1);
                 }
                 
-                //DEMO remove the block
-                if( duplicate.name.Contains("Bullet"))
-                {
-                    duplicate.AddComponent<ProximityTriggerListener>();
-                }
+                UI.Utils.CopyMissingComponents(gameObject, duplicate, GeneralUIController.Instance.CombineRulesController.lastECAEvent, 
+                    GeneralUIController.Instance.CombineRulesController.notifyTracker);
                 
             }
 

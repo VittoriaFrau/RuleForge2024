@@ -18,8 +18,15 @@ namespace UI
                 {
                     if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                     {
-                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
-                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
+                        string objectNameOfLastEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent.ObjectStr;
+                        string subjectNameOfLastEcaEvent =
+                            GeneralUIController.Instance.CombineRulesController.lastECAEvent.Subject;
+                        if (Utils.HaveSameRoot(collision.gameObject.name, objectNameOfLastEcaEvent) ||
+                            Utils.HaveSameRoot(collision.gameObject.name, subjectNameOfLastEcaEvent))
+                        {
+                            GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
+                            GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
+                        }
                     }
                     OnProximityEnter?.Invoke(collision.gameObject);
                 }

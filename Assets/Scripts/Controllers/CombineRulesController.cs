@@ -53,6 +53,9 @@ namespace UI
         private Action<InputAction.CallbackContext> controllerHandler;
         [SerializeField]
         private float offsetY = 0.2f;// Offset for the rule plate position
+        public Action<ECAEvent> notifyTracker;
+        public ECAEvent lastECAEvent;
+        
 
         
         
@@ -514,7 +517,9 @@ namespace UI
                     GameObject obj = ecaEvent.ObjectRef;
                     Debug.Log($"Binding 'when/equivalence' event: {ecaEvent} on GameObject: {(obj != null ? obj.name : "null")}");
                     var isEquivalence = ecaEvent.IsEquivalenceEvent;
-                    BindEvent(obj, ecaEvent, eventSequenceTracker, isEquivalence); 
+                    lastECAEvent = ecaEvent; // Cache the last ECAEvent for later use
+                    BindEvent(obj, eventSequenceTracker, isEquivalence); 
+                    
                 }
             }
 
@@ -536,7 +541,7 @@ namespace UI
                             GameObject obj = mEvent.ObjectRef;
                             Debug.Log($"Binding meanwhile event: {mEvent} on GameObject: {obj.name}");
                             eventSequenceTracker = new EventSequenceTracker(new[] { mEvent }, rule.Actions.ToArray(), ruleEngine);
-                            BindEvent(obj, mEvent, eventSequenceTracker, false, meanwhileRule);
+                            BindEvent(obj, eventSequenceTracker, false, meanwhileRule);
                         }
                     }
                 }
@@ -730,39 +735,13 @@ namespace UI
             ruleDebugText = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/RuleDebugText").gameObject;
         }
         
-        private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,
+        private void BindEvent(GameObject target, EventSequenceTracker tracker,
             bool isEquivalence, MeanwhileEvent meanwhileEvent = null)
         {
-            Action<ECAEvent> notifyTracker;
             
             //DEMO
             if (meanwhileEvent != null)
                 return;
-                
-            //DEMO
-            if (meanwhileEvent != null)
-            {
-                ECAEvent laserEvent =
-                    meanwhileEvent.events.FirstOrDefault(e =>
-                        e.Modality == InteractionCreationController.Modalities.Laser);
-                if (laserEvent != null &&
-                    laserEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
-                {
-                    notifyTracker = (evt) => tracker.EventTriggered(evt);
-                    var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(laserEvent.ObjectRef);
-
-                    foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
-                    {
-                        if (Utils.GetECALastScriptFromECAObject(interactable.gameObject)
-                            .Equals(lastEcaScriptCategoryOfTarget))
-                        {
-                            BindModalityEvent(interactable.gameObject, laserEvent, notifyTracker);
-                        }
-                    }
-
-                    return;
-                }
-            }
 
             if (meanwhileEvent != null && !meanwhileEvent.events.Any(e => e.Modality == InteractionCreationController.Modalities.Speech))
             {
@@ -775,12 +754,12 @@ namespace UI
                     : (evt) => tracker.EventTriggered(evt);
             }
 
-            if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
             {
                 //if the event is bound to a single object, we bind it directly to that object
-                BindModalityEvent(target, eventToBind, notifyTracker);
+                BindModalityEvent(target);
             }
-            else if (eventToBind.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            else if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
             {
                 var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(target);
 
@@ -788,20 +767,20 @@ namespace UI
                 {
                     if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
                     {
-                        BindModalityEvent(interactable.gameObject, eventToBind, notifyTracker);
+                        BindModalityEvent(interactable.gameObject);
                     }
                 }
             }
             else
             {
-                Debug.LogWarning($"Unknown event category: {eventToBind.EventCategory}");
+                Debug.LogWarning($"Unknown event category: {lastECAEvent.EventCategory}");
             }
         }
 
         
-        private void BindModalityEvent(GameObject target, ECAEvent eventToBind, Action<ECAEvent> notifyTracker)
+        private void BindModalityEvent(GameObject target)
         {
-            var modality = eventToBind.Modality;
+            var modality = lastECAEvent.Modality;
 
             if (target == null)
             {
@@ -829,31 +808,31 @@ namespace UI
             switch (modality)
             {
                 case InteractionCreationController.Modalities.Touch:
-                    BindTouchEvent(target, eventToBind, notifyTracker);
+                    BindTouchEvent(target, lastECAEvent, notifyTracker);
                     break;
 
                 case InteractionCreationController.Modalities.Speech:
-                    BindSpeechEvent(eventToBind, notifyTracker);
+                    BindSpeechEvent(lastECAEvent, notifyTracker);
                     break;
 
                 case InteractionCreationController.Modalities.Laser:
-                    BindLaserEvent(target, eventToBind, notifyTracker);
+                    BindLaserEvent(target, lastECAEvent, notifyTracker);
                     break;
 
                 case InteractionCreationController.Modalities.Headgaze:
-                    BindHeadGazeEvent(target, eventToBind, notifyTracker);
+                    BindHeadGazeEvent(target, lastECAEvent, notifyTracker);
                     break;
 
                 case InteractionCreationController.Modalities.Proximity:
-                    BindProximityEvent(target, eventToBind, notifyTracker);
+                    BindProximityEvent(target);
                     break;
 
                 case InteractionCreationController.Modalities.Controller:
-                    BindControllerEvent(eventToBind, notifyTracker);
+                    BindControllerEvent(lastECAEvent, notifyTracker);
                     break;
 
                 default:
-                    Debug.LogWarning($"Unknown modality: {eventToBind.Modality}");
+                    Debug.LogWarning($"Unknown modality: {lastECAEvent.Modality}");
                     break;
             }
         }
@@ -998,7 +977,7 @@ namespace UI
             }
         }
 
-        private void BindProximityEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
+        private void BindProximityEvent(GameObject target)
         {
             var collider = target.GetComponent<Collider>();
             if (collider == null)
@@ -1022,7 +1001,7 @@ namespace UI
             listener.OnProximityEnter += (other) =>
             {
                 Debug.Log($"Proximity detected with {other.name}, triggering action.");
-                notifyTracker(ecaEvent);
+                notifyTracker(lastECAEvent);
             };
         }
         

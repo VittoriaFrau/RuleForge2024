@@ -114,11 +114,11 @@ namespace UI
 
         private void ExecuteThenEvents(ref GameObject latestDuplicate, string baseNameForDuplicates)
         {
+            var lastTriggeredObjects = GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects;
             foreach (var thenEvent in thenEvents)
             {
                 var action = thenEvent.Action;
                 var subject = action.GetSubject();
-                var lastTriggeredObjects = GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects;
                 
                 if (action.IsDynamicSubject)
                 {
@@ -136,8 +136,7 @@ namespace UI
                             break;
                         }
                     }
-                    // Clear the list
-                    lastTriggeredObjects.Clear();
+                    
                 }
 
                 if (thenEvent.Verb == "is duplicated")
@@ -176,6 +175,8 @@ namespace UI
                         oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
                 }
             }
+            // Clear the list
+            lastTriggeredObjects.Clear();
         }
 
         private GameObject FindLatestDuplicate(string baseName)

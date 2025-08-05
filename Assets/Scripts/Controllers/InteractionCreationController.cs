@@ -654,8 +654,8 @@ namespace UI
         public IEnumerator WaitForSpeechDemo()
         {
             yield return new WaitForSeconds(5f);
-            GeneralUIController.Instance.SetDebugText("You said \"Star\"");
-            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "star",
+            GeneralUIController.Instance.SetDebugText("You said \"Fire\"");
+            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "fire",
                 Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);

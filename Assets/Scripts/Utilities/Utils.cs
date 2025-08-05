@@ -59,7 +59,7 @@ namespace UI
             return Color.white;
         }
 
-        
+
         //"providerType":"glove","providerId":42,"timestamp":1687168716976,"name":"tap","actuator":"thumb","contact":"index tip","raw":{}}}}
         /*public static MicrogestureData convertJsonToMicrogestureData(string json)
         {
@@ -70,21 +70,24 @@ namespace UI
             string name = jsonObject.microgesture.content.name;
             string actuator = jsonObject.microgesture.content.actuator;
             string contact = jsonObject.microgesture.content.contact;
-            
+
             MicrogestureData data = new MicrogestureData(providerType, providerId, timestamp, name, actuator, contact);
             return data;
         }*/
-        
-        public static Texture2D LoadPNG(string filePath) {
+
+        public static Texture2D LoadPNG(string filePath)
+        {
 
             Texture2D tex = null;
             byte[] fileData;
 
-            if (File.Exists(filePath)) 	{
+            if (File.Exists(filePath))
+            {
                 fileData = File.ReadAllBytes(filePath);
                 tex = new Texture2D(2, 2);
                 tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
             }
+
             return tex;
         }
 
@@ -107,7 +110,7 @@ namespace UI
             _actionEvents, GameObject cubePrefab, GameObject prefabVariant, GameObject cubePlate)
         {
             Dictionary<GameObject, Vector3> result = new Dictionary<GameObject, Vector3>();
-            //Filter events 
+            //Filter events
             List<ECAEvent> filteredModalityEvents = RemoveDuplicates(_modalityEvents);
 
             float previousZ = 1.41f;
@@ -124,7 +127,7 @@ namespace UI
             }
 
             List<ECAEvent> filteredActionsEvents = RemoveDuplicates(_actionEvents);
-            
+
             foreach (var e in filteredActionsEvents)
             {
                 //Adjust cube transform
@@ -133,26 +136,26 @@ namespace UI
                 GameObject cube;
                 if (e.Object != "")
                 {
-                    cube = InstantiateRuleCube(cubePrefab, 1, position, cubePlate.transform, 
+                    cube = InstantiateRuleCube(cubePrefab, 1, position, cubePlate.transform,
                         new Texture[]{e.Texture});
                 }
                 else
                 {
-                    cube = InstantiateRuleCube(prefabVariant, 1, position, cubePlate.transform, 
+                    cube = InstantiateRuleCube(prefabVariant, 1, position, cubePlate.transform,
                         new Texture[]{e.Texture});
                 }
 
                 cube.tag = "ActionRuleCube";
-                
+
                 result.Add(cube, position);
                 FillTextLabelsInCube(e, cube);
             }
-            
+
             return result;
         }*/
-        
-        public static void GenerateCubesFromEventList(List<ECAEvent> recordedEvents, 
-            GameObject modalityCubePrefab, GameObject actionCubePrefab, 
+
+        public static void GenerateCubesFromEventList(List<ECAEvent> recordedEvents,
+            GameObject modalityCubePrefab, GameObject actionCubePrefab,
             GameObject actionCubePrefabVariant, GameObject cubePlate)
         {
 
@@ -160,23 +163,25 @@ namespace UI
             float previousZ = 1.41f;
             int i = 0;
             foreach (var e in recordedEvents)
-            { 
+            {
                 //Vector3 position = CalculatePositionInPlate(previousZ, allEvents.IndexOf(e));
                 //previousZ = position.z;
                 Vector3 staticLocalPosition = CalculateStaticLocalPosition(i);
                 GameObject cube;
-                
+
                 if (!e.IsActionEvent)
                 {
                     if (e.Texture == null)
                     {
                         Debug.LogError("Texture is null for event: " + e);
                     }
-                    cube = InstantiateRuleCube(modalityCubePrefab, 1, 
+
+                    cube = InstantiateRuleCube(modalityCubePrefab, 1,
                         staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
                 }
-                else cube = InstantiateRuleCube(e.ObjectStr == null ? actionCubePrefabVariant : actionCubePrefab, 1, 
-                    staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
+                else
+                    cube = InstantiateRuleCube(e.ObjectStr == null ? actionCubePrefabVariant : actionCubePrefab, 1,
+                        staticLocalPosition, cubePlate.transform, new Texture[] { e.Texture });
 
                 e.CubeID = cube.GetComponent<CubeController>().cubeID;
                 e.CubeInitialPosition = staticLocalPosition;
@@ -185,7 +190,7 @@ namespace UI
             }
 
         }
-        
+
         public static Texture2D LoadTextureFromFile(string filename)
         {
             // Verifica se il file esiste
@@ -199,7 +204,9 @@ namespace UI
             byte[] fileData = System.IO.File.ReadAllBytes(filename);
 
             // Crea una nuova Texture2D
-            Texture2D texture = new Texture2D(2, 2); // Le dimensioni iniziali non sono importanti, saranno ridimensionate automaticamente
+            Texture2D
+                texture = new Texture2D(2,
+                    2); // Le dimensioni iniziali non sono importanti, saranno ridimensionate automaticamente
 
             // Carica l'immagine dai byte nella texture
             if (texture.LoadImage(fileData))
@@ -219,136 +226,140 @@ namespace UI
         {
             switch (i)
             {
-               case 0:
-                   return new Vector3(-5.3f, -77.9f, -16.3f);
-               case 1:
-                   return new Vector3(-5.3f, -42.5f, -16.3f);
-               case 2:
-                   return new Vector3(-5.3f, -8.4f, -16.3f);
-               case 3:
-                   return new Vector3(-5.3f, 31.2f, -15.0f);
+                case 0:
+                    return new Vector3(-5.3f, -77.9f, -16.3f);
+                case 1:
+                    return new Vector3(-5.3f, -42.5f, -16.3f);
+                case 2:
+                    return new Vector3(-5.3f, -8.4f, -16.3f);
+                case 3:
+                    return new Vector3(-5.3f, 31.2f, -15.0f);
             }
+
             return new Vector3(-5.3f, 0.0f, -16.3f);
         }
 
-        public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, Transform interactableTransform)
-    {
-        // Validation checks
-        if (string.IsNullOrEmpty(prefabType))
+        public static GameObject InstantiateObject(string prefabType, List<GameObject> prefabList, Camera mainCamera,
+            Transform interactableTransform)
         {
-            Debug.LogError("PrefabType is null or empty!");
-            return null;
-        }
+            // Validation checks
+            if (string.IsNullOrEmpty(prefabType))
+            {
+                Debug.LogError("PrefabType is null or empty!");
+                return null;
+            }
 
-        if (mainCamera == null)
-        {
-            Debug.LogError("MainCamera is null!");
-            mainCamera = Camera.main;
             if (mainCamera == null)
             {
-                Debug.LogError("Cannot find main camera!");
-                return null;
+                Debug.LogError("MainCamera is null!");
+                mainCamera = Camera.main;
+                if (mainCamera == null)
+                {
+                    Debug.LogError("Cannot find main camera!");
+                    return null;
+                }
             }
-        }
 
-        if (interactableTransform == null)
-        {
-            Debug.LogError("InteractableTransform is null!");
-            return null;
-        }
-
-        // Get prefab
-        GameObject prefab = GetPrefabFromString(prefabType, prefabList);
-        if (prefab == null)
-        {
-            Debug.LogError($"Prefab not found for type: {prefabType}");
-            return null;
-        }
-
-        // Calculate spawn position
-        Vector3 spawnPosition;
-        try
-        {
-            GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
-            if (floor != null)
+            if (interactableTransform == null)
             {
-                Vector3 upwardOffset = Vector3.up * 1f;
-                Vector3 forwardOffset = mainCamera.transform.forward * 1f;
-                spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
-            }
-            else
-            {
-                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 1f;
-                Debug.LogWarning("Floor not found, using camera position as reference");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error calculating spawn position: {e.Message}");
-            return null;
-        }
-
-        // Instantiate object
-        GameObject go = null;
-        try
-        {
-            go = Object.Instantiate(prefab, spawnPosition, prefab.transform.localRotation);
-            if (go == null)
-            {
-                Debug.LogError("Failed to instantiate object!");
+                Debug.LogError("InteractableTransform is null!");
                 return null;
             }
 
-            // Set parent
-            go.transform.parent = interactableTransform;
-
-            // Setup Rigidbody
-            Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
-            if (rigidbody == null)
+            // Get prefab
+            GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+            if (prefab == null)
             {
-                rigidbody = go.AddComponent<Rigidbody>();
-                Debug.Log($"Added Rigidbody to {go.name}");
+                Debug.LogError($"Prefab not found for type: {prefabType}");
+                return null;
             }
 
-            rigidbody.useGravity = true;
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
+            // Calculate spawn position
+            Vector3 spawnPosition;
+            try
+            {
+                GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
+                if (floor != null)
+                {
+                    Vector3 upwardOffset = Vector3.up * 1f;
+                    Vector3 forwardOffset = mainCamera.transform.forward * 1f;
+                    spawnPosition = floor.transform.position + upwardOffset + forwardOffset;
+                }
+                else
+                {
+                    spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 1f;
+                    Debug.LogWarning("Floor not found, using camera position as reference");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error calculating spawn position: {e.Message}");
+                return null;
+            }
 
-            // Rename object
-            int sameTypeCount = 0;
-            foreach (Transform child in interactableTransform)
+            // Instantiate object
+            GameObject go = null;
+            try
             {
-                if (child.name.StartsWith(prefabType)) sameTypeCount++;
-            }
-            go.name = prefabType + sameTypeCount;
+                go = Object.Instantiate(prefab, spawnPosition, prefab.transform.localRotation);
+                if (go == null)
+                {
+                    Debug.LogError("Failed to instantiate object!");
+                    return null;
+                }
 
-            // Set tag and ECAObject component
-            go.tag = "Interactable";
-            ECAObject ecaObject = go.GetComponent<ECAObject>();
-            if (ecaObject != null)
-            {
-                ecaObject.isUsingGravity = ECABoolean.YES;
+                // Set parent
+                go.transform.parent = interactableTransform;
+
+                // Setup Rigidbody
+                Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
+                if (rigidbody == null)
+                {
+                    rigidbody = go.AddComponent<Rigidbody>();
+                    Debug.Log($"Added Rigidbody to {go.name}");
+                }
+
+                rigidbody.useGravity = true;
+                rigidbody.velocity = Vector3.zero;
+                rigidbody.angularVelocity = Vector3.zero;
+
+                // Rename object
+                int sameTypeCount = 0;
+                foreach (Transform child in interactableTransform)
+                {
+                    if (child.name.StartsWith(prefabType)) sameTypeCount++;
+                }
+
+                go.name = prefabType + sameTypeCount;
+
+                // Set tag and ECAObject component
+                go.tag = "Interactable";
+                ECAObject ecaObject = go.GetComponent<ECAObject>();
+                if (ecaObject != null)
+                {
+                    ecaObject.isUsingGravity = ECABoolean.YES;
+                }
+                else
+                {
+                    Debug.LogWarning($"ECAObject component not found on {go.name}");
+                    ecaObject = go.AddComponent<ECAObject>();
+                    ecaObject.isUsingGravity = ECABoolean.YES;
+                }
             }
-            else
+            catch (Exception e)
             {
-                Debug.LogWarning($"ECAObject component not found on {go.name}");
-                ecaObject = go.AddComponent<ECAObject>();
-                ecaObject.isUsingGravity = ECABoolean.YES;
+                Debug.LogError($"Error during object instantiation: {e.Message}");
+                if (go != null)
+                {
+                    Object.Destroy(go);
+                }
+
+                return null;
             }
+
+            return go;
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error during object instantiation: {e.Message}");
-            if (go != null)
-            {
-                Object.Destroy(go);
-            }
-            return null;
-        }
 
-        return go;
-    }
-        
         public static void ApplyOriginalMaterialToDuplicatedObjects(Transform interactablesTransform)
         {
             foreach (Transform go in interactablesTransform)
@@ -375,135 +386,138 @@ namespace UI
                 }
             }
         }
-    
-        public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList, Camera mainCamera, 
-        Transform interactableTransform, Vector3 position)
-    {
-        // Validation checks
-        if (string.IsNullOrEmpty(prefabType))
-        {
-            Debug.LogError("PrefabType is null or empty!");
-            return null;
-        }
 
-        if (mainCamera == null)
+        public static GameObject InstantiateSpawnObject(string prefabType, List<GameObject> prefabList,
+            Camera mainCamera,
+            Transform interactableTransform, Vector3 position)
         {
-            Debug.LogError("MainCamera is null!");
-            mainCamera = Camera.main;
+            // Validation checks
+            if (string.IsNullOrEmpty(prefabType))
+            {
+                Debug.LogError("PrefabType is null or empty!");
+                return null;
+            }
+
             if (mainCamera == null)
             {
-                Debug.LogError("Cannot find main camera!");
-                return null;
+                Debug.LogError("MainCamera is null!");
+                mainCamera = Camera.main;
+                if (mainCamera == null)
+                {
+                    Debug.LogError("Cannot find main camera!");
+                    return null;
+                }
             }
-        }
 
-        if (interactableTransform == null)
-        {
-            Debug.LogError("InteractableTransform is null!");
-            return null;
-        }
-
-        // Get prefab
-        GameObject prefab = GetPrefabFromString(prefabType, prefabList);
-        if (prefab == null)
-        {
-            Debug.LogError($"Prefab not found for type: {prefabType}");
-            return null;
-        }
-
-        // Calculate spawn position
-        /*Vector3 spawnPosition;
-        try
-        {
-            GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
-            if (floor != null)
+            if (interactableTransform == null)
             {
-                Vector3 upwardOffset = Vector3.up * 1f;
-                Vector3 forwardOffset = mainCamera.transform.forward * 2f;
-                spawnPosition = position + upwardOffset + forwardOffset;
-            }
-            else
-            {
-                spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
-                Debug.LogWarning("Floor not found, using camera position as reference");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error calculating spawn position: {e.Message}");
-            return null;
-        }*/
-
-        // Instantiate object
-        GameObject go = null;
-        try
-        {
-            go = Object.Instantiate(prefab, position, Quaternion.identity);
-            if (go == null)
-            {
-                Debug.LogError("Failed to instantiate object!");
+                Debug.LogError("InteractableTransform is null!");
                 return null;
             }
 
-            // Set parent
-            go.transform.parent = interactableTransform;
-
-            // Setup Rigidbody
-            Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
-            if (rigidbody == null)
+            // Get prefab
+            GameObject prefab = GetPrefabFromString(prefabType, prefabList);
+            if (prefab == null)
             {
-                rigidbody = go.AddComponent<Rigidbody>();
-                Debug.Log($"Added Rigidbody to {go.name}");
+                Debug.LogError($"Prefab not found for type: {prefabType}");
+                return null;
             }
 
-            rigidbody.useGravity = true;
-            rigidbody.velocity = Vector3.zero;
-            rigidbody.angularVelocity = Vector3.zero;
+            // Calculate spawn position
+            /*Vector3 spawnPosition;
+            try
+            {
+                GameObject floor = GameObject.Find("Floor") ?? GameObject.Find("floor");
+                if (floor != null)
+                {
+                    Vector3 upwardOffset = Vector3.up * 1f;
+                    Vector3 forwardOffset = mainCamera.transform.forward * 2f;
+                    spawnPosition = position + upwardOffset + forwardOffset;
+                }
+                else
+                {
+                    spawnPosition = mainCamera.transform.position + mainCamera.transform.forward * 2f;
+                    Debug.LogWarning("Floor not found, using camera position as reference");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error calculating spawn position: {e.Message}");
+                return null;
+            }*/
 
-            // Rename object
-            int sameTypeCount = 0;
-            foreach (Transform child in interactableTransform)
+            // Instantiate object
+            GameObject go = null;
+            try
             {
-                if (child.name.StartsWith(prefabType)) sameTypeCount++;
-            }
-            go.name = prefabType + sameTypeCount;
+                go = Object.Instantiate(prefab, position, Quaternion.identity);
+                if (go == null)
+                {
+                    Debug.LogError("Failed to instantiate object!");
+                    return null;
+                }
 
-            // Set tag and ECAObject component
-            go.tag = "Interactable";
-            ECAObject ecaObject = go.GetComponent<ECAObject>();
-            if (ecaObject != null)
-            {
-                ecaObject.isUsingGravity = ECABoolean.YES;
+                // Set parent
+                go.transform.parent = interactableTransform;
+
+                // Setup Rigidbody
+                Rigidbody rigidbody = go.GetComponent<Rigidbody>() ?? go.GetComponentInChildren<Rigidbody>();
+                if (rigidbody == null)
+                {
+                    rigidbody = go.AddComponent<Rigidbody>();
+                    Debug.Log($"Added Rigidbody to {go.name}");
+                }
+
+                rigidbody.useGravity = true;
+                rigidbody.velocity = Vector3.zero;
+                rigidbody.angularVelocity = Vector3.zero;
+
+                // Rename object
+                int sameTypeCount = 0;
+                foreach (Transform child in interactableTransform)
+                {
+                    if (child.name.StartsWith(prefabType)) sameTypeCount++;
+                }
+
+                go.name = prefabType + sameTypeCount;
+
+                // Set tag and ECAObject component
+                go.tag = "Interactable";
+                ECAObject ecaObject = go.GetComponent<ECAObject>();
+                if (ecaObject != null)
+                {
+                    ecaObject.isUsingGravity = ECABoolean.YES;
+                }
+                else
+                {
+                    Debug.LogWarning($"ECAObject component not found on {go.name}");
+                    ecaObject = go.AddComponent<ECAObject>();
+                    ecaObject.isUsingGravity = ECABoolean.YES;
+                }
             }
-            else
+            catch (Exception e)
             {
-                Debug.LogWarning($"ECAObject component not found on {go.name}");
-                ecaObject = go.AddComponent<ECAObject>();
-                ecaObject.isUsingGravity = ECABoolean.YES;
+                Debug.LogError($"Error during object instantiation: {e.Message}");
+                if (go != null)
+                {
+                    Object.Destroy(go);
+                }
+
+                return null;
             }
+
+            return go;
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error during object instantiation: {e.Message}");
-            if (go != null)
-            {
-                Object.Destroy(go);
-            }
-            return null;
-        }
 
-        return go;
-    }
-        
-    
+
         /*public static ECAEvent GetEventFromCube(GameObject cube, GameObject interactablesParent)
         {
             ECAEvent e = new ECAEvent(cube);
-            
+
             GameObject frontFace = cube.transform.Find("FrontFaceRule").gameObject;
             TextMeshProUGUI subjectFront = frontFace.transform.Find("Subject").transform.Find("Image").GetComponent<TextMeshProUGUI>();
             e.Subject = subjectFront.text;
-                
+
             TextMeshProUGUI verbFront = frontFace.transform.Find("Verb").transform.Find("Image").GetComponent<TextMeshProUGUI>();
             string[] verbAndEvent = verbFront.text.Split(' ');
             if (verbAndEvent.Length == 1)
@@ -515,15 +529,15 @@ namespace UI
             {
                 e.EventStr = verbAndEvent[0] + " " + verbAndEvent[1];
             }
-            
-                
+
+
             TextMeshProUGUI objectFront = frontFace.transform.Find("Object").transform.Find("Image").GetComponent<TextMeshProUGUI>();
             e.ObjectStr = objectFront.text;
-            
+
             e.Texture = (Texture2D)cube.GetComponent<Renderer>().material.mainTexture;
-            
+
             e.Modality = GetModalityFromVerb(e.Verb);
-            
+
             e.ObjectRef = interactablesParent.transform.Find(e.ObjectStr).gameObject;
 
             return e;
@@ -536,6 +550,7 @@ namespace UI
             {
                 return null;
             }
+
             int cubeID = cubeController.cubeID;
             ECAEvent e = recordedEvents.Find(ev => ev.CubeID == cubeID);
             if (e == null)
@@ -553,6 +568,7 @@ namespace UI
             {
                 return null;
             }
+
             int cubeID = cubeController.cubeID;
             MeanwhileEvent @event = recordedMeanwhiles.Find(m => m.CubeID == cubeID);
             if (@event == null)
@@ -576,7 +592,7 @@ namespace UI
                 case "clicks":
                     return InteractionCreationController.Modalities.Touch;
                 case "points":
-                case "stops pointing": 
+                case "stops pointing":
                     return InteractionCreationController.Modalities.Laser;
                 case "looks":
                 case "stops looking":
@@ -590,13 +606,15 @@ namespace UI
          * Instantiate a cube with a rule description
          * @params: cubeLevel: 1, 2, 3 is the number of joint cubes
          */
-        public static GameObject InstantiateRuleCube(GameObject cubePrefab, int cubeLevel, Vector3 position, Transform parent, Texture[] texture )
+        public static GameObject InstantiateRuleCube(GameObject cubePrefab, int cubeLevel, Vector3 position,
+            Transform parent, Texture[] texture)
         {
-            GameObject cube = Object.Instantiate(cubePrefab, position, Quaternion.Euler(0f,0f,0f), parent);
+            GameObject cube = Object.Instantiate(cubePrefab, position, Quaternion.Euler(0f, 0f, 0f), parent);
             cube.transform.rotation = Quaternion.identity;
             cube.transform.localScale = new Vector3(25, 25, 25);
             cube.transform.localPosition = position;
-            cube.transform.localRotation = new Quaternion(-90.0f, cube.transform.rotation.y, cube.transform.rotation.z, cube.transform.rotation.w);
+            cube.transform.localRotation = new Quaternion(-90.0f, cube.transform.rotation.y, cube.transform.rotation.z,
+                cube.transform.rotation.w);
             if (cubeLevel < 2)
             {
                 Material material = new Material(Shader.Find("Standard"));
@@ -614,6 +632,7 @@ namespace UI
                     Debug.LogError("Invalid texture array or missing textures!");
                     return cube;
                 }
+
                 GameObject cubeLeft = cube.transform.Find("CubeLeft").gameObject;
                 GameObject cubeRight = cube.transform.Find("CubeRight").gameObject;
 
@@ -632,9 +651,10 @@ namespace UI
                 materialRight.mainTextureOffset = new Vector2(0.25f, 0.25f);
 
             }
+
             //if this is a cube level2, we don't need the cubeId. This will most likely change in the future
             CubeController cubeController = cube.GetComponent<CubeController>();
-            if (cubeController !=null )
+            if (cubeController != null)
             {
                 cubeController.cubeID = cube.GetInstanceID();
             }
@@ -647,31 +667,33 @@ namespace UI
             float zPosition;
             if (eventIndex == 6)
                 previousZ = 1.41f;
-            zPosition=previousZ - 0.13f;
-            
+            zPosition = previousZ - 0.13f;
+
             float xPosition = eventIndex < 6 ? -0.37f : -0.25f; //One or more rows
             Vector3 position = new Vector3(xPosition, -0.19f, zPosition);
             return position;
         }
 
-        public static void GenerateTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string logicalOperator)
+        public static void GenerateTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription,
+            string logicalOperator)
         {
             string previousString = textLabel.text;
             //Remove the new line
-            string formattedText = cubeDescription.Replace("\n", " "); 
-            if(previousString == "..." || previousString=="") //if it's the first cube
+            string formattedText = cubeDescription.Replace("\n", " ");
+            if (previousString == "..." || previousString == "") //if it's the first cube
                 textLabel.text = formattedText;
             else
             {
-                textLabel.text = previousString + " "+ logicalOperator + " " + formattedText;
+                textLabel.text = previousString + " " + logicalOperator + " " + formattedText;
             }
-            
+
         }
-        
-        public static void RemoveTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription, string locution)
+
+        public static void RemoveTextFromCubePosition(TextMeshProUGUI textLabel, string cubeDescription,
+            string locution)
         {
             string input = textLabel.text;
-            
+
             int locutionIndex = input.IndexOf(locution, StringComparison.OrdinalIgnoreCase);
             int phraseIndex = input.IndexOf(cubeDescription, StringComparison.OrdinalIgnoreCase);
 
@@ -692,17 +714,19 @@ namespace UI
                     textLabel.text = input;
                 }
             }
-            
+
             // Rimuove eventuale operatore logico rimasto all'inizio della stringa
             if (input.StartsWith(locution, StringComparison.OrdinalIgnoreCase))
             {
                 input = input.Substring(locution.Length).TrimStart(' ');
             }
+
             // Rimuove eventuale operatore logico rimasto alla fine della stringa
             if (input.EndsWith(locution, StringComparison.OrdinalIgnoreCase))
             {
-                input = input.Substring(0,input.Length-locution.Length).TrimEnd(' ');
+                input = input.Substring(0, input.Length - locution.Length).TrimEnd(' ');
             }
+
             textLabel.text = input;
         }
 
@@ -720,8 +744,8 @@ namespace UI
                     break;
                 case InteractionCreationController.Modalities.Speech:
                     labelTexts[1] = "says"; //3rd person for reading
-                    labelTexts[2] = "\""  + e.EventStr + "\""; //keyword
-                    break; 
+                    labelTexts[2] = "\"" + e.EventStr + "\""; //keyword
+                    break;
                 case InteractionCreationController.Modalities.Proximity:
                     labelTexts[0] = e.Subject;
                     labelTexts[1] = "is near to"; //3rd person for reading
@@ -733,35 +757,41 @@ namespace UI
                     break;
                 case InteractionCreationController.Modalities.None: // action cube
                     labelTexts[1] = e.Verb;
-                    if(e.Verb.Equals("is duplicated"))
+                    if (e.Verb.Equals("is duplicated"))
                     {
                         labelTexts[2] = e.ObjectStr + " times";
                     }
+
                     break;
                 default:
-                    labelTexts[1] = e.EventStr; 
+                    labelTexts[1] = e.EventStr;
                     break;
             }
-            
-            
+
+
             if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
             {
                 if (!string.IsNullOrEmpty(e.ObjectStr))
                 {
-                    string objectNameWithoutNumber = Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
-                    labelTexts[2] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                    string objectNameWithoutNumber =
+                        Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
+                    labelTexts[2] =
+                        "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
                 }
                 else
                 {
-                    string subjectNameWithoutNumber = Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
+                    string subjectNameWithoutNumber =
+                        Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
                     labelTexts[2] = subjectNameWithoutNumber; //if it's a category, we use "any" instead of the object
                 }
-                
+
                 //if the modality is proximity, we do the same for the subject
                 if (e.Modality == InteractionCreationController.Modalities.Proximity)
                 {
-                    string subjectNameWithoutNumber = Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
-                    labelTexts[0] = "any " + subjectNameWithoutNumber; //if it's a category, we use "any" instead of the subject
+                    string subjectNameWithoutNumber =
+                        Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
+                    labelTexts[0] =
+                        "any " + subjectNameWithoutNumber; //if it's a category, we use "any" instead of the subject
                 }
             }
 
@@ -776,10 +806,10 @@ namespace UI
                     //To read the text better we replace the spaces with new lines, only if labelTexts[i] has more than 10 ch
                     if (labelTexts[i].Length > 10)
                     {
-                        string formattedText = labelTexts[i].Replace(" ", "\n"); 
-                        faceLabels[i].text =formattedText;
+                        string formattedText = labelTexts[i].Replace(" ", "\n");
+                        faceLabels[i].text = formattedText;
                     }
-                    else 
+                    else
                     {
                         faceLabels[i].text = labelTexts[i];
                     }
@@ -810,7 +840,7 @@ namespace UI
 
             if (obj != null && secondVerbText != null && meanwhileText != null)
             {
-                return new[] { subject, verb,  meanwhileText, secondVerbText , obj};
+                return new[] { subject, verb, meanwhileText, secondVerbText, obj };
             }
 
             if (obj != null && secondVerbText != null)
@@ -825,7 +855,7 @@ namespace UI
 
             if (secondVerbText != null && meanwhileText != null)
             {
-                return new[] { subject, verb, meanwhileText, secondVerbText  };
+                return new[] { subject, verb, meanwhileText, secondVerbText };
             }
 
             return secondVerbText != null ? new[] { subject, verb, secondVerbText } : new[] { subject, verb };
@@ -848,16 +878,17 @@ namespace UI
                 }
             }).ToArray();
         }
-        
-        public static void FillTextLabelsInMergedCubes(GameObject newCube, ECAEvent [] events)
+
+        public static void FillTextLabelsInMergedCubes(GameObject newCube, ECAEvent[] events)
         {
             // Define the face names and text labels
             string[] faceNames = { "FrontFaceRule", "TopFaceRule" };
-            
+
             if (events[0].EventStr == null)
             {
                 events[0].EventStr = events[0].Verb;
             }
+
             if (events[1].EventStr == null)
             {
                 events[1].EventStr = events[1].Verb;
@@ -867,44 +898,54 @@ namespace UI
             {
                 events[0].EventStr = events[0].Verb;
             }
-            
+
             if (events[1].Modality == InteractionCreationController.Modalities.Speech)
             {
                 events[1].EventStr = events[1].Verb;
             }
-            
+
             events[0].EventStr = ConvertToIngForm(events[0].EventStr);
             events[1].EventStr = ConvertToIngForm(events[1].EventStr);
-            
-            string[] labelTexts = { events[0].Subject, events[0].EventStr + " " + events[0].ObjectStr, "and", events[1].EventStr + " ", events[1].ObjectStr };
 
-            if(events[0].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            string[] labelTexts =
             {
-                string objectNameWithoutNumber = Regex.Replace(events[0].ObjectStr, @"\d+$", ""); // Get the object name without the number
-                labelTexts[1] = events[0].EventStr + " " + "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
-            } 
-            
-            if(events[1].EventCategory == CategoryController.CategoryObjectSelected.Category)
+                events[0].Subject, events[0].EventStr + " " + events[0].ObjectStr, "and", events[1].EventStr + " ",
+                events[1].ObjectStr
+            };
+
+            if (events[0].EventCategory == CategoryController.CategoryObjectSelected.Category)
             {
-                string objectNameWithoutNumber = Regex.Replace(events[1].ObjectStr, @"\d+$", ""); // Get the object name without the number
-                labelTexts[4] = "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+                string objectNameWithoutNumber =
+                    Regex.Replace(events[0].ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[1] =
+                    events[0].EventStr + " " + "any " +
+                    objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
             }
-            
+
+            if (events[1].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                string objectNameWithoutNumber =
+                    Regex.Replace(events[1].ObjectStr, @"\d+$", ""); // Get the object name without the number
+                labelTexts[4] =
+                    "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
+            }
+
             // Loop through each face and fill the text labels
             foreach (string faceName in faceNames)
             {
                 TextMeshProUGUI[] faceLabels = GetOrderedTextLabels(newCube, faceName);
-                
+
                 // Fill the text labels with the appropriate text
                 for (int i = 0; i < faceLabels.Length; i++)
                 {
                     faceLabels[i].text = labelTexts[i];
                 }
-                
+
             }
-        } 
-        
-        public static string ConvertToIngForm(string verb) {
+        }
+
+        public static string ConvertToIngForm(string verb)
+        {
             if (string.IsNullOrEmpty(verb)) return verb;
 
             if (verb.StartsWith("stops") || verb.StartsWith("is")) return verb;
@@ -920,7 +961,8 @@ namespace UI
             {
                 verb = verb.Substring(0, verb.Length - 1);
             }
-            else if (verb.EndsWith("es") && (verb.EndsWith("ses") || verb.EndsWith("xes") || verb.EndsWith("zes") || verb.EndsWith("ches") || verb.EndsWith("shes")))
+            else if (verb.EndsWith("es") && (verb.EndsWith("ses") || verb.EndsWith("xes") || verb.EndsWith("zes") ||
+                                             verb.EndsWith("ches") || verb.EndsWith("shes")))
             {
                 verb = verb.Substring(0, verb.Length - 2);
             }
@@ -944,7 +986,7 @@ namespace UI
         {
             string ruleDescription = "";
             //Front face
-            TextMeshProUGUI [] frontFaceR = GetTextLabelsInCube(cube, "FrontFaceRule");
+            TextMeshProUGUI[] frontFaceR = GetTextLabelsInCube(cube, "FrontFaceRule");
             foreach (var t in frontFaceR)
             {
                 ruleDescription += t.text + " ";
@@ -962,7 +1004,8 @@ namespace UI
         //Delete all the unnecessary containers
         public static void ResetCubeContainers()
         {
-            Transform whenContainer = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "When").transform;
+            Transform whenContainer = GameObject.FindGameObjectsWithTag("RuleUtils")
+                .FirstOrDefault(x => x.name == "When").transform;
             Transform whenFrontplate = whenContainer.Find("Frontplate");
             GameObject whenSequentialRow = whenFrontplate.Find("SequentialRow").gameObject;
             GameObject whenEquivalenceRow = whenFrontplate.Find("EquivalenceRow").gameObject;
@@ -976,8 +1019,9 @@ namespace UI
             {
                 if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
             }
-            
-            Transform thenContainer = GameObject.FindGameObjectsWithTag("RuleUtils").FirstOrDefault(x => x.name == "Then").transform;
+
+            Transform thenContainer = GameObject.FindGameObjectsWithTag("RuleUtils")
+                .FirstOrDefault(x => x.name == "Then").transform;
             Transform thenFrontplate = thenContainer.Find("Frontplate");
             GameObject thenSequentialRow = thenFrontplate.Find("SequentialRow").gameObject;
             GameObject thenEquivalenceRow = thenFrontplate.Find("EquivalenceRow").gameObject;
@@ -986,7 +1030,7 @@ namespace UI
             {
                 if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
             }
-            
+
             foreach (Transform child in thenEquivalenceRow.transform)
             {
                 if (child.name.StartsWith("CubeContainer(Clone)")) Object.Destroy(child.gameObject);
@@ -1030,7 +1074,7 @@ namespace UI
                 case "Shape":
                     return "Icon 133";
                 case "Food":
-                case "Prop":    
+                case "Prop":
                     return "Icon 54";
                 case "Environment":
                 case "Furniture":
@@ -1046,7 +1090,8 @@ namespace UI
                 case "Animal":
                     return "Assets/Resources/Icons/paws.png";
             }
-            Debug.LogError("Icon null for category "+ category);
+
+            Debug.LogError("Icon null for category " + category);
             return null;
         }
 
@@ -1062,7 +1107,7 @@ namespace UI
                     break;
                 case Action.ActionType.CHANGES:
                 case Action.ActionType.CUSTOMCHANGE:
-                    e.Verb = action.GetActionMethod() + " " + action.GetObject() + " " +  action.GetModifier();
+                    e.Verb = action.GetActionMethod() + " " + action.GetObject() + " " + action.GetModifier();
                     e.ObjectStr = action.GetModifierValue().ToString();
                     break;
                 case Action.ActionType.VALUE:
@@ -1081,6 +1126,7 @@ namespace UI
                         GameObject actionObject = action.GetObject() as GameObject;
                         e.ObjectStr = actionObject.name;
                     }
+
                     break;
             }
 
@@ -1095,7 +1141,7 @@ namespace UI
                 case "hides":
                     return new Action(action.GetSubject(), "shows");
                 case "opens":
-                    return new Action(action.GetSubject(), "closes");  
+                    return new Action(action.GetSubject(), "closes");
                 case "closes":
                     return new Action(action.GetSubject(), "opens");
                 case "gravityON":
@@ -1104,10 +1150,11 @@ namespace UI
                     return new Action(action.GetSubject(), "gravityON");
                 case "turns":
                     string modifier = action.GetObject().ToString();
-                    ECABoolean oppositeModifier = modifier.Equals("on") ? ECABoolean.OFF : ECABoolean.ON ;
+                    ECABoolean oppositeModifier = modifier.Equals("on") ? ECABoolean.OFF : ECABoolean.ON;
                     return new Action(action.GetSubject(), "turns", oppositeModifier);
                 case "changes":
-                    return new Action(action.GetSubject(), "changes", action.GetModifier(), "to", action.GetModifierValue());
+                    return new Action(action.GetSubject(), "changes", action.GetModifier(), "to",
+                        action.GetModifierValue());
                 case "changes color to":
                     //TODO: implement the previous color
                     ECAColor ECAColor = new ECAColor("white");
@@ -1117,17 +1164,18 @@ namespace UI
                     {
                         return new Action(action.GetSubject(), "delete duplicates");
                     }
+
                     break;
                 case "follows":
                     return new Action(action.GetSubject(), "unfollows");
-                case "changes text": 
+                case "changes text":
                     return new Action(action.GetSubject(), "resets text");
                 case "increases by one":
                 case "doubles":
                 case "decreases by one":
                     return new Action(action.GetSubject(), "resets counter");
                 case "is thrown":
-                case "explodes": 
+                case "explodes":
                 case "moves near":
                     return new Action(action.GetSubject(), "resets");
                 case "turns off":
@@ -1138,7 +1186,7 @@ namespace UI
 
             return null;
         }
-        
+
         public static Action GetActionFromString(string s, GameObject SelectedObject)
         {
             if (ECAColor.IsEcaColor(s))
@@ -1146,18 +1194,19 @@ namespace UI
                 ECAColor color = new ECAColor(s);
                 return (new Action(SelectedObject, "changes", "color", "to", color));
             }
+
             // get the verb by making the string s lowercase
             string verb = s.ToLower();
             return new Action(SelectedObject, verb);
         }
-        
+
         public static void ChangeButtonAppearance(bool active, GameObject button)
         {
             GameObject frontPlate = button.transform.Find("Frontplate").gameObject;
             GameObject animatedContent = frontPlate.transform.Find("AnimatedContent").gameObject;
             var textMeshPro = animatedContent.transform.Find("Text");
             var icon = animatedContent.transform.Find("Icon");
-            if(textMeshPro == null) textMeshPro = icon.transform.Find("Text");    
+            if (textMeshPro == null) textMeshPro = icon.transform.Find("Text");
             var textMeshProUGUI = textMeshPro.GetComponent<TextMeshProUGUI>();
             var color = textMeshProUGUI.color;
             color.a = active ? 1 : 0.2f;
@@ -1171,7 +1220,8 @@ namespace UI
         public static void TogglePressableButton(bool active, GameObject button)
         {
             PressableButton pressableButton = button.GetComponent<PressableButton>();
-            if(pressableButton){
+            if (pressableButton)
+            {
                 pressableButton.enabled = active;
             }
         }
@@ -1196,11 +1246,11 @@ namespace UI
         public static void ExecuteActionOnCategory(RuleEngine _ruleEngine, Action action, GameObject parent)
         {
             GameObject mainGameObject = action.GetSubject();
-            string ecaLastScript = "ECA"+ GetECALastScriptFromECAObject(mainGameObject);
+            string ecaLastScript = "ECA" + GetECALastScriptFromECAObject(mainGameObject);
             GameObject[] categoryGameObjects = FindObjectsWithECAScript(parent, ecaLastScript);
-            
+
             foreach (GameObject categoryGameObject in categoryGameObjects)
-            {   
+            {
                 Action newAction = action;
                 newAction.SetSubject(categoryGameObject);
                 _ruleEngine.ExecuteAction(newAction);
@@ -1217,7 +1267,7 @@ namespace UI
                 _ruleEngine.ExecuteAction(newAction);
             }
         }
-        
+
         public static bool AreControllersConnected()
         {
             List<InputDevice> devices = new List<InputDevice>();
@@ -1239,5 +1289,58 @@ namespace UI
                 return true;
             return false;
         }
+
+        public static void CopyMissingComponents(GameObject source, GameObject duplicate, ECAEvent ecaEvent = null,
+            Action<ECAEvent> notifyTracker = null)
+        {
+            // finds all MonoBehaviour of source
+            var sourceComponents = source.GetComponents<MonoBehaviour>();
+
+            foreach (var sourceComp in sourceComponents)
+            {
+                var type = sourceComp.GetType();
+
+                // Ignores already existing components in the duplicate
+                if (duplicate.GetComponent(type) != null)
+                    continue;
+
+                // Adds the missing component to the duplicate
+                var newComp = duplicate.AddComponent(type);
+                Debug.Log($"[ComponentReplicator] Added missing component: {type.Name} to {duplicate.name}");
+
+                // Special handling for ProximityTriggerListener
+                if (newComp is ProximityTriggerListener listener)
+                {
+                    if (ecaEvent != null && notifyTracker != null)
+                    {
+                        listener.OnProximityEnter += (other) =>
+                        {
+                            Debug.Log($"[ComponentReplicator] Proximity detected with {other.name}, triggering action.");
+                            notifyTracker?.Invoke(ecaEvent);
+                        };
+                    }
+                }
+            }
+        }
+        
+        public static bool HaveSameRoot(string a, string b)
+        {
+            string rootA = NormalizeAndExtractRoot(a);
+            string rootB = NormalizeAndExtractRoot(b);
+            return rootA.Equals(rootB, System.StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeAndExtractRoot(string input)
+        {
+            // Rimuove prefisso "new" se presente
+            if (input.StartsWith("new", System.StringComparison.OrdinalIgnoreCase))
+            {
+                input = input.Substring(3);
+            }
+
+            // Rimuove numeri finali
+            return Regex.Replace(input, @"\d+$", "");
+        }
+    
     }
 }
