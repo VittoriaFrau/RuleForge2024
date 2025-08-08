@@ -298,23 +298,23 @@ namespace UI
             ApplyShining(controllerRightReference, shiningTouchMaterial);
         }
 
-        public void ReplaceLeftControllerModel(Transform gunPrefabTransform)
+        public void ReplaceLeftControllerModel(Transform equippablePrefabTransform)
         {
             if (handModelLeft.Model != null)
             {
                 Destroy(handModelLeft.Model.gameObject); // Destroy the old model
             }
 
-            handModelLeft.ModelPrefab = gunPrefabTransform;
+            handModelLeft.ModelPrefab = equippablePrefabTransform;
 
             Destroy(handModelLeft.ModelParent.gameObject.transform.GetChild(0).gameObject);
 
             // Move the new prefab as child of the hand model parent
-            gunPrefabTransform.SetParent(handModelLeft.ModelParent);
+            equippablePrefabTransform.SetParent(handModelLeft.ModelParent);
 
-            gunPrefabTransform.SetPositionAndRotation(new Vector3(-7.53674394e-05f, 0.000259717082f, -5.92828146e-05f),
+            equippablePrefabTransform.SetPositionAndRotation(new Vector3(-7.53674394e-05f, 0.000259717082f, -5.92828146e-05f),
                 Quaternion.Euler(88.7832413f, 209.190033f, 209.371323f));
-            gunPrefabTransform.localScale = new Vector3(0.17f, 0.17f, 0.17f);
+            equippablePrefabTransform.localScale = new Vector3(0.17f, 0.17f, 0.17f);
         }
 
         private GameObject ReplaceHandModel(HandModel handModel, Transform newPrefab)
@@ -1268,7 +1268,7 @@ namespace UI
             }
             //DEMO, if not demo use null instead of load png
             ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near",
-                proximityGameObject2, Utils.LoadPNG("Assets/Resources/Scenario/BlasterGame/bulletRockProximity.png"), false);
+                proximityGameObject2, Utils.LoadPNG(null), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);

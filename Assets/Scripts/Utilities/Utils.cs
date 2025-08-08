@@ -1171,8 +1171,8 @@ namespace UI
                     }
 
                     break;
-                case "follows":
-                    return new Action(action.GetSubject(), "unfollows");
+                case "equip":
+                    return new Action(action.GetSubject(), "unequip");
                 case "changes text":
                     return new Action(action.GetSubject(), "resets text");
                 case "increases by one":

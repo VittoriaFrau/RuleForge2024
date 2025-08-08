@@ -323,7 +323,7 @@ namespace ECAPrototyping.RuleEngine
             if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
             {
                 GeneralUIController.Instance.InteractionCreationController.ReplaceLeftControllerModel(gameObject.transform);
-                if (gameObject.name.Contains("gun"))
+                if (UI.Utils.IsEquipable(gameObject))
                 {
                     // adjustments for the demo
                     transform.localPosition = new Vector3(-7.53674394e-05f, 0.000259717082f, -5.92828146e-05f);
@@ -433,7 +433,17 @@ namespace ECAPrototyping.RuleEngine
             }
             else
             {
-                transform.position = targetObject.transform.position;
+                if (targetObject.name.Equals("Floor"))
+                {
+                    // If the target object is the floor, we just move randomly on the floor
+                    Camera mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+                    Vector3 upwardOffset = Vector3.up * 1f;
+                    Vector3 forwardOffset = mainCamera.transform.forward * 1f;
+                    Vector3 spawnPosition = targetObject.transform.position + upwardOffset + forwardOffset;
+                    transform.position = spawnPosition;
+                }
+                // If no spawn cube is found, just move to the target object's position
+                else transform.position = targetObject.transform.position;
             }
         }
         

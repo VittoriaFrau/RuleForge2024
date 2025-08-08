@@ -14,22 +14,19 @@ namespace UI
         {
             if (collision.gameObject.CompareTag("Interactable"))
             {
-                if (!Utils.IsEquipable(collision.gameObject))
+                if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                 {
-                    if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
+                    string objectNameOfLastEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent.ObjectStr;
+                    string subjectNameOfLastEcaEvent =
+                        GeneralUIController.Instance.CombineRulesController.lastECAEvent.Subject;
+                    if (Utils.HaveSameRoot(collision.gameObject.name, objectNameOfLastEcaEvent) ||
+                        Utils.HaveSameRoot(collision.gameObject.name, subjectNameOfLastEcaEvent))
                     {
-                        string objectNameOfLastEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent.ObjectStr;
-                        string subjectNameOfLastEcaEvent =
-                            GeneralUIController.Instance.CombineRulesController.lastECAEvent.Subject;
-                        if (Utils.HaveSameRoot(collision.gameObject.name, objectNameOfLastEcaEvent) ||
-                            Utils.HaveSameRoot(collision.gameObject.name, subjectNameOfLastEcaEvent))
-                        {
-                            GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
-                            GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
-                        }
+                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
+                        GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
                     }
-                    OnProximityEnter?.Invoke(collision.gameObject);
                 }
+                OnProximityEnter?.Invoke(collision.gameObject);
             }
             
         }

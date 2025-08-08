@@ -102,6 +102,22 @@ namespace UI
                 }
                 _editModeController.CreateAndPublishAction("moves near");
             }
+
+            if (other.CompareTag("Floor"))
+            {
+                ProximityGameObject1 = other.gameObject;
+                string proximityObjectName = ProximityGameObject1.name;
+                GeneralUIController.Instance.SetDebugText("Do you want the " + selectedObjBaseName + 
+                                                          " to move somewhere near to the " + proximityObjectName + "?");
+                interactionButtons.SetActive(true);
+                backButton.SetActive(false);
+                handMenuManager.HideMenus();
+                if (GeneralUIController.Instance.isRecording)
+                {
+                    handMenuManager.HideRecordButtonInEditMenu();
+                }
+                _editModeController.CreateAndPublishAction("moves near");
+            }
         }
 
         void OnTriggerExit(Collider other)
