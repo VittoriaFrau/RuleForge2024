@@ -21,6 +21,9 @@ namespace ECAPrototyping.RuleEngine
         /// <b>GameRender</b> is the renderer of the object.
         /// </summary>
         private Renderer gameRenderer;
+        private ObjectManipulator objectManipulator;
+        private Rigidbody rigidbody;
+        private BoxCollider boxCollider;
         
         /// <summary>
         /// <b> Color </b> is the color of the object 
@@ -58,27 +61,36 @@ namespace ECAPrototyping.RuleEngine
 
         protected virtual void Awake()
         {
-                      // Aggiungi ObjectManipulator se non esiste
-            var manipulator = gameObject.GetComponent<ObjectManipulator>();
-            if (manipulator == null)
+            // Aggiungi ObjectManipulator se non esiste
+            objectManipulator = gameObject.GetComponent<ObjectManipulator>();
+            if (objectManipulator == null)
             {
-                manipulator = gameObject.AddComponent<ObjectManipulator>();
+                objectManipulator = gameObject.AddComponent<ObjectManipulator>();
             }
 
             // Aggiungi BoxCollider se non esiste
-            if (gameObject.GetComponent<BoxCollider>() == null)
+            boxCollider = gameObject.GetComponent<BoxCollider>();
+            if (boxCollider == null)
             {
-                gameObject.AddComponent<BoxCollider>();
+                boxCollider = gameObject.AddComponent<BoxCollider>();
             }
 
             // Configura Rigidbody se non esiste
-            if (gameObject.GetComponent<Rigidbody>() == null)
+            rigidbody = gameObject.GetComponent<Rigidbody>();
+            if (rigidbody == null)
             {
-                Rigidbody rb = gameObject.AddComponent<Rigidbody>();
-                rb.useGravity = false;
-                rb.isKinematic = true;
+                rigidbody = gameObject.AddComponent<Rigidbody>();
+                rigidbody.useGravity = false;
+                rigidbody.isKinematic = true;
             }
-            gameRenderer = this.gameObject.GetComponent<Renderer>();
+
+            if (shouldFloat)
+            {
+                rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                
+            }
+
+        gameRenderer = this.gameObject.GetComponent<Renderer>();
             if(gameRenderer == null)
                 gameRenderer = this.gameObject.AddComponent<MeshRenderer>();
             color = gameRenderer.material.color;
@@ -415,6 +427,44 @@ namespace ECAPrototyping.RuleEngine
         /// 
         [Action(typeof(ECAObject), "moves near", typeof(ECAObject))]
         public void Moves(ECAObject targetObject)
+        {
+            initialPosition = transform.position;
+            var rb = GetComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+            GameObject spawnCube = GameObject.FindGameObjectWithTag("SpawnCube");
+            if (spawnCube)
+            {
+                Transform spawnCubeChild = spawnCube.transform.GetChild(0);
+                if (spawnCubeChild != null)
+                {
+                    Vector3 targetPosition = spawnCubeChild.position;
+                    transform.position = targetPosition;
+                    rb.MovePosition(targetPosition);
+                }
+            }
+            else
+            {
+                if (targetObject.name.Equals("Floor"))
+                {
+                    // If the target object is the floor, we just move randomly on the floor
+                    Camera mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+                    Vector3 upwardOffset = Vector3.up * 1f;
+                    Vector3 forwardOffset = mainCamera.transform.forward * 1f;
+                    Vector3 spawnPosition = targetObject.transform.position + upwardOffset + forwardOffset;
+                    transform.position = spawnPosition;
+                }
+                // If no spawn cube is found, just move to the target object's position
+                else transform.position = targetObject.transform.position;
+            }
+        }
+        
+        /// <summary>
+        /// <b>Moves</b> moves the selected object close to the spawn cube.   
+        /// </summary>
+        /// 
+        [Action(typeof(ECAObject), "moves around", typeof(ECAObject))]
+        public void MovesAround(ECAObject targetObject)
         {
             initialPosition = transform.position;
             var rb = GetComponent<Rigidbody>();

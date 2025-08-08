@@ -280,7 +280,7 @@ MonoBehaviour:
   rotateLerpTime: 0.001
   scaleLerpTime: 0.001
   enableConstraints: 1
-  constraintsManager: {fileID: 0}
+  constraintsManager: {fileID: 2851765778546201232}
   manipulationLogicTypes:
     moveLogicType:
       reference: MixedReality.Toolkit.SpatialManipulation.MoveLogic, MixedReality.Toolkit.SpatialManipulation
@@ -360,6 +360,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a01e545503b47c393e1e91edaf29ada, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEquipable:
+    choice: 3
 --- !u!1 &3585594593242577515
 GameObject:
   m_ObjectHideFlags: 0

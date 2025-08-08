@@ -36,6 +36,7 @@ namespace UI.RuleEditor
         public List<GameObject> ecaDoorButtons;
         public List<GameObject> ecaTextButtons;
         public List<GameObject> ecaPropsButtons;
+        public List<GameObject> ecaTimerButtons;
         
         private string inputText = "";
         
@@ -174,6 +175,9 @@ namespace UI.RuleEditor
                 case "Props":
                     ecaPropsButtons.ForEach(button => button.SetActive(true));
                     break;
+                case "Timer":
+                    ecaTimerButtons.ForEach(button => button.SetActive(true));
+                    break;
             }
 
             if (GeneralUIController.Instance.isRecording)
@@ -197,6 +201,7 @@ namespace UI.RuleEditor
             ecaDoorButtons.ForEach(button => button.SetActive(false));
             ecaTextButtons.ForEach(button => button.SetActive(false));
             ecaPropsButtons.ForEach(button => button.SetActive(false));
+            ecaTimerButtons.ForEach(button => button.SetActive(false));
         }
         
         public void ShowNewInteractionMenu()

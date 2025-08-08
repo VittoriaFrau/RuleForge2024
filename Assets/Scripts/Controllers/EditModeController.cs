@@ -98,7 +98,7 @@ namespace UI
             if(action==null) 
                 action = Utils.GetActionFromString(actionName,  GeneralUIController.Instance.GetSelectedObject());
             // If I'm recording, I need to save the action
-            if (GeneralUIController.Instance.isRecording && actionName != "moves near")
+            if (GeneralUIController.Instance.isRecording && !actionName.Contains("moves"))
             {
                 GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
             }else if (actionName.Equals("moves near"))

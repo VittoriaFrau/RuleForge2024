@@ -116,7 +116,7 @@ namespace UI
                 {
                     handMenuManager.HideRecordButtonInEditMenu();
                 }
-                _editModeController.CreateAndPublishAction("moves near");
+                _editModeController.CreateAndPublishAction("moves around");
             }
         }
 
@@ -132,11 +132,23 @@ namespace UI
         {
             if (GeneralUIController.Instance.isRecording)
             {
-                ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves near", 
+                if (ProximityGameObject1.CompareTag("Floor"))
+                {
+                    // moves around
+                    ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves around", 
+                        ProximityGameObject1);
+                    GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
+                    string screenshotName = selectedObjBaseName + " moves around" + ProximityGameObject1.name;
+                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
+                }
+                else{
+                    ECAPrototyping.RuleEngine.Action action = new ECAPrototyping.RuleEngine.Action(selectedObject, "moves near", 
                     ProximityGameObject1);
-                GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
-                string screenshotName = selectedObjBaseName + " moves near" + ProximityGameObject1.name;
-                _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
+                    GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
+                    string screenshotName = selectedObjBaseName + " moves near" + ProximityGameObject1.name;
+                    _screenshotCamera.SaveImageFromCameraStatic(screenshotCamera.GetComponent<Camera>(), screenshotName);
+                }
+                
             }
             GeneralUIController.Instance.EditModeState();
             if (GeneralUIController.Instance.isRecording)

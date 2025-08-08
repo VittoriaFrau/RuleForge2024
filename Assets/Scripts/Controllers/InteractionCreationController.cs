@@ -1351,6 +1351,7 @@ namespace UI
 
             // Reset selectedObject's local position relative to its new parent
             selectedObject.transform.localPosition = Vector3.zero;
+            
         }
 
         /// <summary>

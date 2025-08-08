@@ -1182,6 +1182,7 @@ namespace UI
                 case "is thrown":
                 case "explodes":
                 case "moves near":
+                case "moves around":
                     return new Action(action.GetSubject(), "resets");
                 case "turns off":
                     return new Action(action.GetSubject(), "turns on");

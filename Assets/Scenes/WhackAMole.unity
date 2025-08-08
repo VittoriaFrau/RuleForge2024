@@ -491,30 +491,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3078364785314551234, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -635,10 +611,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7859643972730393318, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-      propertyPath: constraintsManager
-      value: 
-      objectReference: {fileID: 1051143113}
     - target: {fileID: 8913578132882953922, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -787,6 +759,7 @@ GameObject:
   - component: {fileID: 341802477}
   - component: {fileID: 341802476}
   - component: {fileID: 341802479}
+  - component: {fileID: 341802480}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Floor
@@ -900,8 +873,35 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10, y: 0.108958334, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 10, y: 0.13030235, z: 10}
+  m_Center: {x: 0, y: 0.0106720105, z: 0}
+--- !u!54 &341802480
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341802474}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 0
 --- !u!1 &635837588
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,17 +1227,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1051143113 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2962564909230106531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
-  m_PrefabInstance: {fileID: 30245621}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50cdab0cd5a0916419324bb54314773d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1867267783
 GameObject:
   m_ObjectHideFlags: 0
