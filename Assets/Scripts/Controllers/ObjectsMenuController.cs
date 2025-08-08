@@ -83,6 +83,11 @@ public class ObjectsMenuController : MonoBehaviour
         List<GameObject> prefabs = prefabLibrary[prefabKey];
         GameObject newObj = Utils.InstantiateSpawnObject(type, prefabs, mainCamera, interactables.transform, position);
         spawnedObjects.Add(newObj);
+        //DEMO rotate mole
+        if (newObj.name.Contains("Mole"))
+        {
+            newObj.transform.localRotation = new Quaternion(270.0f,180.0f,0.0f, newObj.transform.localRotation.w);
+        }
         return newObj;
     }
     
