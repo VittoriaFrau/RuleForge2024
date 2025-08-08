@@ -872,7 +872,7 @@ namespace UI
             float timeElapsed = 0f;
             var timerText = GeneralUIController.Instance.InteractionCreationController.TimerText;
 
-            while (timeElapsed < seconds)
+            while (timeElapsed <= seconds)
             {
                 if (timerText != null)
                 {

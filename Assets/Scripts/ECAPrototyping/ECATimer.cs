@@ -5,7 +5,6 @@ namespace ECAPrototyping.RuleEngine
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(ECAObject))]
-    [RequireComponent(typeof(TextMeshPro))]
     [ECARules4All("timer")]
     public class ECATimer : MonoBehaviour
     {
