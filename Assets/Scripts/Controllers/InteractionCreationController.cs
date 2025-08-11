@@ -218,37 +218,8 @@ namespace UI
             handMenuManager.ShowKeyboard("SetTimerSeconds");
             GeneralUIController.Instance.SetSelectedObject(timer);
             GeneralUIController.Instance.TimersController.AddTimer(timer);
-            
-            /*timerText = timer.GetComponentInChildren<TextMeshPro>();
-            if(timerText != null)
-            {
-                GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
-                timerText.text = "0:00";
-                timerText.fontSize = 2.5f;
-                timerText.color = Color.white;
-                handMenuManager.ShowKeyboard("SetTimerSeconds");
-            }
-            else
-            {
-                Debug.LogWarning("Timer text component not found.");
-            }*/
         }
         
-        /*public void ResetTimer()
-        {
-            // Reset the timer to the initial state
-            GeneralUIController.Instance.SetDebugText("Timer reset to 0");
-            if (timerText != null)
-            {
-                timerText.text = "0:00";
-                timerSeconds = 0;
-            }
-            else
-            {
-                Debug.LogWarning("Timer text component not found.");
-            }
-        }*/
-
         private void ActivateControllers()
         {
             // Left hand
