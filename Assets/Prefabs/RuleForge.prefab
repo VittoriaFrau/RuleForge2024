@@ -148836,6 +148836,7 @@ GameObject:
   - component: {fileID: 8716191333414450868}
   - component: {fileID: 3159531990346631017}
   - component: {fileID: 1274055155741964715}
+  - component: {fileID: 6333660214156160633}
   m_Layer: 0
   m_Name: EventHandler
   m_TagString: EventHandler
@@ -149031,6 +149032,18 @@ MonoBehaviour:
   CategoryButton: {fileID: 6484061656993021004}
   AllObjectsButton: {fileID: 8869748033016092393}
   categoryObjectSelected: 0
+--- !u!114 &6333660214156160633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5876039117203238164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1676e2269848b2bbed8c9c6917993f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5888020213602804899
 GameObject:
   m_ObjectHideFlags: 0

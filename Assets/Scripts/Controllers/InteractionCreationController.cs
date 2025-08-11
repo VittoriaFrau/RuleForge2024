@@ -116,26 +116,6 @@ namespace UI
         public GameObject resetTimerButton;
 
         public GameObject addTimerButton;
-        private GameObject timer;
-
-        public GameObject Timer
-        {
-            get => timer;
-            set => timer = value;
-        }
-        private TextMeshPro timerText;
-        private int timerSeconds = 0;
-        public int TimerSeconds
-        {
-            get => timerSeconds;
-            set { timerSeconds = value; }
-        }
-
-        public TextMeshPro TimerText
-        {
-            get => timerText;
-            set => timerText = value;
-        }
 
         private void Start()
         {
@@ -230,17 +210,16 @@ namespace UI
 
         public void AddTimer()
         {
-            if (timer != null)
-            {
-                handMenuManager.ShowKeyboard("SetTimerSeconds");
-                return;
-            }
-            
-            timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
+            GameObject timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
             timer.AddComponent<ECATimer>();
             GeneralUIController.Instance.SetSelectedObject(timer);
             timer.name = "Timer";
-            timerText = timer.GetComponentInChildren<TextMeshPro>();
+            GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
+            handMenuManager.ShowKeyboard("SetTimerSeconds");
+            GeneralUIController.Instance.SetSelectedObject(timer);
+            GeneralUIController.Instance.TimersController.AddTimer(timer);
+            
+            /*timerText = timer.GetComponentInChildren<TextMeshPro>();
             if(timerText != null)
             {
                 GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
@@ -252,10 +231,10 @@ namespace UI
             else
             {
                 Debug.LogWarning("Timer text component not found.");
-            }
+            }*/
         }
         
-        public void ResetTimer()
+        /*public void ResetTimer()
         {
             // Reset the timer to the initial state
             GeneralUIController.Instance.SetDebugText("Timer reset to 0");
@@ -268,7 +247,7 @@ namespace UI
             {
                 Debug.LogWarning("Timer text component not found.");
             }
-        }
+        }*/
 
         private void ActivateControllers()
         {
@@ -489,7 +468,7 @@ namespace UI
 
             if (_modality == Modalities.Timer)
             {
-                ResetTimer();
+                GeneralUIController.Instance.TimersController.ResetAllTimersToZero();
             }
         }
 

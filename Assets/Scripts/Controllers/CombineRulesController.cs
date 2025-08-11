@@ -55,20 +55,6 @@ namespace UI
         private float offsetY = 0.2f;// Offset for the rule plate position
         public Action<ECAEvent> notifyTracker;
         public ECAEvent lastECAEvent;
-        
-
-        
-        //DEMO, remove comment when using meanwhile
-        /*private void Update()
-        {
-            foreach (var rule in activeMeanwhileEvents)
-            {
-                if (rule != null)
-                {
-                    rule.UpdateTimer(Time.deltaTime);
-                }
-            }
-        }*/
 
         public void ActivateCombineRules(bool startFromScratch = true)
         {
@@ -859,35 +845,10 @@ namespace UI
         private void BindTimerEvent()
         {
             float durationInSeconds = lastECAEvent.ObjectStr != null ? float.Parse(lastECAEvent.ObjectStr) : 0f;
-            if (durationInSeconds <= 0)
-            {
-                Debug.LogWarning("Timer duration is not set or is zero. Skipping timer binding.");
-                return;
-            }
-            StartCoroutine(TimerCoroutine(durationInSeconds));
+            
+            GeneralUIController.Instance.TimersController.BindTimerEvent(lastECAEvent.Subject, durationInSeconds, notifyTracker, lastECAEvent);
         }
         
-        private IEnumerator TimerCoroutine(float seconds)
-        {
-            float timeElapsed = 0f;
-            var timerText = GeneralUIController.Instance.InteractionCreationController.TimerText;
-
-            while (timeElapsed <= seconds)
-            {
-                if (timerText != null)
-                {
-                    timerText.text = Mathf.FloorToInt(timeElapsed).ToString();
-                }
-
-                yield return new WaitForSeconds(1f);
-                timeElapsed += 1f;
-            }
-
-            
-            notifyTracker(lastECAEvent);
-        }
-
-
         
         private void BindTouchEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
         {

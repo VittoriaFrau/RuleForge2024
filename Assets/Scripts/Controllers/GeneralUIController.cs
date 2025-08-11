@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Controllers;
 using RulePlate.Core;
 using TMPro;
 using UI.RuleEditor;
@@ -64,6 +65,13 @@ namespace UI
             set => _objectsMenuController = value;
         }
         
+        private TimersController _timersController;
+        public TimersController TimersController
+        {
+            get => _timersController;
+            set => _timersController = value;
+        }
+        
         public HandMenuManager _handMenuManager;
 
         
@@ -99,6 +107,7 @@ namespace UI
             _editModeController = eventHandler.GetComponent<EditModeController>();
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
+            _timersController = eventHandler.GetComponent<TimersController>();
             if (_combineRulesController.activeRulePlate)
             {
                 if(_combineRulesController.activeRulePlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlatePrefab.gameObject.SetActive(false);
@@ -137,7 +146,7 @@ namespace UI
                     _handMenuManager.DeActivatePlayStateMenu();
                     _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
                     _combineRulesController.UnbindAllEvents();
-                    _interactionCreationController.ResetTimer();
+                    _timersController.ResetAllTimersToZero();
                     break;
             }
         }

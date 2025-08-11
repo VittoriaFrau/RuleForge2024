@@ -295,8 +295,17 @@ namespace UI.RuleEditor
                     {
                         // Create UI element with text of input
                         int nSeconds = int.Parse(input);
-                        GeneralUIController.Instance.InteractionCreationController.TimerSeconds = nSeconds;
-                        GeneralUIController.Instance.InteractionCreationController.TimerText.text = Utils.CalculateTimerText(nSeconds);
+                        ECATimer timer = GeneralUIController.Instance.GetSelectedObject().GetComponent<ECATimer>();
+                        if (timer != null)
+                        {
+                            timer.SetTimerDuration(nSeconds);
+                        }
+                        else
+                        {
+                            // If the object does not have a timer, create one
+                            timer = GeneralUIController.Instance.GetSelectedObject().AddComponent<ECATimer>();
+                            timer.SetTimerDuration(nSeconds);
+                        }
                         if (GeneralUIController.Instance.isRecording)
                         {
                             ECAEvent ecaEvent = new ECAEvent(GeneralUIController.Instance.GetSelectedObject(), 

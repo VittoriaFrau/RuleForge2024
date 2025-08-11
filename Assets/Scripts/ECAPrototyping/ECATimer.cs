@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using TMPro;
 using UI;
 using UnityEngine;
@@ -9,10 +11,86 @@ namespace ECAPrototyping.RuleEngine
     public class ECATimer : MonoBehaviour
     {
 
+        private float timerDuration; 
+        private float currentTime;
+        private TextMeshPro timerText;
+        private Action<ECAEvent> trackerCallback;
+        private ECAEvent trackerEvent;
+
+
+        private void Start()
+        {
+            timerText = gameObject.GetComponentInChildren<TextMeshPro>();
+            timerDuration = 0f;
+            currentTime = 0f;
+            timerText.fontSize = 2.5f;
+            timerText.color = Color.white;
+            timerText.text = "0:00";
+        }
+        
+        public void SetTimerDuration(float duration)
+        {
+            timerDuration = duration;
+            currentTime = 0f;
+            if (timerText != null)
+            {
+                timerText.text = UI.Utils.CalculateTimerText(duration);
+            }
+        }
+
         [Action(typeof(ECATimer), "restarts")]
         public void Restart()
         {
-            GeneralUIController.Instance.InteractionCreationController.ResetTimer();
+            currentTime = 0;
+            timerText.text = "0:00";
+            if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
+            {
+                StartTimer(trackerCallback, trackerEvent);
+            }
         }
+        
+        public void StartTimer(Action<ECAEvent> notifyTracker = null, ECAEvent ecaEvent = null)
+        {
+            trackerCallback = notifyTracker;
+            trackerEvent = ecaEvent;
+            StartCoroutine(TimerCoroutine());
+        }
+        
+        public void StopTimer()
+        {
+            StopCoroutine(TimerCoroutine());
+            if (timerText != null)
+            {
+                timerText.text = UI.Utils.CalculateTimerText(timerDuration);
+            }
+        }
+        
+        public void ResetTimerToZero()
+        {
+            currentTime = 0f;
+            if (timerText != null)
+            {
+                timerText.text = UI.Utils.CalculateTimerText(0f);
+            }
+        }
+
+        private IEnumerator TimerCoroutine()
+        {
+            float timeElapsed = 0f;
+
+            while (timeElapsed <= timerDuration)
+            {
+                if (timerText != null)
+                {
+                    // Mostra il valore attuale (senza arrotondamenti strani)
+                    timerText.text = Mathf.FloorToInt(timeElapsed).ToString();
+                }
+
+                yield return new WaitForSeconds(1f);
+                timeElapsed += 1f;
+            }
+            trackerCallback?.Invoke(trackerEvent);
+        }
+        
     }
 }

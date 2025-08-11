@@ -1281,7 +1281,7 @@ namespace UI
             return devices.Count > 0;
         }
 
-        public static string CalculateTimerText(int timeInSeconds)
+        public static string CalculateTimerText(float timeInSeconds)
         {
             int minutes = Mathf.FloorToInt(timeInSeconds / 60);
             int seconds = Mathf.FloorToInt(timeInSeconds % 60);
