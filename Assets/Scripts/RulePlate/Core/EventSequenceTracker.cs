@@ -143,8 +143,11 @@ namespace UI
                 {
                     ruleEngine.ExecuteAction(action);
                     //if opposite action is not already in the list, we add it
-                    if (!oppositeActions.Contains(Utils.GetOppositeAction(action, thenEvent.Verb)))
-                        oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
+                    Action oppositeAction = Utils.GetOppositeAction(action, thenEvent.Verb);
+                    if (oppositeAction != null && !oppositeActions.Contains(oppositeAction))
+                    {
+                        oppositeActions.Add(oppositeAction);
+                    }
                     latestDuplicate = FindLatestDuplicate(baseNameForDuplicates);
                     continue;
                 }
@@ -171,8 +174,9 @@ namespace UI
                 if (!subject.GetComponent<ECAObject>().isACopy || 
                     GeneralUIController.Instance.UIstate == GeneralUIController.UIState.EditMode) 
                 {
-                    if (!oppositeActions.Contains(Utils.GetOppositeAction(action, thenEvent.Verb)))
-                        oppositeActions.Add(Utils.GetOppositeAction(action, thenEvent.Verb));
+                    Action oppositeAction = Utils.GetOppositeAction(action, thenEvent.Verb);
+                    if (oppositeAction != null && !oppositeActions.Contains(oppositeAction))
+                        oppositeActions.Add(oppositeAction);
                 }
             }
             // Clear the list

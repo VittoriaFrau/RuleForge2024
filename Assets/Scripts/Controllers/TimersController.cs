@@ -31,6 +31,17 @@ namespace Controllers
                 Debug.LogError($"Timer object with name {timerObjName} not found in timerList.");
             }
         }
+        
+        public void UnBindAllTimerEvents()
+        {
+            foreach (var timer in timerList)
+            {
+                if (timer.TryGetComponent<ECATimer>(out var ecaTimer))
+                {
+                    ecaTimer.StopTimer();
+                }
+            }
+        }
 
         
         public void AddTimer(GameObject timer)
@@ -56,6 +67,17 @@ namespace Controllers
                 if (timer.TryGetComponent<ECATimer>(out var ecaTimer))
                 {
                     ecaTimer.ResetTimerToZero();
+                }
+            }
+        }
+
+        public void StopAllTimers()
+        {
+            foreach (var timer in timerList)
+            {
+                if (timer.TryGetComponent<ECATimer>(out var ecaTimer))
+                {
+                    ecaTimer.StopTimer();
                 }
             }
         }

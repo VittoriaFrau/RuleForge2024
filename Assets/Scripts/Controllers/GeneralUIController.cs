@@ -147,6 +147,7 @@ namespace UI
                     _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
                     _combineRulesController.UnbindAllEvents();
                     _timersController.ResetAllTimersToZero();
+                    _timersController.StopAllTimers();
                     break;
             }
         }

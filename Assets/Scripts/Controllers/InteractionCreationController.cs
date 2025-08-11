@@ -214,6 +214,7 @@ namespace UI
             timer.AddComponent<ECATimer>();
             GeneralUIController.Instance.SetSelectedObject(timer);
             timer.name = "Timer";
+            timer.transform.position = new Vector3(timer.transform.position.x,  2.5f, timer.transform.position.z);
             GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
             handMenuManager.ShowKeyboard("SetTimerSeconds");
             GeneralUIController.Instance.SetSelectedObject(timer);

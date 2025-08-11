@@ -291,6 +291,7 @@ namespace ECAPrototyping.RuleEngine
             // Restore original material if it was changed of the object
             RestoreOriginalMaterials();
             isDuplicated.Assign(ECABoolean.BoolType.NO);
+            GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Clear();
         }
         
         /// <summary>
@@ -486,7 +487,7 @@ namespace ECAPrototyping.RuleEngine
                 if (targetObject.name.Equals("Floor"))
                 {
                     Vector3 spawnPosition =
-                        UI.Utils.CalculateRandomSpawnPosition(gameObject, gameObject.transform.parent);
+                        UI.Utils.CalculateRandomSpawnPosition(targetObject.transform.position, gameObject.transform.parent);
                     // Set the object's position
                     transform.position = spawnPosition;
                 }

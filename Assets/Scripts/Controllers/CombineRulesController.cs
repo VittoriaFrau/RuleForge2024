@@ -1054,6 +1054,10 @@ namespace UI
                                 }
 
                                 break;
+                            
+                            case InteractionCreationController.Modalities.Timer:
+                                GeneralUIController.Instance.TimersController.UnBindAllTimerEvents();
+                                break;
                         }
                     }
                 }
