@@ -485,18 +485,8 @@ namespace ECAPrototyping.RuleEngine
             {
                 if (targetObject.name.Equals("Floor"))
                 {
-                    // Get the center position of the floor
-                    Vector3 floorCenter = targetObject.transform.position;
-
-                    // Generate a random point within a 2-meter radius on the XZ plane
-                    float radius = 1f;
-                    Vector2 randomCircle = Random.insideUnitCircle * radius;
-                    Vector3 randomOffset = new Vector3(randomCircle.x, 0f, randomCircle.y);
-
-                    // Calculate final spawn position with height offset
-                    float heightOffset = 0.3f; //  meter above the floor
-                    Vector3 spawnPosition = floorCenter + randomOffset + Vector3.up * heightOffset;
-
+                    Vector3 spawnPosition =
+                        UI.Utils.CalculateRandomSpawnPosition(gameObject, gameObject.transform.parent);
                     // Set the object's position
                     transform.position = spawnPosition;
                 }

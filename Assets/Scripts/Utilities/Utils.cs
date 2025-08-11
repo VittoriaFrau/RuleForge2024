@@ -1347,6 +1347,55 @@ namespace UI
             // Rimuove numeri finali
             return Regex.Replace(input, @"\d+$", "");
         }
+        
+        public static Vector3 CalculateRandomSpawnPosition(GameObject targetObject, Transform parentWithChildren, float radius = 1f, float heightOffset = 0.3f)
+        {
+            Vector3 floorCenter = targetObject.transform.position;
+
+            Vector3 spawnPosition;
+            int safetyCounter = 0;
+            const int maxAttempts = 20;
+
+            do
+            {
+                // Generate a random point within the given radius on the XZ plane
+                Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * radius;
+                Vector3 randomOffset = new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+                // Calculate final spawn position with height offset
+                spawnPosition = floorCenter + randomOffset + Vector3.up * heightOffset;
+
+                safetyCounter++;
+
+                // Prevent infinite loops
+                if (safetyCounter > maxAttempts)
+                {
+                    Debug.LogWarning("No valid spawn position found after max attempts.");
+                    return spawnPosition;
+                }
+
+            } while (IsIntersectingWithChildren(spawnPosition, parentWithChildren));
+
+            return spawnPosition;
+        }
+
+        
+        /// <summary>
+        /// Checks if the given position intersects with any child of the specified parent.
+        /// This assumes each child has a collider.
+        /// </summary>
+        public static bool IsIntersectingWithChildren(Vector3 position, Transform parent)
+        {
+            foreach (Transform child in parent)
+            {
+                Collider childCollider = child.GetComponent<Collider>();
+                if (childCollider != null && childCollider.bounds.Contains(position))
+                {
+                    return true; // Position intersects with this child
+                }
+            }
+            return false;
+        }
     
     }
 }
