@@ -86,7 +86,8 @@ public class ObjectsMenuController : MonoBehaviour
         //DEMO rotate mole
         if (newObj.name.Contains("Mole"))
         {
-            newObj.transform.localRotation = new Quaternion(270.0f,180.0f,0.0f, newObj.transform.localRotation.w);
+            newObj.transform.localRotation = 
+                Quaternion.Euler(-90f, -180f, 0f);
         }
         return newObj;
     }

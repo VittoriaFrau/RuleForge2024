@@ -1368,7 +1368,7 @@ namespace UI
             spawnCube.transform.rotation = initialSpawnCubeTransform.rotation;
 
             // Unparent selectedObject and reset Rigidbody constraints
-            selectedObject.transform.SetParent(null);
+            selectedObject.transform.SetParent(interactablesParent.transform);
 
             Rigidbody rb = selectedObject.GetComponent<Rigidbody>();
             if (rb != null)

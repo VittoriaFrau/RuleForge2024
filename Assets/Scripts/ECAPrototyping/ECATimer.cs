@@ -9,8 +9,8 @@ namespace ECAPrototyping.RuleEngine
     public class ECATimer : MonoBehaviour
     {
 
-        [Action(typeof(ECATimer), "resets timer")]
-        public void ResetTimer()
+        [Action(typeof(ECATimer), "restarts")]
+        public void Restart()
         {
             GeneralUIController.Instance.InteractionCreationController.ResetTimer();
         }

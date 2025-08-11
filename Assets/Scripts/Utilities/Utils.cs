@@ -1285,7 +1285,7 @@ namespace UI
         {
             int minutes = Mathf.FloorToInt(timeInSeconds / 60);
             int seconds = Mathf.FloorToInt(timeInSeconds % 60);
-            return string.Format("{0:D2}:{1:D2}", minutes, seconds);
+            return string.Format("{0}:{1:D2}", minutes, seconds);
         }
 
         public static bool IsEquipable(GameObject gameObject)

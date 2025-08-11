@@ -485,11 +485,19 @@ namespace ECAPrototyping.RuleEngine
             {
                 if (targetObject.name.Equals("Floor"))
                 {
-                    // If the target object is the floor, we just move randomly on the floor
-                    Camera mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-                    Vector3 upwardOffset = Vector3.up * 1f;
-                    Vector3 forwardOffset = mainCamera.transform.forward * 1f;
-                    Vector3 spawnPosition = targetObject.transform.position + upwardOffset + forwardOffset;
+                    // Get the center position of the floor
+                    Vector3 floorCenter = targetObject.transform.position;
+
+                    // Generate a random point within a 2-meter radius on the XZ plane
+                    float radius = 1f;
+                    Vector2 randomCircle = Random.insideUnitCircle * radius;
+                    Vector3 randomOffset = new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+                    // Calculate final spawn position with height offset
+                    float heightOffset = 0.3f; //  meter above the floor
+                    Vector3 spawnPosition = floorCenter + randomOffset + Vector3.up * heightOffset;
+
+                    // Set the object's position
                     transform.position = spawnPosition;
                 }
                 // If no spawn cube is found, just move to the target object's position

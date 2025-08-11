@@ -101,7 +101,7 @@ namespace UI
             if (GeneralUIController.Instance.isRecording && !actionName.Contains("moves"))
             {
                 GeneralUIController.Instance.InteractionCreationController.SaveRecordedAction(action);
-            }else if (actionName.Equals("moves near"))
+            }else if (actionName.Contains("moves"))
             {
                 // we need to assign to the action the proximity object
                 GameObject proximityObject =  GeneralUIController.Instance.InteractionCreationController.spawnCube
