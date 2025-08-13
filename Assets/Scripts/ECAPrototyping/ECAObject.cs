@@ -269,9 +269,20 @@ namespace ECAPrototyping.RuleEngine
                     duplicate.name = "new" + baseName + (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count - 1);
                 }
                 
-                UI.Utils.CopyMissingComponents(gameObject, duplicate, GeneralUIController.Instance.CombineRulesController.lastECAEvent, 
-                    GeneralUIController.Instance.CombineRulesController.notifyTracker);
-                
+                //UI.Utils.CopyMissingComponents(gameObject, duplicate, GeneralUIController.Instance.CombineRulesController.lastECAEvent,
+                //GeneralUIController.Instance.CombineRulesController.notifyTracker);
+                var lastEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
+                var trackerDict = GeneralUIController.Instance.CombineRulesController.EventTrackers;
+
+                if (trackerDict.TryGetValue(lastEvent, out var tracker))
+                {
+                    UI.Utils.CopyMissingComponents(gameObject, duplicate, lastEvent, tracker.EventTriggered);
+                }
+                else
+                {
+                    Debug.LogWarning("No tracker found for lastECAEvent during duplication.");
+                }
+
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);
@@ -308,7 +319,7 @@ namespace ECAPrototyping.RuleEngine
             {
                 Vector3 spawnPos = transform.position + Random.insideUnitSphere * 0.5f;
                 GameObject frag = Instantiate(this.gameObject, spawnPos, Random.rotation);
-                frag.transform.localScale = Vector3.one * 0.05f; // Scale down the fragment
+                frag.transform.localScale = transform.localScale * 0.1f; // Scale down the fragment
             
                 Rigidbody rb = frag.GetComponent<Rigidbody>();
                 if (rb != null)

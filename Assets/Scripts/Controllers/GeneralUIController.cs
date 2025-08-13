@@ -144,7 +144,7 @@ namespace UI
                     break;
                 case UIState.Play:
                     _handMenuManager.DeActivatePlayStateMenu();
-                    _combineRulesController.eventSequenceTracker.ExecuteOppositeActions();
+                    _combineRulesController.ExecuteAllOppositeActions();
                     _combineRulesController.UnbindAllEvents();
                     _timersController.ResetAllTimersToZero();
                     _timersController.StopAllTimers();

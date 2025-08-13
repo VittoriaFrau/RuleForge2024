@@ -756,7 +756,7 @@ namespace UI
                     labelTexts[2] = "trigger";
                     break;
                 case InteractionCreationController.Modalities.Timer:
-                    labelTexts[0] = "timer";
+                    labelTexts[0] = e.Subject;
                     labelTexts[1] = "hits";
                     labelTexts[2] = e.ObjectStr + " seconds"; 
                     break;

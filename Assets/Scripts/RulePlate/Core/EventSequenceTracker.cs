@@ -204,15 +204,14 @@ namespace UI
         public void ExecuteOppositeActions()
         {
             Debug.Log("[Tracker] Executing opposite actions...");
-            //log the opposite actions
-            foreach (var action in oppositeActions)
-            {
-                Debug.Log($"[Tracker] Opposite Action: " + action.ToString());
-            }
             if (oppositeActions == null || oppositeActions.Count == 0) return;
 
             foreach (var action in oppositeActions)
             {
+                if (action!= null) // for instance when duplicating the gameobject does not exist yet
+                {
+                    Debug.Log($"[Tracker] Opposite Action: " + action.ToString());
+                }
                 ruleEngine.ExecuteAction(action);
             }
 

@@ -81,5 +81,10 @@ namespace Controllers
                 }
             }
         }
+
+        public int GetTimerCount()
+        {
+            return timerList.Count;
+        }
     }
 }

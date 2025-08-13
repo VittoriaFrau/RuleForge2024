@@ -29,7 +29,13 @@ namespace UI
         public GameObject modalityRuleCubePrefab, actionRuleCubePrefab, actionRuleCubePrefabVariant;
         private List<MeanwhileEvent> activeMeanwhileEvents = new();
         private ECAEvent[] currentThenEvents;
-        public EventSequenceTracker eventSequenceTracker;
+        private Dictionary<ECAEvent, EventSequenceTracker> eventTrackers = new();
+
+        public Dictionary<ECAEvent, EventSequenceTracker> EventTrackers
+        {
+            get => eventTrackers;
+            set => eventTrackers = value;
+        }
         private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
 
         public enum ContainerType
@@ -53,7 +59,7 @@ namespace UI
         private Action<InputAction.CallbackContext> controllerHandler;
         [SerializeField]
         private float offsetY = 0.2f;// Offset for the rule plate position
-        public Action<ECAEvent> notifyTracker;
+        //public Action<ECAEvent> notifyTracker;
         public ECAEvent lastECAEvent;
 
         public void ActivateCombineRules(bool startFromScratch = true)
@@ -508,9 +514,15 @@ namespace UI
                 return;
 
             RuleEngine ruleEngine = RuleEngine.GetInstance();
-            eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), rule.Actions.ToArray(), ruleEngine);
-
-            // Bind normali ECAEvent
+            EventSequenceTracker eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), rule.Actions.ToArray(), ruleEngine);
+            
+            
+            foreach (var ecaEvent in rule.Events)
+            {
+                eventTrackers[ecaEvent] = eventSequenceTracker;
+            }
+            
+            // Bind normal ECAEvent
             if (rule.Events != null)
             {
                 foreach (var ecaEvent in rule.Events)
@@ -739,26 +751,27 @@ namespace UI
         private void BindEvent(GameObject target, EventSequenceTracker tracker,
             bool isEquivalence, MeanwhileEvent meanwhileEvent = null)
         {
-            
+            Action<ECAEvent> localTracker = null;
             //DEMO
             if (meanwhileEvent != null)
                 return;
 
             if (meanwhileEvent != null && !meanwhileEvent.events.Any(e => e.Modality == InteractionCreationController.Modalities.Speech))
             {
-                notifyTracker = (evt) => OnMeanwhileEventTriggered(evt, meanwhileEvent);
+                localTracker = (evt) => OnMeanwhileEventTriggered(evt, meanwhileEvent);
             }
             else
             {
-                notifyTracker = isEquivalence
-                    ? (evt) => tracker.TriggerActionsDirectly(evt)
-                    : (evt) => tracker.EventTriggered(evt);
+                localTracker = isEquivalence
+                    ? (evt) => eventTrackers[evt].TriggerActionsDirectly(evt)
+                    : (evt) => eventTrackers[evt].EventTriggered(evt);
+
             }
 
             if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
             {
                 //if the event is bound to a single object, we bind it directly to that object
-                BindModalityEvent(target);
+                BindModalityEvent(target, localTracker);
             }
             else if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
             {
@@ -768,7 +781,7 @@ namespace UI
                 {
                     if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
                     {
-                        BindModalityEvent(interactable.gameObject);
+                        BindModalityEvent(interactable.gameObject, localTracker);
                     }
                 }
             }
@@ -779,7 +792,7 @@ namespace UI
         }
 
         
-        private void BindModalityEvent(GameObject target)
+        private void BindModalityEvent(GameObject target, Action<ECAEvent> tracker)
         {
             var modality = lastECAEvent.Modality;
 
@@ -809,31 +822,31 @@ namespace UI
             switch (modality)
             {
                 case InteractionCreationController.Modalities.Touch:
-                    BindTouchEvent(target, lastECAEvent, notifyTracker);
+                    BindTouchEvent(target, lastECAEvent, tracker);
                     break;
 
                 case InteractionCreationController.Modalities.Speech:
-                    BindSpeechEvent(lastECAEvent, notifyTracker);
+                    BindSpeechEvent(lastECAEvent, tracker);
                     break;
 
                 case InteractionCreationController.Modalities.Laser:
-                    BindLaserEvent(target, lastECAEvent, notifyTracker);
+                    BindLaserEvent(target, lastECAEvent, tracker);
                     break;
 
                 case InteractionCreationController.Modalities.Headgaze:
-                    BindHeadGazeEvent(target, lastECAEvent, notifyTracker);
+                    BindHeadGazeEvent(target, lastECAEvent, tracker);
                     break;
 
                 case InteractionCreationController.Modalities.Proximity:
-                    BindProximityEvent(target);
+                    BindProximityEvent(target, lastECAEvent, tracker);
                     break;
 
                 case InteractionCreationController.Modalities.Controller:
-                    BindControllerEvent(lastECAEvent, notifyTracker);
+                    BindControllerEvent(lastECAEvent, tracker);
                     break;
                 
                 case InteractionCreationController.Modalities.Timer:
-                    BindTimerEvent();
+                    BindTimerEvent(tracker);
                     break;
 
                 default:
@@ -842,7 +855,7 @@ namespace UI
             }
         }
         
-        private void BindTimerEvent()
+        private void BindTimerEvent( Action<ECAEvent> notifyTracker)
         {
             float durationInSeconds = lastECAEvent.ObjectStr != null ? float.Parse(lastECAEvent.ObjectStr) : 0f;
             
@@ -989,7 +1002,7 @@ namespace UI
             }
         }
 
-        private void BindProximityEvent(GameObject target)
+        private void BindProximityEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
         {
             var collider = target.GetComponent<Collider>();
             if (collider == null)
@@ -1013,7 +1026,7 @@ namespace UI
             listener.OnProximityEnter += (other) =>
             {
                 Debug.Log($"Proximity detected with {other.name}, triggering action.");
-                notifyTracker(lastECAEvent);
+                notifyTracker(ecaEvent);
             };
         }
         
@@ -1058,6 +1071,14 @@ namespace UI
                             case InteractionCreationController.Modalities.Timer:
                                 GeneralUIController.Instance.TimersController.UnBindAllTimerEvents();
                                 break;
+                            
+                            case InteractionCreationController.Modalities.Proximity:
+                                var listener = go.GetComponent<ProximityTriggerListener>();
+                                if (listener != null)
+                                {
+                                    listener.ClearListeners();
+                                }
+                                break;
                         }
                     }
                 }
@@ -1067,8 +1088,6 @@ namespace UI
             GeneralUIController.Instance.InteractionCreationController.DisableControllerTrigger();
             var triggerActionReference = GeneralUIController.Instance.InteractionCreationController.GetTriggerActionReference();
             triggerActionReference.action.performed -= controllerHandler;
-            
-            //TODO proximity unbind
             
             gameObjectsWithBindings.Clear();
         }
@@ -1088,7 +1107,14 @@ namespace UI
         }
 
         
-       
+        public void ExecuteAllOppositeActions()
+        {
+            foreach (var tracker in eventTrackers.Values)
+            {
+                tracker.ExecuteOppositeActions();
+            }
+        }
+
 
     }
 }

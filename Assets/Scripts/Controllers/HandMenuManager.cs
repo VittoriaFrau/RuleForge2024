@@ -310,7 +310,8 @@ namespace UI.RuleEditor
                         {
                             ECAEvent ecaEvent = new ECAEvent(GeneralUIController.Instance.GetSelectedObject(), 
                                 InteractionCreationController.Modalities.Timer, "hits " + nSeconds + " seconds", nSeconds,
-                                Utils.LoadPNG("Assets/Resources/Modalities/timer.png"), false);
+                                Utils.LoadTextureFromFile("Assets/Resources/Modalities/timer.png")
+                                , false);
                             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                             {
                                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);

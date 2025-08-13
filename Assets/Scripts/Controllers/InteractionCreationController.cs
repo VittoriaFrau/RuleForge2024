@@ -212,13 +212,12 @@ namespace UI
         {
             GameObject timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
             timer.AddComponent<ECATimer>();
-            GeneralUIController.Instance.SetSelectedObject(timer);
-            timer.name = "Timer";
             timer.transform.position = new Vector3(timer.transform.position.x,  2.5f, timer.transform.position.z);
             GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
             handMenuManager.ShowKeyboard("SetTimerSeconds");
             GeneralUIController.Instance.SetSelectedObject(timer);
             GeneralUIController.Instance.TimersController.AddTimer(timer);
+            timer.name = "Timer" + GeneralUIController.Instance.TimersController.GetTimerCount();
         }
         
         private void ActivateControllers()
@@ -377,6 +376,7 @@ namespace UI
 
         private void DeActivateProximityModality()
         {
+            proximityCube.GetComponentInChildren<ProximityCubeCollision>().ResetProximityGameObjects();
             //Hide proximity cube
             proximityCube.SetActive(false);
             // loop to the objects in the interactablesParent
@@ -388,7 +388,6 @@ namespace UI
                     Physics.SyncTransforms();
                 }
             }
-            proximityCube.GetComponent<ProximityCubeCollision>().ResetProximityGameObjects();
         }
 
         private void ActivateHeadGazeModality()
@@ -618,8 +617,8 @@ namespace UI
         public IEnumerator WaitForSpeechDemo()
         {
             yield return new WaitForSeconds(5f);
-            GeneralUIController.Instance.SetDebugText("You said \"Fire\"");
-            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "fire",
+            GeneralUIController.Instance.SetDebugText("You said \"Star\"");
+            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "star",
                 Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
@@ -825,13 +824,13 @@ namespace UI
                 Debug.Log("Saved action: " + ecaEvent);
                 GeneralUIController.Instance.SetDebugText(ecaEvent.ToString());
                 //DEMO, remove block and leave only prepareforactionscreenshot
-                if (ecaEvent.Subject.Contains("Bullet") && ecaEvent.Verb.Contains("is duplicated"))
+                if (ecaEvent.Subject.Contains("Mole") && ecaEvent.Verb.Contains("near"))
                 {
-                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BlasterGame/Duplication.png");
+                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearMole.png");
                 }
-                else if (ecaEvent.Subject.Contains("Bullet") && ecaEvent.Verb.Contains("moves"))
+                else if (ecaEvent.Subject.Contains("Star") && ecaEvent.Verb.Contains("near"))
                 {
-                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BlasterGame/BulletMovesGun.png");
+                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearStar.png");
                 }
                 else PrepareForActionScreenShot(selectedObject);
             }
@@ -1207,6 +1206,9 @@ namespace UI
 
                 Physics.SyncTransforms();
             }
+            //VALUTARE
+            proximityCube.GetComponentInChildren<ObjectManipulator>().enabled = true;
+
             
         }
 
