@@ -16,9 +16,20 @@ namespace UI
             {
                 if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                 {
-                    string objectNameOfLastEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent.ObjectStr;
-                    string subjectNameOfLastEcaEvent =
-                        GeneralUIController.Instance.CombineRulesController.lastECAEvent.Subject;
+                    ECAEvent lastProximityEcaEvent;
+                    if (GeneralUIController.Instance.CombineRulesController.lastECAEvent.Modality ==
+                        InteractionCreationController.Modalities.Proximity)
+                    {
+                        lastProximityEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
+                    }
+                    else
+                    {
+                        // search among all the events
+                        lastProximityEcaEvent = GeneralUIController.Instance.recordedEvents
+                            .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity);
+                    }
+                    string objectNameOfLastEcaEvent = lastProximityEcaEvent.ObjectStr;
+                    string subjectNameOfLastEcaEvent = lastProximityEcaEvent.Subject;
                     if (Utils.HaveSameRoot(collision.gameObject.name, objectNameOfLastEcaEvent) ||
                         Utils.HaveSameRoot(collision.gameObject.name, subjectNameOfLastEcaEvent))
                     {

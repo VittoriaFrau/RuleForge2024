@@ -16,6 +16,7 @@ namespace ECAPrototyping.RuleEngine
         private TextMeshPro timerText;
         private Action<ECAEvent> trackerCallback;
         private ECAEvent trackerEvent;
+        private Coroutine activeTimerCoroutine = null;
 
 
         private void Start()
@@ -51,19 +52,31 @@ namespace ECAPrototyping.RuleEngine
         
         public void StartTimer(Action<ECAEvent> notifyTracker = null, ECAEvent ecaEvent = null)
         {
+            if (activeTimerCoroutine != null)
+            {
+                StopCoroutine(activeTimerCoroutine);
+                activeTimerCoroutine = null;
+            }
+
             trackerCallback = notifyTracker;
             trackerEvent = ecaEvent;
-            StartCoroutine(TimerCoroutine());
+            activeTimerCoroutine = StartCoroutine(TimerCoroutine());
         }
         
         public void StopTimer()
         {
-            StopCoroutine(TimerCoroutine());
+            if (activeTimerCoroutine != null)
+            {
+                StopCoroutine(activeTimerCoroutine);
+                activeTimerCoroutine = null;
+            }
+
             if (timerText != null)
             {
                 timerText.text = UI.Utils.CalculateTimerText(timerDuration);
             }
         }
+
         
         public void ResetTimerToZero()
         {
