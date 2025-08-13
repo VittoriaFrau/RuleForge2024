@@ -1,15 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using ECAPrototyping.Utils;
-using MixedReality.Toolkit.SpatialManipulation;
-using MixedReality.Toolkit.UX;
-using MixedReality.Toolkit.UX.Experimental;
 using TMPro;
-using UI;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace ECAPrototyping.RuleEngine
 {
