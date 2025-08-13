@@ -96,6 +96,12 @@ namespace UI
                 ChangeMaterial("current");
             }
         }
+        
+        public void ResetProximityGameObjects()
+        {
+            ProximityGameObject1 = null;
+            ProximityGameObject2 = null;
+        }
     
     }
 

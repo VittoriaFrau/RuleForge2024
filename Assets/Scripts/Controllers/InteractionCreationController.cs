@@ -388,6 +388,7 @@ namespace UI
                     Physics.SyncTransforms();
                 }
             }
+            proximityCube.GetComponent<ProximityCubeCollision>().ResetProximityGameObjects();
         }
 
         private void ActivateHeadGazeModality()
