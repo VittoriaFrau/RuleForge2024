@@ -70,6 +70,8 @@ public class ObjectsMenuController : MonoBehaviour
         GameObject uiElement = Utils.InstantiateObject(type, UIPrefabs, mainCamera, interactables.transform);
         uiElement.GetComponent<Rigidbody>().useGravity = false;
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
+        Vector3 localPosition = uiElement.transform.localPosition;
+        uiElement.transform.localPosition = new Vector3(localPosition.x, 2.5f, localPosition.z);
         return uiElement;
     }
 

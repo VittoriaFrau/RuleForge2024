@@ -823,16 +823,7 @@ namespace UI
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 Debug.Log("Saved action: " + ecaEvent);
                 GeneralUIController.Instance.SetDebugText(ecaEvent.ToString());
-                //DEMO, remove block and leave only prepareforactionscreenshot
-                if (ecaEvent.Subject.Contains("Mole") && ecaEvent.Verb.Contains("near"))
-                {
-                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearMole.png");
-                }
-                else if (ecaEvent.Subject.Contains("Star") && ecaEvent.Verb.Contains("near"))
-                {
-                    GeneralUIController.Instance.recordedEvents.Last().Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearStar.png");
-                }
-                else PrepareForActionScreenShot(selectedObject);
+                PrepareForActionScreenShot(selectedObject);
             }
         }
 
@@ -1222,12 +1213,22 @@ namespace UI
             }
             //DEMO, if not demo use null instead of load png
             ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near",
-                proximityGameObject2, Utils.LoadPNG(null), false);
+                proximityGameObject2, null, false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
+                //DEMO if not demo remove
+                if (proximityGameObject1.name.Contains("Hammer") && proximityGameObject2.name.Contains("Mole"))
+                {
+                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearMole.PNG");
+                }
+                else if (proximityGameObject1.name.Contains("Hammer") && proximityGameObject2.name.Contains("Star"))
+                {
+                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearStar.PNG");
+                }
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 //DEMO if not demo decomment
                 //PrepareForModalityScreenshot(proximityGameObject1, Modalities.Touch, ecaEvent);
+                
             }
         }
 

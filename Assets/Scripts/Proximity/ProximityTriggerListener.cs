@@ -22,27 +22,28 @@ namespace UI
             {
                 if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                 {
-                    ECAEvent lastProximityEcaEvent;
-                    if (GeneralUIController.Instance.CombineRulesController.lastECAEvent.Modality ==
-                        InteractionCreationController.Modalities.Proximity)
+                    ECAEvent proximityEcaEvent = GeneralUIController.Instance.recordedEvents
+                        .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity && 
+                                   Utils.HaveSameRoot(collision.gameObject.name, e.ObjectStr));
+                    // print all recorded events
+                    GeneralUIController.Instance.recordedEvents
+                        .ForEach(e => Debug.Log($"Recorded Event: {e.EventStr} on {e.ObjectStr} with modality {e.Modality}"));
+                    if (proximityEcaEvent == null)
                     {
-                        lastProximityEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
+                        if (GeneralUIController.Instance.CombineRulesController.lastECAEvent.Modality ==
+                            InteractionCreationController.Modalities.Proximity)
+                        {
+                            proximityEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
+                        }
                     }
-                    else
-                    {
-                        // search among all the events
-                        lastProximityEcaEvent = GeneralUIController.Instance.recordedEvents
-                            .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity);
-                    }
-                    
                     
                     var trackerDict = GeneralUIController.Instance.CombineRulesController.EventTrackers;
-                    if (trackerDict.TryGetValue(lastProximityEcaEvent, out var tracker))
+                    if (trackerDict.TryGetValue(proximityEcaEvent, out var tracker))
                     {
                         OnProximityEnter = (other) =>
                         {
                             Debug.Log($"Proximity detected with {other.name}, triggering correct tracker.");
-                            tracker.EventTriggered(lastProximityEcaEvent);
+                            tracker.EventTriggered(proximityEcaEvent);
                         };
                     }
                     else
@@ -50,8 +51,8 @@ namespace UI
                         Debug.LogWarning("No tracker found for proximity event.");
                     }
 
-                    string objectNameOfLastEcaEvent = lastProximityEcaEvent.ObjectStr;
-                    string subjectNameOfLastEcaEvent = lastProximityEcaEvent.Subject;
+                    string objectNameOfLastEcaEvent = proximityEcaEvent.ObjectStr;
+                    string subjectNameOfLastEcaEvent = proximityEcaEvent.Subject;
                     if (Utils.HaveSameRoot(collision.gameObject.name, objectNameOfLastEcaEvent) ||
                         Utils.HaveSameRoot(collision.gameObject.name, subjectNameOfLastEcaEvent))
                     {
