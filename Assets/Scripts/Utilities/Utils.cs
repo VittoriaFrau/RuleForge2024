@@ -1077,6 +1077,7 @@ namespace UI
                     return "Icon 117";
                 case "shape":
                 case "Shape":
+                case "Object":
                     return "Icon 133";
                 case "Food":
                 case "Prop":

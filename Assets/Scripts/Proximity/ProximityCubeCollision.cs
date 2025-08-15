@@ -102,8 +102,8 @@ namespace UI
             ProximityGameObject1 = null;
             ProximityGameObject2 = null;
             ChangeMaterial("current");
-            this.transform.GetChild(0).localPosition = Vector3.zero;
-            this.transform.GetChild(0).localRotation = Quaternion.Euler(Vector3.zero);
+            this.transform.localPosition = Vector3.zero;
+            this.transform.localRotation = Quaternion.Euler(Vector3.zero);
         }
     
     }
