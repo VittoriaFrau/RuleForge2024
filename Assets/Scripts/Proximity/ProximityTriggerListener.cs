@@ -24,18 +24,20 @@ namespace UI
                 {
                     ECAEvent proximityEcaEvent = GeneralUIController.Instance.recordedEvents
                         .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity && 
-                                   Utils.HaveSameRoot(collision.gameObject.name, e.ObjectStr));
-                    // print all recorded events
-                    GeneralUIController.Instance.recordedEvents
-                        .ForEach(e => Debug.Log($"Recorded Event: {e.EventStr} on {e.ObjectStr} with modality {e.Modality}"));
+                                   Utils.HaveSameRoot(this.gameObject.name, e.ObjectRef.name) && Utils.HaveSameRoot(e.Subject, collision.gameObject.name));
                     if (proximityEcaEvent == null)
+                    {
+                        Debug.Log("No proximity event found");
+                        return;
+                    }
+                    /*if (proximityEcaEvent == null)
                     {
                         if (GeneralUIController.Instance.CombineRulesController.lastECAEvent.Modality ==
                             InteractionCreationController.Modalities.Proximity)
                         {
                             proximityEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
                         }
-                    }
+                    }*/
                     
                     var trackerDict = GeneralUIController.Instance.CombineRulesController.EventTrackers;
                     if (trackerDict.TryGetValue(proximityEcaEvent, out var tracker))
