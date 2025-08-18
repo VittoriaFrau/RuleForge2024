@@ -1026,6 +1026,9 @@ namespace UI
             {
                 listener = target.AddComponent<ProximityTriggerListener>();
             }
+            
+            //DEMO
+            return;
 
             listener.OnProximityEnter += (other) =>
             {

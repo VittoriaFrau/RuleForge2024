@@ -279,7 +279,7 @@ namespace ECAPrototyping.RuleEngine
                 var lastEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
                 var trackerDict = GeneralUIController.Instance.CombineRulesController.EventTrackers;
 
-                if (trackerDict.TryGetValue(lastEvent, out var tracker))
+                if (lastEvent != null && trackerDict.TryGetValue(lastEvent, out var tracker))
                 {
                     UI.Utils.CopyMissingComponents(gameObject, duplicate, lastEvent, tracker.EventTriggered);
                 }
@@ -320,12 +320,21 @@ namespace ECAPrototyping.RuleEngine
             int fragments = 10; 
             float explosionForce = 250f; 
             initialPosition = transform.position;
+            var proximityTriggerListener = GetComponent<ProximityTriggerListener>();
+            if (proximityTriggerListener != null)
+            {
+                proximityTriggerListener.enabled = false; // Disable the proximity trigger listener to prevent further interactions
+            }
             for (int i = 0; i < fragments; i++)
             {
                 Vector3 spawnPos = transform.position + Random.insideUnitSphere * 0.5f;
                 GameObject frag = Instantiate(this.gameObject, spawnPos, Random.rotation);
                 frag.transform.localScale = transform.localScale * 0.1f; // Scale down the fragment
-            
+                ProximityTriggerListener proximityTriggerListenerFragm = frag.GetComponent<ProximityTriggerListener>();
+                if (proximityTriggerListenerFragm != null)
+                {
+                    proximityTriggerListenerFragm.enabled = false; // Disable the proximity trigger listener to prevent further interactions
+                }
                 Rigidbody rb = frag.GetComponent<Rigidbody>();
                 if (rb != null)
                 {
@@ -337,6 +346,10 @@ namespace ECAPrototyping.RuleEngine
             }
 
             gameObject.SetActive(false); 
+            if(proximityTriggerListener != null)
+            {
+                proximityTriggerListener.enabled = true; // Re-enable the proximity trigger listener for the original object
+            }
         }
         
         

@@ -43,9 +43,12 @@ namespace UI
         
         private void AddListenerToInteractables()
         {
-            foreach (var interactable in interactables)
+            foreach (GameObject interactable in interactables)
             {
-                AddListenerToSingleInteractable(interactable);
+                if (!interactable.name.Contains("spawnCube"))
+                {
+                    AddListenerToSingleInteractable(interactable);
+                }
             }
         }
 
@@ -79,6 +82,12 @@ namespace UI
                 ObjectManipulator _objectManipulator = interactable.GetComponent<ObjectManipulator>();
                 if(_objectManipulator != null) 
                     _objectManipulator.OnClicked.RemoveAllListeners();
+                Prototypation _prototypation = interactable.GetComponent<Prototypation>();
+                if (_prototypation != null)
+                {
+                    // Remove the Prototypation component if it exists
+                    Destroy(_prototypation);
+                }
             }
         }
 
