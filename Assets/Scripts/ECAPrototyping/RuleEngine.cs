@@ -1173,7 +1173,12 @@ namespace ECAPrototyping.RuleEngine
 
         public override string ToString()
         {
-            string stringAction = a_subject.name + " " + a_verb + " " + a_object;
+            string stringAction = a_subject.name + " " + a_verb;
+
+            if (a_object != null)
+            {
+                stringAction += " " + a_object.ToString();
+            }
 
             if (a_modifier != null)
             {

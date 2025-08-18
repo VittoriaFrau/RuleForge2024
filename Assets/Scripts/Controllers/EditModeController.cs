@@ -77,7 +77,8 @@ namespace UI
             foreach (var interactable in interactables)
             {
                 ObjectManipulator _objectManipulator = interactable.GetComponent<ObjectManipulator>();
-                _objectManipulator.OnClicked.RemoveAllListeners();
+                if(_objectManipulator != null) 
+                    _objectManipulator.OnClicked.RemoveAllListeners();
             }
         }
 

@@ -20,6 +20,14 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECACounter), "increases by one")]
         public void IncreaseCounter()
         {
+            //counter++;
+            //textMeshPro.text = "" + counter;
+        }
+        
+        //DEMO
+        [Action(typeof(ECACounter), "increases by 1")]
+        public void IncreaseCounterByOne()
+        {
             counter++;
             textMeshPro.text = "" + counter;
         }
@@ -34,8 +42,8 @@ namespace ECAPrototyping.RuleEngine
         [Action(typeof(ECACounter), "doubles")]
         public void DoubleCounter()
         {
-            counter = 2*counter;
-            textMeshPro.text = "" + counter;
+           // counter = 2*counter;
+            //textMeshPro.text = "" + counter;
         }
         
         [Action(typeof(ECACounter), "resets counter")]

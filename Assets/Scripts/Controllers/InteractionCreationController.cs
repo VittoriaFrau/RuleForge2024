@@ -213,11 +213,11 @@ namespace UI
             GameObject timer = GeneralUIController.Instance.ObjectsMenuController.CreateUIElement("Text");
             timer.AddComponent<ECATimer>();
             timer.transform.position = new Vector3(timer.transform.position.x,  2.5f, timer.transform.position.z);
-            GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
             handMenuManager.ShowKeyboard("SetTimerSeconds");
             GeneralUIController.Instance.SetSelectedObject(timer);
             GeneralUIController.Instance.TimersController.AddTimer(timer);
             timer.name = "Timer" + GeneralUIController.Instance.TimersController.GetTimerCount();
+            GeneralUIController.Instance.SetDebugText("How many seconds do you want to set?");
         }
         
         private void ActivateControllers()
@@ -1332,7 +1332,8 @@ namespace UI
             }
             var spawnCubeCollision = spawnCube.GetComponentInChildren<SpawnCubeCollision>(true);
             spawnCubeCollision.backButton.GetComponentInChildren<PressableButton>().OnClicked.RemoveListener(() => ResetSpawnCubeAndSelectedObject());
-
+            spawnCubeCollision.ProximityGameObject1 = null;
+            spawnCubeCollision.ProximityGameObject2 = null;
         }
 
         //get trigger action reference method

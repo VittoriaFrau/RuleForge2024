@@ -148,6 +148,15 @@ namespace UI
                     _combineRulesController.UnbindAllEvents();
                     _timersController.ResetAllTimersToZero();
                     _timersController.StopAllTimers();
+                    GameObject star = GameObject.Find("Star1");
+                    if (star != null)
+                    {
+                        ProximityTriggerListener listener = star.GetComponent<ProximityTriggerListener>();
+                        if (listener != null)
+                        {
+                            Destroy(listener);
+                        }
+                    }
                     break;
             }
         }
@@ -233,6 +242,11 @@ namespace UI
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
             Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
+            GameObject star = GameObject.Find("Star1");
+            if (star != null)
+            {
+                star.AddComponent<ProximityTriggerListener>();
+            }
         }
         
         public void SetSelectedObject(GameObject _selectedObject)

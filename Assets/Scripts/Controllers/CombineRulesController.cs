@@ -16,6 +16,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
+using Action = ECAPrototyping.RuleEngine.Action;
 
 namespace UI
 {
@@ -61,6 +62,9 @@ namespace UI
         private float offsetY = 0.2f;// Offset for the rule plate position
         //public Action<ECAEvent> notifyTracker;
         public ECAEvent lastECAEvent;
+        
+        //DEMO
+        public List<Action> manualOppositeActions = new List<Action>();
 
         public void ActivateCombineRules(bool startFromScratch = true)
         {
@@ -1113,6 +1117,24 @@ namespace UI
             {
                 tracker.ExecuteOppositeActions();
             }
+
+            //DEMO
+            ECAAnimal[] allTexts = Resources.FindObjectsOfTypeAll<ECAAnimal>();
+            GameObject mole = allTexts.FirstOrDefault(t => t.gameObject.name == "Mole1")?.gameObject;
+
+            manualOppositeActions.Add(new Action(mole, "resets"));
+            ECAShape[] allShapes = Resources.FindObjectsOfTypeAll<ECAShape>();
+            GameObject star = allShapes.FirstOrDefault(t => t.gameObject.name == "Star1")?.gameObject;
+            if (star != null)
+            {
+                manualOppositeActions.Add(new Action(star, "resets"));
+            }
+            foreach (var action in manualOppositeActions)
+            {
+                RuleEngine ruleEngine = RuleEngine.GetInstance();
+                ruleEngine.ExecuteAction(action);
+            }
+            manualOppositeActions.Clear();
         }
 
 

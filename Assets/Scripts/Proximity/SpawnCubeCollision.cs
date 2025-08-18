@@ -33,7 +33,6 @@ namespace UI
         private string selectedObjBaseName;
         private GameObject selectedObject => GeneralUIController.Instance.GetSelectedObject();
         
-        private RuleEngine _ruleEngine;
         private void Awake()
         {
             rend = GetComponent<Renderer>();
@@ -48,8 +47,6 @@ namespace UI
             }
             handMenuManager = GameObject.FindGameObjectWithTag("HandMenu").GetComponent<HandMenuManager>();
             initialPosition = transform.localPosition;
-            _ruleEngine = RuleEngine.GetInstance();
-            
             selectedObjBaseName = selectedObject.name.Substring(0, name.Length).ToLower();
         }
 

@@ -1178,6 +1178,7 @@ namespace UI
                 case "changes text":
                     return new Action(action.GetSubject(), "resets text");
                 case "increases by one":
+                case "increases by 1":
                 case "doubles":
                 case "decreases by one":
                     return new Action(action.GetSubject(), "resets counter");

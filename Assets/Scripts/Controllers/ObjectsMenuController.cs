@@ -91,6 +91,12 @@ public class ObjectsMenuController : MonoBehaviour
             newObj.transform.localRotation = 
                 Quaternion.Euler(-90f, -180f, 0f);
         }
+        if (newObj.name.ToLower().Contains("star"))
+        {
+            newObj.transform.localRotation = 
+                Quaternion.Euler(-90f, 0f, 0f);
+            newObj.transform.localPosition = new Vector3(-0.6f, newObj.transform.localPosition.y, newObj.transform.localPosition.z);
+        }
         return newObj;
     }
     

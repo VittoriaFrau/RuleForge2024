@@ -87,6 +87,11 @@ namespace ECAPrototyping.RuleEngine
             if (shouldFloat)
             {
                 rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+                if (gameObject.name.ToLower().Contains("timer"))
+                {
+                    //unfreeze the position on the Y axis
+                    rigidbody.constraints &= ~RigidbodyConstraints.FreezePositionX;
+                }
                 
             }
 

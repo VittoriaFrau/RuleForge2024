@@ -1,4 +1,5 @@
 using ECAPrototyping.RuleEngine;
+using TMPro;
 
 namespace UI
 {
@@ -22,23 +23,15 @@ namespace UI
             {
                 if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                 {
-                    ECAEvent proximityEcaEvent = GeneralUIController.Instance.recordedEvents
-                        .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity && 
-                                   Utils.HaveSameRoot(this.gameObject.name, e.ObjectRef.name) && Utils.HaveSameRoot(e.Subject, collision.gameObject.name));
+                    /*ECAEvent proximityEcaEvent = GeneralUIController.Instance.recordedEvents
+                        .Find(e => e.Modality == InteractionCreationController.Modalities.Proximity &&
+                                   Utils.HaveSameRoot(this.gameObject.name, e.ObjectRef.name) && Utils.HaveSameRoot(e.Subject, collision.gameObject.name));}
                     if (proximityEcaEvent == null)
                     {
                         Debug.Log("No proximity event found");
                         return;
                     }
-                    /*if (proximityEcaEvent == null)
-                    {
-                        if (GeneralUIController.Instance.CombineRulesController.lastECAEvent.Modality ==
-                            InteractionCreationController.Modalities.Proximity)
-                        {
-                            proximityEcaEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
-                        }
-                    }*/
-                    
+
                     var trackerDict = GeneralUIController.Instance.CombineRulesController.EventTrackers;
                     if (trackerDict.TryGetValue(proximityEcaEvent, out var tracker))
                     {
@@ -61,8 +54,38 @@ namespace UI
                         GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(gameObject);
                         GeneralUIController.Instance.InteractionCreationController.LastTriggeredObjects.Add(collision.gameObject);
                     }
-                    OnProximityEnter?.Invoke(collision.gameObject);
-                }
+                    OnProximityEnter?.Invoke(collision.gameObject);*/
+
+                    if (gameObject.name.ToLower().Contains("mole"))
+                    {
+                        if (collision.gameObject.name.ToLower().Contains("hammer"))
+                        {
+                            RuleEngine ruleEngine = RuleEngine.GetInstance();
+                            ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "explodes"));
+                            TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
+                            int counterValue = Convert.ToInt32(textMeshPro.text);
+                            textMeshPro.text = (counterValue+1).ToString();
+                            //GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(gameObject, "resets"));
+                            GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
+
+                            return;
+                        }
+                    }
+                    if (gameObject.name.ToLower().Contains("star"))
+                    {
+                        if (collision.gameObject.name.ToLower().Contains("hammer"))
+                        {
+                            RuleEngine ruleEngine = RuleEngine.GetInstance();
+                            ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "explodes"));
+                            TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
+                            int counterValue = Convert.ToInt32(textMeshPro.text);
+                            textMeshPro.text = (counterValue*2).ToString();
+                            //GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(gameObject, "resets"));
+                            GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
+
+                        }
+                    }
+            }
             }
             
         }
