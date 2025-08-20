@@ -85006,7 +85006,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Speed
+  m_text: Increase speed
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
   m_sharedMaterial: {fileID: -1005824763306460071, guid: 533bdd8d5c92b52448ee2ecf7bd828a4, type: 2}
@@ -152310,7 +152310,7 @@ GameObject:
   - component: {fileID: 194991483049676801}
   - component: {fileID: 8482551771410994996}
   m_Layer: 5
-  m_Name: Speed
+  m_Name: SpeedIncrease
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172577,6 +172577,7 @@ MonoBehaviour:
   ecaPropsButtons:
   - {fileID: 993710196664584871}
   - {fileID: 5912214257385220836}
+  - {fileID: 7936884369344006896}
   ecaTimerButtons:
   - {fileID: 4112005337502988557}
   - {fileID: 8865361883966265369}
@@ -172584,7 +172585,7 @@ MonoBehaviour:
   debugPanel: {fileID: 2274138254633824154}
   editModeController: {fileID: 2266740878681303224}
   menuContentCanvas: {fileID: 6651988460665923547}
-  isUsingOculusLink: 0
+  isUsingOculusLink: 1
 --- !u!1 &6651988460665923547
 GameObject:
   m_ObjectHideFlags: 0
@@ -239410,9 +239411,7 @@ GameObject:
   - component: {fileID: 7465288949684051184}
   - component: {fileID: 825416084360356269}
   - component: {fileID: 241303650391077475}
-  - component: {fileID: 1508840531712761154}
   - component: {fileID: 7070697735583338413}
-  - component: {fileID: 5525368208846405766}
   - component: {fileID: 2203549103403341732}
   m_Layer: 0
   m_Name: Floor
@@ -239486,28 +239485,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1508840531712761154
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9185219226641853728}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!65 &7070697735583338413
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -239529,33 +239506,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 0.13030235, z: 10}
   m_Center: {x: 0, y: 0.0106720105, z: 0}
---- !u!54 &5525368208846405766
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9185219226641853728}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 126
-  m_CollisionDetection: 0
 --- !u!114 &2203549103403341732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242312,7 +242262,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
+  m_Height: 1
   m_Radius: 0.1
   m_SlopeLimit: 45
   m_StepOffset: 0.3
