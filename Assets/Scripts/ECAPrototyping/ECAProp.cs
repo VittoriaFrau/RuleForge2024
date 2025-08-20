@@ -12,6 +12,9 @@ namespace ECAPrototyping.RuleEngine
         [StateVariable("equipable", ECARules4AllType.Boolean)] 
         public ECABoolean isEquipable = new(ECABoolean.BoolType.NO);
         
+        private float speedFactor = 1f;  
+        private float speedStep = 0.8f; 
+        
         [Action(typeof(ECAProp), "turns on")]
         public void TurnOnConveyor()
         {
@@ -26,9 +29,17 @@ namespace ECAPrototyping.RuleEngine
         }
         
         [Action(typeof(ECAProp), "increases speed")]
-        public void Increases()
+        public void IncreasesSpeed()
         {
-            //todo
+            speedFactor += speedStep;
+            GetComponent<Animator>().speed = speedFactor;
+        }
+        
+        [Action(typeof(ECAProp), "decreases speed")]
+        public void DecreasesSpeed()
+        {
+            speedFactor = Mathf.Max(0f, speedFactor - speedStep); // never go below 0
+            GetComponent<Animator>().speed = speedFactor;
         }
 
         

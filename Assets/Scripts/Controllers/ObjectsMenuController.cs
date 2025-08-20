@@ -57,7 +57,14 @@ public class ObjectsMenuController : MonoBehaviour
     
     public void NewProp(string type)
     {
-        Utils.InstantiateObject(type, propPrefabs, mainCamera, interactables.transform);
+        GameObject prop = Utils.InstantiateObject(type, propPrefabs, mainCamera, interactables.transform);
+        //DEMO: adjust position and rotation of the prop
+        if (prop.name.Contains("Belt"))
+        {
+            prop.transform.localPosition = new Vector3(0, 0.8f, 0);
+            prop.transform.localRotation = Quaternion.identity;
+            
+        }
     }
     
     public void NewVegetation(string type)

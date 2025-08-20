@@ -1,5 +1,4 @@
 using UnityEngine;
-using ECAPrototyping.Utils;
 
 namespace ECAPrototyping.RuleEngine
 {
@@ -8,6 +7,5 @@ namespace ECAPrototyping.RuleEngine
     [ECARules4All("shape")]
     public class ECAShape : MonoBehaviour
     {
-        
     }
 }

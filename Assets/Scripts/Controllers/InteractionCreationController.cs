@@ -94,7 +94,7 @@ namespace UI
         //Speech
         [Header("Speech Modality")] public GameObject MRTKSpeech;
         public GameObject microphone;
-        private List<string> keywords = new() { "fire", "star", "leviosa", "change", "abracadabra" };
+        private List<string> keywords = new() { "help","fire", "star", "leviosa", "change", "abracadabra" };
         private Transform microphoneOriginalTransform;
         
 
@@ -617,8 +617,8 @@ namespace UI
         public IEnumerator WaitForSpeechDemo()
         {
             yield return new WaitForSeconds(5f);
-            GeneralUIController.Instance.SetDebugText("You said \"Star\"");
-            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "star",
+            GeneralUIController.Instance.SetDebugText("You said \"Help\"");
+            ECAEvent ecaEvent = new ECAEvent(null, Modalities.Speech, "help",
                 Utils.LoadPNG("Assets/Resources/Icons/microphone.png"), false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);

@@ -56,11 +56,12 @@ namespace UI
                     }
                     OnProximityEnter?.Invoke(collision.gameObject);*/
 
-                    if (gameObject.name.ToLower().Contains("mole"))
+                    if (gameObject.name.ToLower().Contains("cube"))
                     {
-                        if (collision.gameObject.name.ToLower().Contains("hammer"))
+                        RuleEngine ruleEngine = RuleEngine.GetInstance();
+                        if (collision.gameObject.name.ToLower().Contains("sword"))
                         {
-                            RuleEngine ruleEngine = RuleEngine.GetInstance();
+                            
                             ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "explodes"));
                             TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
                             int counterValue = Convert.ToInt32(textMeshPro.text);
@@ -68,19 +69,13 @@ namespace UI
                             //GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(gameObject, "resets"));
                             GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
 
-                            return;
                         }
-                    }
-                    if (gameObject.name.ToLower().Contains("star"))
-                    {
-                        if (collision.gameObject.name.ToLower().Contains("hammer"))
+                        else if (collision.gameObject.name.ToLower().Contains("floor"))
                         {
-                            RuleEngine ruleEngine = RuleEngine.GetInstance();
-                            ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "explodes"));
+                            ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "hides"));
                             TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
                             int counterValue = Convert.ToInt32(textMeshPro.text);
-                            textMeshPro.text = (counterValue*2).ToString();
-                            //GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(gameObject, "resets"));
+                            textMeshPro.text = (counterValue-1).ToString();
                             GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
 
                         }

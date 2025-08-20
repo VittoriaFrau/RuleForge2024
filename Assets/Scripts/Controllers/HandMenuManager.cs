@@ -172,7 +172,7 @@ namespace UI.RuleEditor
                 case "Door":
                     ecaDoorButtons.ForEach(button => button.SetActive(true));
                     break;
-                case "Props":
+                case "Prop":
                     ecaPropsButtons.ForEach(button => button.SetActive(true));
                     break;
                 case "Timer":

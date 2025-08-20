@@ -365,7 +365,7 @@ namespace UI
                     if (whenText.text.Contains("any"))
                     {
                         // we remove the numbers from the then text, so it's more generic (e.g. "cube" instead of "cube1")
-                        thenText.text = Regex.Replace(thenText.text, @"\d+", "");
+                        thenText.text = Regex.Replace(thenText.text, @"(?<=[A-Za-z])\d+", "");
                     }
                 }
             }
@@ -1122,16 +1122,11 @@ namespace UI
             }
 
             //DEMO
-            ECAAnimal[] allTexts = Resources.FindObjectsOfTypeAll<ECAAnimal>();
-            GameObject mole = allTexts.FirstOrDefault(t => t.gameObject.name == "Mole1")?.gameObject;
+            ECAShape[] allTexts = Resources.FindObjectsOfTypeAll<ECAShape>();
+            GameObject cube = allTexts.FirstOrDefault(t => t.gameObject.name == "Cube1")?.gameObject;
 
-            manualOppositeActions.Add(new Action(mole, "resets"));
-            ECAShape[] allShapes = Resources.FindObjectsOfTypeAll<ECAShape>();
-            GameObject star = allShapes.FirstOrDefault(t => t.gameObject.name == "Star1")?.gameObject;
-            if (star != null)
-            {
-                manualOppositeActions.Add(new Action(star, "resets"));
-            }
+            manualOppositeActions.Add(new Action(cube, "resets"));
+            
             foreach (var action in manualOppositeActions)
             {
                 RuleEngine ruleEngine = RuleEngine.GetInstance();
