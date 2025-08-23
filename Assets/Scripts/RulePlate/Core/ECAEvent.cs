@@ -8,8 +8,8 @@ namespace UI
     public class ECAEvent
     {
         private InteractionCreationController.Modalities modality;
-        public CategoryController.CategoryObjectSelected EventCategory { get; set; }
         public CategoryController.CategoryObjectSelected ObjectCategory { get; set; }
+        public CategoryController.CategoryObjectSelected SubjectCategory { get; set; }
         private static int _counter = 0;
         
         public string Subject { get; set; }
@@ -35,7 +35,8 @@ namespace UI
             this.ObjectRef = @object;
             this.modality = modality;
             this.EventStr = _event;
-            EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
+            ObjectCategory = GeneralUIController.Instance.CategoryController.lastCategorySelected;
+            SubjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
@@ -51,7 +52,6 @@ namespace UI
             this.ObjectRef = targetObject;
             this.modality = modality;
             this.EventStr = _event;
-            EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
             if (screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
@@ -60,6 +60,7 @@ namespace UI
             ObjectStr = ObjectRef.name;
             _counter++;
             ObjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
+            SubjectCategory = GeneralUIController.Instance.CategoryController.lastCategorySelected;
         }
         
         // Timer
@@ -70,7 +71,8 @@ namespace UI
             this.modality = modality;
             this.EventStr = _event;
             ObjectStr = "" + nSeconds;
-            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            ObjectCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            SubjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
@@ -82,7 +84,8 @@ namespace UI
         {
             ObjectRef = @object;
             _counter++;
-            EventCategory = CategoryController.CategoryObjectSelected.SingleObject;
+            ObjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
+            SubjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
         }
         
         public ECAEvent(GameObject @object, string verb)
@@ -91,12 +94,13 @@ namespace UI
             Verb = verb;
             Subject = @object.name;
             _counter++;
-            EventCategory = CategoryController.CategoryObjectSelected.SingleObject;
+            ObjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
+            SubjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
         }
 
         public void ChangeSubjectCategory(CategoryController.CategoryObjectSelected category)
         {
-            EventCategory = category;
+            SubjectCategory = category;
         }
 
         public void ChangeObjectCategory(CategoryController.CategoryObjectSelected category)
@@ -125,7 +129,7 @@ namespace UI
             if (e.modality != InteractionCreationController.Modalities.None)
             {
                 // If it's category, we need to check the category and the subject
-                if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
+                if (e.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
                 {
                     if (Subject == e.Subject)
                     {

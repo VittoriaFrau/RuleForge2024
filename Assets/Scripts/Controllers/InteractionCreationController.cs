@@ -741,7 +741,7 @@ namespace UI
 
         private void HandleCategoryActions()
         {
-            switch (_categoryController.categoryObjectSelected)
+            switch (_categoryController.lastCategorySelected)
             {
                 case CategoryController.CategoryObjectSelected.SingleObject:
                     ExecuteOppositeActions();
@@ -750,9 +750,9 @@ namespace UI
                 case CategoryController.CategoryObjectSelected.Category:
                 case CategoryController.CategoryObjectSelected.AllObjects:
                     var lastEvent = GeneralUIController.Instance.recordedEvents.Last();
-                    lastEvent.ChangeSubjectCategory(_categoryController.categoryObjectSelected);
+                    lastEvent.ChangeSubjectCategory(_categoryController.lastCategorySelected);
 
-                    if (_categoryController.categoryObjectSelected ==
+                    if (_categoryController.lastCategorySelected ==
                         CategoryController.CategoryObjectSelected.Category)
                     {
                         ExecuteActionOnCategory();
@@ -815,7 +815,7 @@ namespace UI
         public void SaveRecordedAction(Action action)
         {
             ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
-            ecaEvent.EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
+            ecaEvent.ObjectCategory = GeneralUIController.Instance.CategoryController.lastCategorySelected;
             GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {

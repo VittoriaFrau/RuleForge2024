@@ -89,7 +89,7 @@ namespace RulePlate.Core
 
             foreach (var when in Events)
             {
-                if (when.EventCategory == CategoryController.CategoryObjectSelected.Category)
+                if (when.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
                 {
                     string categoryNameSubject = (when.Subject.Equals("user") ? "user" : Utils.GetECALastScriptFromECAObject(GameObject.Find(when.Subject))); 
                     string categoryNameObject = when.ObjectRef == null ? "" : Utils.GetECALastScriptFromECAObject(when.ObjectRef); 

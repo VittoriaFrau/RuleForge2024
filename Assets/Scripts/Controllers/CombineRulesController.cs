@@ -772,12 +772,14 @@ namespace UI
 
             }
 
-            if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            if (lastECAEvent.ObjectCategory == CategoryController.CategoryObjectSelected.SingleObject
+                && lastECAEvent.SubjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
             {
                 //if the event is bound to a single object, we bind it directly to that object
                 BindModalityEvent(target, localTracker);
             }
-            else if (lastECAEvent.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            else if (lastECAEvent.ObjectCategory == CategoryController.CategoryObjectSelected.Category 
+                     && lastECAEvent.SubjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
             {
                 var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(target);
 
@@ -789,9 +791,45 @@ namespace UI
                     }
                 }
             }
+            else if (lastECAEvent.SubjectCategory == CategoryController.CategoryObjectSelected.Category
+                     && lastECAEvent.ObjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            {
+                var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(GameObject.Find(lastECAEvent.Subject));
+
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+            }
+            else if (lastECAEvent.SubjectCategory == CategoryController.CategoryObjectSelected.Category
+                     && lastECAEvent.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(GameObject.Find(lastECAEvent.Subject));
+
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+                
+                var lastEcaScriptCategoryOfTargetObject = Utils.GetECALastScriptFromECAObject(target);
+
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTargetObject))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+            }
             else
             {
-                Debug.LogWarning($"Unknown event category: {lastECAEvent.EventCategory}");
+                Debug.LogWarning($"Unknown event category: {lastECAEvent.ObjectCategory}");
             }
         }
 

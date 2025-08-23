@@ -5,7 +5,6 @@ using MixedReality.Toolkit.UX;
 using TMPro;
 using UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Controllers
 {
@@ -27,7 +26,7 @@ namespace Controllers
         public GameObject AllObjectsButton;
 
         private List<GameObject> buttons;
-        public CategoryObjectSelected categoryObjectSelected;
+        public CategoryObjectSelected lastCategorySelected;
 
         private void Awake()
         {
@@ -42,7 +41,7 @@ namespace Controllers
 
         public void ShowCategoryMenu()
         {
-            categoryObjectSelected = CategoryObjectSelected.SingleObject;
+            lastCategorySelected = CategoryObjectSelected.SingleObject;
             CategoryMenu.SetActive(true);
             HandleCategoryButtons(SingleObjectButton);
         }
@@ -72,25 +71,15 @@ namespace Controllers
         {
             if (Enum.TryParse(category, out CategoryObjectSelected categorySelected))
             {
-                categoryObjectSelected = categorySelected;
+                lastCategorySelected = categorySelected;
                 HandleCategoryButtons(buttons.FirstOrDefault(b => b.name.Equals(category)));
-                Debug.Log($"Category set to: {categoryObjectSelected}");
+                Debug.Log($"Category set to: {lastCategorySelected}");
                 if (GeneralUIController.Instance.isRecording)
                 {
-                    if (GeneralUIController.Instance.InteractionCreationController.Modality == InteractionCreationController.Modalities.Proximity)
-                    {
-                        GeneralUIController.Instance.recordedEvents
+                    GeneralUIController.Instance.recordedEvents
                         .Where(e => e.Modality == GeneralUIController.Instance.InteractionCreationController.Modality)
                         .ToList()
-                        .ForEach(e => e.ChangeObjectCategory(categoryObjectSelected));
-                    }
-                    else
-                    {
-                        GeneralUIController.Instance.recordedEvents
-                        .Where(e => e.Modality == GeneralUIController.Instance.InteractionCreationController.Modality)
-                        .ToList()
-                        .ForEach(e => e.ChangeSubjectCategory(categoryObjectSelected));
-                    }
+                        .ForEach(e => e.ChangeObjectCategory(lastCategorySelected));
                 }
             }
         }
@@ -102,7 +91,7 @@ namespace Controllers
 
         public void ResetCategory()
         {
-            categoryObjectSelected = CategoryObjectSelected.SingleObject;
+            lastCategorySelected = CategoryObjectSelected.SingleObject;
             HandleCategoryButtons(SingleObjectButton);
         }
     }

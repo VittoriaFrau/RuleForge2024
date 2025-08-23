@@ -774,38 +774,16 @@ namespace UI
             }
 
 
-            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category && e.Modality != InteractionCreationController.Modalities.Proximity)
+            if (e.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
             {
-                if (!string.IsNullOrEmpty(e.ObjectStr))
-                {
-                    string objectNameWithoutNumber =
-                        Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
-                    labelTexts[2] =
-                        "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
-                }
-                else
-                {
-                    string subjectNameWithoutNumber =
-                        Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
-                    labelTexts[2] = subjectNameWithoutNumber; //if it's a category, we use "any" instead of the object
-                }
+                // If it's a category, we use "any" instead of the object
+                labelTexts[2] = "any " + RemoveTrailingNumbers(e.ObjectStr);
             }
-            if (e.Modality == InteractionCreationController.Modalities.Proximity)
+
+            if (e.SubjectCategory == CategoryController.CategoryObjectSelected.Category)
             {
-                if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
-                {
-                    string subjectNameWithoutNumber =
-                        Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
-                    labelTexts[0] =
-                        "any " + subjectNameWithoutNumber; //if it's a category, we use "any" instead of the subject
-                }
-                if (e.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
-                {
-                    string objectNameWithoutNumber =
-                        Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
-                    labelTexts[2] =
-                        "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
-                }
+                // If it's a category, we use "any" instead of the subject
+                labelTexts[0] = "any " + RemoveTrailingNumbers(e.Subject);
             }
 
             // Loop through each face and fill the text labels
@@ -829,6 +807,9 @@ namespace UI
                 }
             }
         }
+        
+        public static string RemoveTrailingNumbers(string input) =>
+            Regex.Replace(input ?? string.Empty, @"\d+$", string.Empty);
 
         public static TextMeshProUGUI[] GetTextLabelsInCube(GameObject cube, string face)
         {
@@ -926,7 +907,7 @@ namespace UI
                 events[1].ObjectStr
             };
 
-            if (events[0].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            if (events[0].ObjectCategory == CategoryController.CategoryObjectSelected.Category)
             {
                 string objectNameWithoutNumber =
                     Regex.Replace(events[0].ObjectStr, @"\d+$", ""); // Get the object name without the number
@@ -935,7 +916,7 @@ namespace UI
                     objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
             }
 
-            if (events[1].EventCategory == CategoryController.CategoryObjectSelected.Category)
+            if (events[1].ObjectCategory == CategoryController.CategoryObjectSelected.Category)
             {
                 string objectNameWithoutNumber =
                     Regex.Replace(events[1].ObjectStr, @"\d+$", ""); // Get the object name without the number

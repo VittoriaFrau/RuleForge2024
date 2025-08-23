@@ -117,7 +117,7 @@ namespace UI
                 action.SetObject(proximityObject);
             }
 
-            switch (GeneralUIController.Instance.CategoryController.categoryObjectSelected)
+            switch (GeneralUIController.Instance.CategoryController.lastCategorySelected)
             {
                 case CategoryController.CategoryObjectSelected.SingleObject:
                     _ruleEngine.ExecuteAction(action);

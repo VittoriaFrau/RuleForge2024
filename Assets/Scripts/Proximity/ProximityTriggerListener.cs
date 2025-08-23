@@ -19,7 +19,7 @@ namespace UI
         
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.CompareTag("Interactable"))
+            if (collision.gameObject.CompareTag("Interactable") || collision.gameObject.CompareTag("Floor"))
             {
                 if (GeneralUIController.Instance.UIstate == GeneralUIController.UIState.Play)
                 {
