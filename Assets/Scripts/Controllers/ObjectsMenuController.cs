@@ -71,6 +71,25 @@ public class ObjectsMenuController : MonoBehaviour
     {
         Utils.InstantiateObject(type, environmentPrefabs, mainCamera, interactables.transform);
     }
+
+    public void NewLight(string type)
+    {
+        GameObject lightGameObject = new GameObject("Light1");
+        Light lightComp = lightGameObject.AddComponent<Light>();
+
+        // Configure the light
+        lightComp.type = LightType.Point; // Options: Point, Directional, Spot, Area
+        lightComp.color = Color.white;
+        lightComp.intensity = 1f;
+        lightComp.range = 10f;
+        // Set parent
+        lightGameObject.transform.parent = interactables.transform;
+        lightGameObject.tag = "Interactable";
+        
+        //Add collider
+        lightGameObject.AddComponent<SphereCollider>();
+        
+    }
     
     public GameObject CreateUIElement(string type)
     {

@@ -30,6 +30,7 @@ namespace UI.RuleEditor
         public GameObject propsMenu;
         public GameObject vegetationMenu;
 		public GameObject uiMenu;
+        public GameObject lightMenu;
 
         public List<GameObject> ecaObjectButtons;
         public List<GameObject> ecaCounterButtons;
@@ -230,6 +231,12 @@ namespace UI.RuleEditor
         {
             HideMenus();
             animalMenu.SetActive(true);
+        }
+
+        public void ShowLightMenu()
+        {
+            HideMenus();
+            lightMenu.SetActive(true);
         }
         
         public void ShowFurnitureMenu()
