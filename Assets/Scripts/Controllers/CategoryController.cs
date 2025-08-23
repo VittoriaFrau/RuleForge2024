@@ -50,12 +50,13 @@ namespace Controllers
         public void HideCategoryMenu()
         {
             CategoryMenu.SetActive(false);
+            ResetCategory();
         }
 
         public void CustomizeCategoryMenu(GameObject gameObject)
         {
             string objectCategory = Utils.GetECALastScriptFromECAObject(gameObject);
-            
+
             GeneralUIController.Instance.SetDebugText(
                 $"Are you selecting the {gameObject.name}, any {objectCategory}, or any object?"
             );
@@ -76,16 +77,21 @@ namespace Controllers
                 Debug.Log($"Category set to: {categoryObjectSelected}");
                 if (GeneralUIController.Instance.isRecording)
                 {
-                    // take the events recorded with the current modality and change their category
-                    GeneralUIController.Instance.recordedEvents
+                    if (GeneralUIController.Instance.InteractionCreationController.Modality == InteractionCreationController.Modalities.Proximity)
+                    {
+                        GeneralUIController.Instance.recordedEvents
                         .Where(e => e.Modality == GeneralUIController.Instance.InteractionCreationController.Modality)
                         .ToList()
                         .ForEach(e => e.ChangeObjectCategory(categoryObjectSelected));
+                    }
+                    else
+                    {
+                        GeneralUIController.Instance.recordedEvents
+                        .Where(e => e.Modality == GeneralUIController.Instance.InteractionCreationController.Modality)
+                        .ToList()
+                        .ForEach(e => e.ChangeSubjectCategory(categoryObjectSelected));
+                    }
                 }
-            }
-            else
-            {
-                Debug.LogError($"Invalid category: {category}");
             }
         }
 

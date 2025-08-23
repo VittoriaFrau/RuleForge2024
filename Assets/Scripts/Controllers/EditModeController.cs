@@ -19,12 +19,10 @@ namespace UI
         
         public GameObject interactablesParent;
         private List<GameObject> interactables;
-        private CategoryController _categoryController;
         private RuleEngine _ruleEngine;
        
         private void Start()
         {
-            _categoryController = GetComponent<CategoryController>();
             _ruleEngine = RuleEngine.GetInstance();
         }
         
@@ -119,7 +117,7 @@ namespace UI
                 action.SetObject(proximityObject);
             }
 
-            switch (_categoryController.categoryObjectSelected)
+            switch (GeneralUIController.Instance.CategoryController.categoryObjectSelected)
             {
                 case CategoryController.CategoryObjectSelected.SingleObject:
                     _ruleEngine.ExecuteAction(action);

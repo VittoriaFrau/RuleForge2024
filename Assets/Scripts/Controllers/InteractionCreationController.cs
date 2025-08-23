@@ -750,7 +750,7 @@ namespace UI
                 case CategoryController.CategoryObjectSelected.Category:
                 case CategoryController.CategoryObjectSelected.AllObjects:
                     var lastEvent = GeneralUIController.Instance.recordedEvents.Last();
-                    lastEvent.ChangeObjectCategory(_categoryController.categoryObjectSelected);
+                    lastEvent.ChangeSubjectCategory(_categoryController.categoryObjectSelected);
 
                     if (_categoryController.categoryObjectSelected ==
                         CategoryController.CategoryObjectSelected.Category)
@@ -815,6 +815,7 @@ namespace UI
         public void SaveRecordedAction(Action action)
         {
             ECAEvent ecaEvent = Utils.ConvertActionToECAEvent(action);
+            ecaEvent.EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
             GameObject selectedObject = GeneralUIController.Instance.GetSelectedObject();
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
@@ -1206,24 +1207,24 @@ namespace UI
         public void CreateProximityCube(GameObject proximityGameObject1, GameObject proximityGameObject2)
         {
             //DEMO, I force the bullet to be proximity object one, if not demo remove if
-            if (proximityGameObject1.name.Contains("Bullet"))
+            /*if (proximityGameObject1.name.Contains("Bullet"))
             {
                 //Swap the proximity game objects if the first one is not a bullet
                 (proximityGameObject1, proximityGameObject2) = (proximityGameObject2, proximityGameObject1);
-            }
+            }*/
             //DEMO, if not demo use null instead of load png
             ECAEvent ecaEvent = new ECAEvent(proximityGameObject1, Modalities.Proximity, "is near",
                 proximityGameObject2, null, false);
             if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
             {
                 //DEMO if not demo remove
-                if (proximityGameObject1.name.Contains("Hammer") && proximityGameObject2.name.Contains("Mole"))
+                if (proximityGameObject1.name.Contains("Sword") && proximityGameObject2.name.Contains("Cube"))
                 {
-                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearMole.PNG");
+                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BeatSaber/SwordNearCube.PNG");
                 }
-                else if (proximityGameObject1.name.Contains("Hammer") && proximityGameObject2.name.Contains("Star"))
+                else if (proximityGameObject1.name.Contains("Cube") && proximityGameObject2.name.Contains("Floor"))
                 {
-                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/WhackAMole/HammerNearStar.PNG");
+                    ecaEvent.Texture = Utils.LoadTextureFromFile("Assets/Resources/Scenario/BeatSaber/CubeNearFloor.PNG");
                 }
                 GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
                 //DEMO if not demo decomment

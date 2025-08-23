@@ -9,6 +9,7 @@ namespace UI
     {
         private InteractionCreationController.Modalities modality;
         public CategoryController.CategoryObjectSelected EventCategory { get; set; }
+        public CategoryController.CategoryObjectSelected ObjectCategory { get; set; }
         private static int _counter = 0;
         
         public string Subject { get; set; }
@@ -34,34 +35,31 @@ namespace UI
             this.ObjectRef = @object;
             this.modality = modality;
             this.EventStr = _event;
-            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
+            EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
             if(screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
             SetModalityRule();
             _counter++;
         }
-        
-        public void ChangeObjectCategory(CategoryController.CategoryObjectSelected category)
-        {
-            EventCategory = category;
-        }
-        
+
+
         //Proximity
-        public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event, 
+        public ECAEvent(GameObject @object, InteractionCreationController.Modalities modality, string _event,
             GameObject targetObject, [CanBeNull] Texture2D screenshot, bool isActionEvent)
         {
             this.ObjectRef = targetObject;
             this.modality = modality;
             this.EventStr = _event;
-            EventCategory = CategoryController.CategoryObjectSelected.SingleObject; //By default
-            if(screenshot != null) Texture = screenshot;
+            EventCategory = GeneralUIController.Instance.CategoryController.categoryObjectSelected;
+            if (screenshot != null) Texture = screenshot;
             else Texture = null;
             IsActionEvent = isActionEvent;
             Subject = @object.name;
             Verb = "is near to";
             ObjectStr = ObjectRef.name;
             _counter++;
+            ObjectCategory = CategoryController.CategoryObjectSelected.SingleObject;
         }
         
         // Timer
@@ -84,6 +82,7 @@ namespace UI
         {
             ObjectRef = @object;
             _counter++;
+            EventCategory = CategoryController.CategoryObjectSelected.SingleObject;
         }
         
         public ECAEvent(GameObject @object, string verb)
@@ -92,9 +91,19 @@ namespace UI
             Verb = verb;
             Subject = @object.name;
             _counter++;
+            EventCategory = CategoryController.CategoryObjectSelected.SingleObject;
         }
 
-        
+        public void ChangeSubjectCategory(CategoryController.CategoryObjectSelected category)
+        {
+            EventCategory = category;
+        }
+
+        public void ChangeObjectCategory(CategoryController.CategoryObjectSelected category)
+        {
+            ObjectCategory = category;
+        }
+
         public InteractionCreationController.Modalities Modality
         {
             get => modality;

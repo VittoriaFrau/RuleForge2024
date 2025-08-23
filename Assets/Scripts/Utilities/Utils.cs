@@ -758,7 +758,7 @@ namespace UI
                 case InteractionCreationController.Modalities.Timer:
                     labelTexts[0] = e.Subject;
                     labelTexts[1] = "hits";
-                    labelTexts[2] = e.ObjectStr + " seconds"; 
+                    labelTexts[2] = e.ObjectStr + " seconds";
                     break;
                 case InteractionCreationController.Modalities.None: // action cube
                     labelTexts[1] = e.Verb;
@@ -774,7 +774,7 @@ namespace UI
             }
 
 
-            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
+            if (e.EventCategory == CategoryController.CategoryObjectSelected.Category && e.Modality != InteractionCreationController.Modalities.Proximity)
             {
                 if (!string.IsNullOrEmpty(e.ObjectStr))
                 {
@@ -789,14 +789,22 @@ namespace UI
                         Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
                     labelTexts[2] = subjectNameWithoutNumber; //if it's a category, we use "any" instead of the object
                 }
-
-                //if the modality is proximity, we do the same for the subject
-                if (e.Modality == InteractionCreationController.Modalities.Proximity)
+            }
+            if (e.Modality == InteractionCreationController.Modalities.Proximity)
+            {
+                if (e.EventCategory == CategoryController.CategoryObjectSelected.Category)
                 {
                     string subjectNameWithoutNumber =
                         Regex.Replace(e.Subject, @"\d+$", ""); // Get the subject name without the number
                     labelTexts[0] =
                         "any " + subjectNameWithoutNumber; //if it's a category, we use "any" instead of the subject
+                }
+                if (e.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
+                {
+                    string objectNameWithoutNumber =
+                        Regex.Replace(e.ObjectStr, @"\d+$", ""); // Get the object name without the number
+                    labelTexts[2] =
+                        "any " + objectNameWithoutNumber; //if it's a category, we use "any" instead of the object
                 }
             }
 

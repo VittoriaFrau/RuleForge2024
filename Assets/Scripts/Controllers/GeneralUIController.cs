@@ -29,7 +29,6 @@ namespace UI
             set => activeRules = value;
         }
         
-        //All controllers TODO have one of each and always call them in all the files
         private EditModeController _editModeController;
         public EditModeController EditModeController
         {
@@ -49,6 +48,12 @@ namespace UI
         {
             get => _interactionCreationController;
             set => _interactionCreationController = value;
+        }
+        private CategoryController _categoryController;
+        public CategoryController CategoryController
+        {
+            get => _categoryController;
+            set => _categoryController = value;
         }
 
         private Prototypation _prototypation;
@@ -108,6 +113,7 @@ namespace UI
             _interactionCreationController = eventHandler.GetComponent<InteractionCreationController>();
             _combineRulesController = eventHandler.GetComponent<CombineRulesController>();
             _timersController = eventHandler.GetComponent<TimersController>();
+            _categoryController = GetComponent<CategoryController>();
             if (_combineRulesController.activeRulePlate)
             {
                 if(_combineRulesController.activeRulePlate.gameObject.activeSelf) _combineRulesController.ruleEditorPlatePrefab.gameObject.SetActive(false);

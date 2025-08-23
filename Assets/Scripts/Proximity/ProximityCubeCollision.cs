@@ -57,7 +57,7 @@ namespace UI
         void OnTriggerEnter(Collider other)
         {
             //add to the list of interacting objects only if the object is an interactable object
-            if (other.CompareTag("Interactable"))
+            if (other.CompareTag("Interactable") || other.CompareTag("Floor"))
             {
                 Debug.Log("isrecording: " + GeneralUIController.Instance.isRecording);
                 if (GeneralUIController.Instance.isRecording)
