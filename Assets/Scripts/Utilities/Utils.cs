@@ -49,6 +49,17 @@ namespace UI
             return null;
         }
 
+        public static void CopyMaterialProperties(GameObject source, GameObject destination)
+        {
+            Renderer sourceRenderer = source.GetComponent<Renderer>();
+            Renderer destRenderer = destination.GetComponent<Renderer>();
+
+            if (sourceRenderer != null && destRenderer != null)
+            {
+                destRenderer.material.CopyPropertiesFromMaterial(sourceRenderer.material);
+            }
+        }
+
         public static Color GetColorFromString(string s)
         {
             if (ECAColor.colorDict.ContainsKey(s))
@@ -730,6 +741,18 @@ namespace UI
             textLabel.text = input;
         }
 
+        public static void Demo(GameObject cube)
+        {
+            GameObject beltRoll = GameObject.Find("Nastro");
+            if (beltRoll != null)
+            {
+                // Do something with the beltRoll object
+                cube.transform.parent = beltRoll.transform;
+                cube.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
+            }
+        }
+
         public static void FillTextLabelsInCube(ECAEvent e, GameObject cube)
         {
             // Define the face names and text labels
@@ -1180,6 +1203,10 @@ namespace UI
                     return new Action(action.GetSubject(), "turns on");
                 case "turns on":
                     return new Action(action.GetSubject(), "turns off");
+                case "increases speed":
+                    return new Action(action.GetSubject(), "decreases speed");
+                case "decreases speed":
+                    return new Action(action.GetSubject(), "increases speed");
             }
 
             return null;

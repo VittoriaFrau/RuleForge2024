@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.023312151, g: 0.020891896, b: 0.018664323, a: 1}
+  m_IndirectSpecularColor: {r: 0.023312151, g: 0.020891905, b: 0.018664323, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -391,6 +391,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 607159369133769202, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: isUsingOculusLink
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1205941592210323058, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_Name
       value: RuleForge
@@ -491,6 +495,30 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2681402147080026531, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3078364785314551234, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -539,6 +567,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4766665405315196094, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
+      propertyPath: propPrefabs.Array.data[3]
+      value: 
+      objectReference: {fileID: 5160782369274381370, guid: 8188130ce3d70c64fac5c9590df137a5, type: 3}
     - target: {fileID: 5719973515271713112, guid: d302584e231dfef4c8be7b67f7f48cca, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1071,6 +1103,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1803079969
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1803079971}
+  - component: {fileID: 1803079970}
+  m_Layer: 0
+  m_Name: DEMO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1803079970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803079969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da9b552b93aaa5489443b1ff36db68e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1803079971
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803079969}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.08937581, y: 1.1285807, z: -0.002498813}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1867267783
 GameObject:
   m_ObjectHideFlags: 0
@@ -1115,3 +1191,4 @@ SceneRoots:
   - {fileID: 1867267784}
   - {fileID: 819855487}
   - {fileID: 30245621}
+  - {fileID: 1803079971}

@@ -20,7 +20,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0, y: 50.8, z: 0}
+        value: {x: 0, y: 770.6279, z: 9595.781}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -28,8 +28,8 @@ AnimationClip:
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
-        time: 1
-        value: {x: 0, y: 10.37, z: 0}
+        time: 3.5666666
+        value: {x: 0, y: 771, z: 4810}
         inSlope: {x: 0, y: 0, z: 0}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
@@ -39,7 +39,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011/Nastro 1
+    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011
   m_ScaleCurves: []
   m_FloatCurves: []
   m_PPtrCurves: []
@@ -51,7 +51,7 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 1325238127
+      path: 531391809
       attribute: 1
       script: {fileID: 0}
       typeID: 4
@@ -65,7 +65,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 1
+    m_StopTime: 3.5666666
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -95,7 +95,7 @@ AnimationClip:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 1
+        time: 3.5666666
         value: 0
         inSlope: 0
         outSlope: 0
@@ -107,7 +107,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.x
-    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011/Nastro 1
+    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -117,7 +117,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 50.8
+        value: 770.6279
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -125,8 +125,8 @@ AnimationClip:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 1
-        value: 10.37
+        time: 3.5666666
+        value: 771
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -137,7 +137,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.y
-    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011/Nastro 1
+    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011
     classID: 4
     script: {fileID: 0}
     flags: 0
@@ -147,7 +147,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 9595.781
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -155,8 +155,8 @@ AnimationClip:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 1
-        value: 0
+        time: 3.5666666
+        value: 4810
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -167,7 +167,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalPosition.z
-    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011/Nastro 1
+    path: Sketchfab_model/conveyer build.fbx/Object_2/RootNode/Cube.011
     classID: 4
     script: {fileID: 0}
     flags: 0

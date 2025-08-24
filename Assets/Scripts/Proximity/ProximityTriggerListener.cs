@@ -5,9 +5,14 @@ namespace UI
 {
     using UnityEngine;
     using System;
+    using System.Linq;
 
     public class ProximityTriggerListener : MonoBehaviour
     {
+
+        void Start()
+        {
+        }
         // Public event that other classes can subscribe to
         public event Action<GameObject> OnProximityEnter;
         
@@ -59,25 +64,36 @@ namespace UI
                     if (gameObject.name.ToLower().Contains("cube"))
                     {
                         RuleEngine ruleEngine = RuleEngine.GetInstance();
-                        if (collision.gameObject.name.ToLower().Contains("sword"))
+                        if (collision.gameObject.name.ToLower().Contains("sword") )
                         {
-                            
+
                             ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "explodes"));
-                            TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
+                            /*TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
                             int counterValue = Convert.ToInt32(textMeshPro.text);
-                            textMeshPro.text = (counterValue+1).ToString();
+                            textMeshPro.text = (counterValue + 1).ToString();
                             //GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(gameObject, "resets"));
                             GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
+                            done = true;*/
 
                         }
-                        else if (collision.gameObject.name.ToLower().Contains("floor"))
+                        else if (collision.gameObject.name.ToLower().Contains("floor") )
                         {
-                            ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "hides"));
-                            TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
-                            int counterValue = Convert.ToInt32(textMeshPro.text);
-                            textMeshPro.text = (counterValue-1).ToString();
-                            GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
 
+                            GameObject belt = GameObject.FindGameObjectsWithTag("Interactable").FirstOrDefault(obj => obj.name.Equals("Belt1"));
+                            if (belt != null)
+                            {
+                                ruleEngine.ExecuteAction(new ECAPrototyping.RuleEngine.Action(gameObject, "hides"));
+                                /*TextMeshPro textMeshPro = GameObject.Find("Counter1").GetComponent<TextMeshPro>();
+                                int counterValue = Convert.ToInt32(textMeshPro.text);
+                                textMeshPro.text = (counterValue - 1).ToString();
+                                GeneralUIController.Instance.CombineRulesController.manualOppositeActions.Add(new ECAPrototyping.RuleEngine.Action(GameObject.Find("Counter1"), "resets counter"));
+                                done = true;*/
+                            }
+                        }
+
+                        else if (collision.gameObject.name.ToLower().Contains("belt"))
+                        {
+                            UI.Utils.Demo(gameObject);
                         }
                     }
             }

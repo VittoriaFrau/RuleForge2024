@@ -97,7 +97,7 @@ public class ObjectsMenuController : MonoBehaviour
         uiElement.GetComponent<Rigidbody>().useGravity = false;
         uiElement.GetComponent<Rigidbody>().isKinematic = true;
         Vector3 localPosition = uiElement.transform.localPosition;
-        uiElement.transform.localPosition = new Vector3(localPosition.x, 2.5f, localPosition.z);
+        uiElement.transform.localPosition = new Vector3(localPosition.x, 1.8f, localPosition.z);
         return uiElement;
     }
 

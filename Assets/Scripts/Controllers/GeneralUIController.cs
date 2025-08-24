@@ -129,7 +129,19 @@ namespace UI
         public void DeActivatePreviousState(UIState newState)
         {
             var previousState = _uiState;
-            if(previousState == newState) return;
+            //DEMO
+            if (previousState == UIState.Play)
+            {
+                GameObject belt = GameObject.Find("Belt1");
+                if (belt != null)
+                {
+                    GameObject cube = GameObject.Find("Cube1");
+                    cube.GetComponent<Rigidbody>().useGravity = false;
+                    cube.GetComponent<Rigidbody>().isKinematic = true;
+                    Destroy(cube.GetComponent<ProximityTriggerListener>());
+                }
+            }
+            if (previousState == newState) return;
             
             switch (previousState)
             {
@@ -248,10 +260,13 @@ namespace UI
             //if in the scene there is a duplicate object, destroy it   
             Utils.DestroySpawnedObjects(_interactionCreationController.interactablesParent.transform);
             Utils.ApplyOriginalMaterialToDuplicatedObjects(_interactionCreationController.interactablesParent.transform);
-            GameObject star = GameObject.Find("Star1");
-            if (star != null)
+            
+            GameObject belt = GameObject.Find("Belt1");
+            if (belt != null)
             {
-                star.AddComponent<ProximityTriggerListener>();
+                GameObject cube = GameObject.Find("Cube1");
+                cube.GetComponent<Rigidbody>().useGravity = true;
+                cube.GetComponent<Rigidbody>().isKinematic = false;
             }
         }
         

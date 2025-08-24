@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using ECAPrototyping.Utils;
 using MixedReality.Toolkit.SpatialManipulation;
 using UI;
@@ -77,7 +78,8 @@ namespace ECAPrototyping.RuleEngine
 
             // Configura Rigidbody se non esiste
             rigidbody = gameObject.GetComponent<Rigidbody>();
-            if (rigidbody == null)
+            //DEMO
+            if (rigidbody == null && !name.ToLower().StartsWith("newcube"))
             {
                 rigidbody = gameObject.AddComponent<Rigidbody>();
                 rigidbody.useGravity = false;
@@ -145,10 +147,11 @@ namespace ECAPrototyping.RuleEngine
             isVisible = yesNo;
             UpdateVisibility();
         }
-        
+
         private void UpdateVisibility()
         {
-            this.gameObject.SetActive(isVisible);
+            //set active or inactive the mesh renderer
+            gameRenderer.enabled = isVisible;
         }
         
         
@@ -228,7 +231,7 @@ namespace ECAPrototyping.RuleEngine
         /// <b>Duplicates</b> the object into N objects
         /// </summary>
         ///
-        [Action(typeof(ECAObject), "is duplicated" , typeof(int))]
+        [Action(typeof(ECAObject), "is duplicated", typeof(int))]
         public void CreateDuplicates(int spawnCount)
         {
             if (GeneralUIController.Instance.UIstate != GeneralUIController.UIState.Play)
@@ -239,7 +242,7 @@ namespace ECAPrototyping.RuleEngine
             }
 
             string baseName = this.name.Substring(0, this.name.Length - 1);
-            if(name.StartsWith("new"))
+            if (name.StartsWith("new"))
             {
                 baseName = name.Substring(3); // remove "new" prefix if it exists
             }
@@ -268,12 +271,16 @@ namespace ECAPrototyping.RuleEngine
                 if (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count == 1)
                 {
                     duplicate.name = "new" + baseName;
-                }else 
+                }
+                else
                 {
                     //if it's not the first duplicate, we set the name to "new" + baseName + counter
                     duplicate.name = "new" + baseName + (GeneralUIController.Instance.ObjectsMenuController.spawnedObjects.Count - 1);
                 }
-                
+
+                //copy material properties
+                UI.Utils.CopyMaterialProperties(gameObject, duplicate);
+
                 //UI.Utils.CopyMissingComponents(gameObject, duplicate, GeneralUIController.Instance.CombineRulesController.lastECAEvent,
                 //GeneralUIController.Instance.CombineRulesController.notifyTracker);
                 var lastEvent = GeneralUIController.Instance.CombineRulesController.lastECAEvent;
@@ -291,6 +298,7 @@ namespace ECAPrototyping.RuleEngine
             }
 
             isDuplicated.Assign(ECABoolean.BoolType.YES);
+           
         }
         
         /// <summary>
@@ -431,7 +439,7 @@ namespace ECAPrototyping.RuleEngine
             rb.velocity = launchDirection.normalized * launchSpeed;
         }
 
-        
+
         /// <summary>
         /// <b>ResetObject</b> restore the initial properties of the object.
         /// </summary>
@@ -447,6 +455,8 @@ namespace ECAPrototyping.RuleEngine
             var rb = GetComponent<Rigidbody>();
             rb.isKinematic = true;
             rb.useGravity = false;
+            
+            Shows();
         }
 
 
@@ -485,7 +495,26 @@ namespace ECAPrototyping.RuleEngine
                     transform.position = spawnPosition;
                 }
                 // If no spawn cube is found, just move to the target object's position
-                else transform.position = targetObject.transform.position;
+                else
+                {
+                    //DEMO
+                    if (this.gameObject.name.ToLower().Contains("newcube"))
+                    {
+                        // find bewteen the gameobjects with tag interactable the one called Belt1
+                        GameObject belt = GameObject.FindGameObjectsWithTag("Interactable").FirstOrDefault(obj => obj.name.Equals("Belt1"));
+                        if (belt != null)
+                        {
+                            // Move the object a few centimeters below the belt
+                            Vector3 spherePos = GameObject.Find("Sphere1").transform.position;
+                            transform.position = new Vector3(spherePos.x, spherePos.y - 0.5f, spherePos.z);
+                            rb.isKinematic = false;
+                            rb.useGravity = true;
+
+                            
+                        }
+                    }
+                    else transform.position = targetObject.transform.position;
+                }
             }
         }
         
