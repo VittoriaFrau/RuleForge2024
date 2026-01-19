@@ -9,14 +9,16 @@ namespace UI
     {
         public int CurrentIndex { get; private set; } = 0;
         private readonly ECAEvent[] sequence;
+        private readonly ECAEvent[] ifEvents;
         private readonly ECAEvent[] thenEvents;
         private readonly RuleEngine ruleEngine;
         private List<Action> oppositeActions;
         private bool hasCompleted = false;
 
-        public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] thenEvents, RuleEngine ruleEngine)
+        public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] ifEvents, ECAEvent[] thenEvents, RuleEngine ruleEngine)
         {
             this.sequence = whenSequence;
+            this.ifEvents = ifEvents;
             this.thenEvents = thenEvents;
             this.ruleEngine = ruleEngine;
             this.oppositeActions = new List<Action>();
@@ -86,6 +88,15 @@ namespace UI
         
         private void ExecuteActions()
         {
+            Debug.Log($"[Tracker] ExecuteActions: ifEvents={ifEvents?.Length ?? 0}, thenEvents={thenEvents?.Length ?? 0}");
+            if (!AreIfConditionsMet(ifEvents))
+            {
+                GeneralUIController.Instance.SetDebugText("IF condition not satisfied. THEN skipped.");
+                Debug.Log("[Tracker] IF condition not satisfied. THEN skipped.");
+                ResetTracker();
+                return;
+            }
+
             hasCompleted = true;
             CurrentIndex = 0;
 
@@ -191,7 +202,7 @@ namespace UI
         {
             // Azione: scateni le azioni di THEN
             // Ad esempio:
-            EventSequenceTracker tracker = new EventSequenceTracker(new ECAEvent[0], thenEvents, RuleEngine.GetInstance());
+            EventSequenceTracker tracker = new EventSequenceTracker(new ECAEvent[0], ifEvents, thenEvents, RuleEngine.GetInstance());
             tracker.TriggerActionsDirectly(null); // oppure una logica più complessa
         }
         
@@ -219,6 +230,121 @@ namespace UI
             hasCompleted = false;
             CurrentIndex = 0;
             //oppositeActions.Clear(); 
+        }
+
+        public static bool AreIfConditionsMet(ECAEvent[] ifEvents)
+        {
+            if (ifEvents == null || ifEvents.Length == 0)
+            {
+                return true;
+            }
+
+            foreach (var ifEvent in ifEvents)
+            {
+                if (ifEvent == null)
+                {
+                    return false;
+                }
+
+                var action = ifEvent.Action;
+                var subject = action != null ? action.GetSubject() : ifEvent.ObjectRef;
+                if (subject == null)
+                {
+                    Debug.LogWarning("[Tracker] IF condition has no subject.");
+                    return false;
+                }
+
+                var ecaObject = subject.GetComponent<ECAPrototyping.RuleEngine.ECAObject>();
+                if (ecaObject == null)
+                {
+                    Debug.LogWarning($"[Tracker] IF subject '{subject.name}' has no ECAObject.");
+                    return false;
+                }
+
+                if (!TryEvaluateVisibility(ifEvent, ecaObject, out var matches))
+                {
+                    Debug.LogWarning($"[Tracker] IF condition not supported: {ifEvent.Verb}");
+                    return false;
+                }
+
+                if (!matches)
+                {
+                    Debug.Log($"[Tracker] IF condition failed for {subject.name}: {ifEvent.Verb}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool TryEvaluateVisibility(ECAEvent ifEvent, ECAPrototyping.RuleEngine.ECAObject ecaObject, out bool matches)
+        {
+            matches = false;
+            var verb = (ifEvent.Verb ?? ifEvent.Action?.GetActionMethod() ?? string.Empty).ToLowerInvariant();
+
+            if (verb.Contains("hides"))
+            {
+                matches = !ecaObject.isVisible;
+                return true;
+            }
+
+            if (verb.Contains("shows"))
+            {
+                matches = ecaObject.isVisible;
+                return true;
+            }
+
+            if (verb.Contains("changes visible to") || verb.Contains("changes visibility to"))
+            {
+                object modifierValue = ifEvent.Action != null ? ifEvent.Action.GetModifierValue() : null;
+                if (modifierValue == null)
+                {
+                    modifierValue = ifEvent.ObjectStr;
+                }
+
+                if (TryParseBool(modifierValue, out var desiredVisible))
+                {
+                    matches = ecaObject.isVisible == desiredVisible;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryParseBool(object value, out bool result)
+        {
+            result = false;
+            if (value == null) return false;
+
+            if (value is bool boolVal)
+            {
+                result = boolVal;
+                return true;
+            }
+
+            if (value is ECAPrototyping.Utils.ECABoolean ecaBool)
+            {
+                result = ecaBool;
+                return true;
+            }
+
+            var text = value.ToString()?.Trim().ToLowerInvariant();
+            if (string.IsNullOrEmpty(text)) return false;
+
+            if (text is "yes" or "true" or "on")
+            {
+                result = true;
+                return true;
+            }
+
+            if (text is "no" or "false" or "off")
+            {
+                result = false;
+                return true;
+            }
+
+            return bool.TryParse(text, out result);
         }
 
     }

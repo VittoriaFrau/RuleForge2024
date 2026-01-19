@@ -17,6 +17,7 @@ using UnityEngine.Serialization;
 using Action = ECAPrototyping.RuleEngine.Action;
 using UnityEngine.InputSystem;
 
+
 namespace UI
 {
     public class InteractionCreationController : MonoBehaviour
@@ -48,6 +49,7 @@ namespace UI
 
         //Opposite action events are used to revert the action when we go back to the previous state
         private List<Action> _oppositeActionEvents = new();
+        private readonly List<Behaviour> _disabledInteractables = new();
         public GameObject screenshotCamera;
         private ScreenshotCamera _screenshotCamera;
         public HandMenuManager handMenuManager;
@@ -470,6 +472,7 @@ namespace UI
 
         public void RemoveModalityListeners()
         {
+            RestoreDisabledInteractables();
             //Remove the listeners
             foreach (var go in interactablesParent.transform.GetComponentsInChildren<ObjectManipulator>())
             {
@@ -760,6 +763,7 @@ namespace UI
             uiController.isRecording = false;
             screenshotCamera.SetActive(false);
             uiController.SetDebugText("Recording stopped.");
+            RestoreDisabledInteractables();
 
             if (uiController.UIstate == GeneralUIController.UIState.NewInteraction)
             {
@@ -830,6 +834,7 @@ namespace UI
         public void StartRecording()
         {
             GeneralUIController.Instance.isRecording = true;
+            Debug.Log($"[Interaction] StartRecording state={GeneralUIController.Instance.UIstate} modality={_modality}");
 
             switch (GeneralUIController.Instance.UIstate)
             {
@@ -893,6 +898,7 @@ namespace UI
                     break;
             }
             
+            Debug.Log($"[Interaction] RecordInteraction modality={_modality} interactables={interactablesParent.transform.childCount}");
             recordInteractionButton.SetActive(false);
             stopInteractionButton.SetActive(true);
 
@@ -909,6 +915,7 @@ namespace UI
 
         private void AddListener(ObjectManipulator manipulator)
         {
+            Debug.Log($"[Interaction] AddListener {manipulator.gameObject.name} modality={_modality}");
             switch (_modality)
             {
                 case Modalities.Headgaze:
@@ -956,6 +963,7 @@ namespace UI
 
         public void DeActivateNewInteraction()
         {
+            RestoreDisabledInteractables();
             DeActivateCurrentModality();
             RemoveModalityListeners();
             _modality = Modalities.None;
@@ -1048,6 +1056,15 @@ namespace UI
         private void AddTouchListener(ObjectManipulator manipulator)
         {
             GameObject gameObject = manipulator.gameObject;
+            Debug.Log($"[Interaction] AddTouchListener {gameObject.name}");
+            var pressable = gameObject.GetComponent<MixedReality.Toolkit.UX.PressableButton>();
+            var stateful = gameObject.GetComponent<MixedReality.Toolkit.StatefulInteractable>();
+            Debug.Log($"[Interaction] Touch target components {gameObject.name}: " +
+                      $"ObjectManipulator={(manipulator != null)} " +
+                      $"PressableButton={(pressable != null)} " +
+                      $"StatefulInteractable={(stateful != null)} " +
+                      $"ColliderCount={gameObject.GetComponents<Collider>().Length}");
+            DisableConflictingInteractables(gameObject, manipulator);
 
             //attach listener to object manipulator manipulation started event
             /*manipulator.OnClicked.AddListener (() =>
@@ -1069,16 +1086,18 @@ namespace UI
 
             manipulator.selectEntered.AddListener(interactor =>
             {
-                Debug.Log(manipulator.gameObject.name + " Select entered");
+                Debug.Log($"[Interaction] Touch selectEntered {manipulator.gameObject.name}");
                 GeneralUIController.Instance.SetDebugText("You selected " + manipulator.gameObject.name);
 
                 _categoryController.CustomizeCategoryMenu(gameObject);
 
                 //Note: event should be added before starting the coroutine
                 ECAEvent ecaEvent = new ECAEvent(manipulator.gameObject, Modalities.Touch, "selects", null, false);
+                Debug.Log($"[Interaction] Touch event created {ecaEvent}");
                 if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
                 {
                     GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+                    Debug.Log($"[Interaction] Touch event recorded. Total={GeneralUIController.Instance.recordedEvents.Count}");
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                 }
 
@@ -1097,6 +1116,71 @@ namespace UI
                     PrepareForModalityScreenshot(manipulator.gameObject, Modalities.Touch, ecaEvent);
                 }
             });*/
+        }
+
+        private void DisableConflictingInteractables(GameObject target, ObjectManipulator manipulator)
+        {
+            if (target == null)
+            {
+                return;
+            }
+
+            var xrInteractables = target.GetComponentsInChildren<UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable>(true)
+                .Concat(new[] { target.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRBaseInteractable>() })
+                .Where(c => c != null)
+                .Distinct()
+                .Cast<Behaviour>()
+                .ToList();
+
+            var mrtkInteractables = target.GetComponentsInChildren<Behaviour>(true)
+                .Where(c =>
+                    c is MixedReality.Toolkit.StatefulInteractable ||
+                    c is MixedReality.Toolkit.UX.PressableButton)
+                .ToList();
+
+            var interactables = xrInteractables
+                .Concat(mrtkInteractables)
+                .Where(c => c != null && c.enabled && c != manipulator)
+                .Distinct()
+                .ToList();
+
+            if (interactables.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var interactable in interactables)
+            {
+                interactable.enabled = false;
+                _disabledInteractables.Add(interactable);
+                Debug.Log($"[Interaction] Disabled {interactable.GetType().Name} on {interactable.gameObject.name} to avoid collider conflict.");
+            }
+
+            if (manipulator != null)
+            {
+                manipulator.enabled = false;
+                manipulator.enabled = true;
+                Debug.Log($"[Interaction] Re-registered ObjectManipulator on {manipulator.gameObject.name} after disabling conflicts.");
+            }
+        }
+
+        private void RestoreDisabledInteractables()
+        {
+            if (_disabledInteractables.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var interactable in _disabledInteractables)
+            {
+                if (interactable != null)
+                {
+                    interactable.enabled = true;
+                    Debug.Log($"[Interaction] Restored {interactable.GetType().Name} on {interactable.gameObject.name}.");
+                }
+            }
+
+            _disabledInteractables.Clear();
         }
 
         private void AddControllersListener(ObjectManipulator manipulator)

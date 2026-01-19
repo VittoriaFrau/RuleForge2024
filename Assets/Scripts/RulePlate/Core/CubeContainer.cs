@@ -39,10 +39,8 @@ namespace UI.RuleEditor
             //find if this instance is a child of a then or when
             Transform parent = gameObject.transform.parent;
 
-            if (rulePhase == CombineRulesController.RulePhase.None)
-            {
-                FindRulePhase(parent);
-            }
+            FindRulePhase(parent);
+            Debug.Log($"[CubeContainer] Start on {name}. rulePhase={rulePhase} parent={parent?.name}");
             parent = gameObject.transform.parent;
             // Find the parent EquivalenceRow container
             foreach (Transform child in parent.parent){
@@ -60,54 +58,30 @@ namespace UI.RuleEditor
                 _ => containerType
             };
 
-            _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
+            var eventHandler = GameObject.FindGameObjectWithTag("EventHandler");
+            _combineRulesController = eventHandler != null
+                ? eventHandler.GetComponent<CombineRulesController>()
+                : FindObjectOfType<CombineRulesController>();
+            if (_combineRulesController == null)
+            {
+                Debug.LogError("[CubeContainer] CombineRulesController not found. Disable CubeContainer.");
+                enabled = false;
+                return;
+            }
             
             modalityContainerPrefab = _combineRulesController.modalityContainerPrefab;
             actionContainerPrefab = _combineRulesController.actionContainerPrefab;
+            Debug.Log($"[CubeContainer] Prefabs: modality={modalityContainerPrefab?.name} action={actionContainerPrefab?.name}");
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            //if the cube is a action cube and the container is a when container, return and viceversa
-            if (collision.gameObject.CompareTag("ActionRuleCube") && rulePhase == CombineRulesController.RulePhase.When)
+            Debug.Log($"[CubeContainer] OnCollisionEnter {name} <- {collision.gameObject.name}");
+            if (!TryGetCubeRoot(collision.gameObject, out var cubeRoot))
             {
                 return;
             }
-            
-            if (collision.gameObject.CompareTag("RuleCubes") && rulePhase == CombineRulesController.RulePhase.Then)
-            {
-                return;
-            }
-            
-            if(collision.gameObject == currentCube)
-            {
-                // If the current cube is the same as the colliding cube, do nothing
-                return;
-            }
-            
-            // Check if collision occurred with a RuleCube and not already instantiating
-            if ((collision.gameObject.CompareTag("RuleCubes") || collision.gameObject.CompareTag("ActionRuleCube")) && !isInstantiating)
-            {
-                isInstantiating = true;
-                _combineRulesController.DeactivateRuleDebugText();
-                PositionGameObjectInContainer(collision);
-                CreateSequenceContainer();
-                _combineRulesController.AddContainer(rulePhase, this.gameObject);
-
-                if (rulePhase != CombineRulesController.RulePhase.Then)
-                {
-                    CreateEquivalenceContainer();
-                    _combineRulesController.AddContainer(rulePhase, gameObject);
-                }
-                
-                currentCube = collision.gameObject;
-
-                collision.gameObject.GetComponent<ObjectManipulator>().enabled = true;
-                
-                //Update text
-                _combineRulesController.CalculateRuleText(collision.gameObject, rulePhase, true, containerType, id );
-                StartCoroutine(ResetInstantiation());
-            }
+            TryAttachCubeRoot(cubeRoot);
         }
 
         private void FindRulePhase(Transform parent)
@@ -137,7 +111,13 @@ namespace UI.RuleEditor
 
         private void OnCollisionExit(Collision collision)
         {
-            if ((collision.gameObject.CompareTag("RuleCubes") || collision.gameObject.CompareTag("ActionRuleCube"))
+            Debug.Log($"[CubeContainer] OnCollisionExit {name} <- {collision.gameObject.name}");
+            if (!TryGetCubeRoot(collision.gameObject, out var cubeRoot))
+            {
+                return;
+            }
+
+            if ((cubeRoot.CompareTag("RuleCubes") || cubeRoot.CompareTag("ActionRuleCube"))
                 && !isInstantiating && !isRemoving)
             {
                 isRemoving = true;
@@ -146,27 +126,34 @@ namespace UI.RuleEditor
                 _combineRulesController.RemoveContainer(rulePhase);
                 _combineRulesController.RemoveContainer(rulePhase);
                 currentCube = null;
-                _combineRulesController.CalculateRuleText(collision.gameObject, rulePhase, false, containerType, id);
+                _combineRulesController.CalculateRuleText(cubeRoot, rulePhase, false, containerType, id);
             }
 
             StartCoroutine(ResetInstantiation());
             //CalculateRuleText();
         }
 
-        private void PositionGameObjectInContainer(Collision collision)
+        private void PositionGameObjectInContainer(GameObject cubeRoot)
         {
+            Debug.Log($"[CubeContainer] Position cube {cubeRoot.name} into {name}");
             //Deactivate object manipulator from object
-            collision.gameObject.GetComponent<ObjectManipulator>().enabled = false;
+            if (cubeRoot.TryGetComponent<ObjectManipulator>(out var manipulator))
+            {
+                manipulator.enabled = false;
+            }
                 
             //Position the cube in the right position
             Vector3 positionContainer = gameObject.transform.position;
-            collision.gameObject.transform.position = new Vector3(positionContainer.x, positionContainer.y + 0.1f ,positionContainer.z);
+            cubeRoot.transform.position = new Vector3(positionContainer.x, positionContainer.y + 0.1f ,positionContainer.z);
 
             //Set the collision transform velocities to 0
-            collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            collision.gameObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            if (cubeRoot.TryGetComponent<Rigidbody>(out var body))
+            {
+                body.velocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
                 
-            collision.gameObject.transform.rotation = gameObject.transform.rotation;
+            cubeRoot.transform.rotation = gameObject.transform.rotation;
         }
 
         private void CreateSequenceContainer()
@@ -180,6 +167,7 @@ namespace UI.RuleEditor
             sequenceInstantiated.transform.localScale = transform.localScale;
             sequenceInstantiated.transform.localPosition = new Vector3(sequenceInstantiated.transform.localPosition.x,  
                 sequenceInstantiated.transform.localPosition.y,3.99f);
+            Debug.Log($"[CubeContainer] Created sequence container {sequenceInstantiated.name} under {transform.parent.name}");
         }
 
         private void CreateEquivalenceContainer()
@@ -187,6 +175,12 @@ namespace UI.RuleEditor
             //Modality or action container
             GameObject containerPrefab = rulePhase == CombineRulesController.RulePhase.When ? modalityContainerPrefab : actionContainerPrefab;
             //Create a new instance of the container in the equivalence position
+            if (equivalenceCubeContainer == null)
+            {
+                Debug.LogWarning("[CubeContainer] EquivalenceRow not found, skipping equivalence container creation.");
+                return;
+            }
+
             equivalenceInstantiated = Instantiate(containerPrefab);
             equivalenceInstantiated.transform.parent = equivalenceCubeContainer.transform;
             equivalenceInstantiated.transform.rotation = gameObject.transform.rotation;
@@ -195,7 +189,140 @@ namespace UI.RuleEditor
             localPosition = new Vector3(localPosition.x,  
                 localPosition.y,3.99f);
             equivalenceInstantiated.transform.localPosition = localPosition;
+            Debug.Log($"[CubeContainer] Created equivalence container {equivalenceInstantiated.name} under {equivalenceCubeContainer.name}");
 
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other == null) return;
+            Debug.Log($"[CubeContainer] OnTriggerEnter {name} <- {other.gameObject.name}");
+            OnCollisionEnterProxy(other.gameObject);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other == null) return;
+            Debug.Log($"[CubeContainer] OnTriggerExit {name} <- {other.gameObject.name}");
+            OnCollisionExitProxy(other.gameObject);
+        }
+
+        private void OnCollisionEnterProxy(GameObject other)
+        {
+            Debug.Log($"[CubeContainer] OnCollisionEnterProxy {name} <- {other.name}");
+            if (!TryGetCubeRoot(other, out var cubeRoot))
+            {
+                return;
+            }
+            TryAttachCubeRoot(cubeRoot);
+        }
+
+        private void OnCollisionExitProxy(GameObject other)
+        {
+            Debug.Log($"[CubeContainer] OnCollisionExitProxy {name} <- {other.name}");
+            if (!TryGetCubeRoot(other, out var cubeRoot))
+            {
+                return;
+            }
+
+            if ((cubeRoot.CompareTag("RuleCubes") || cubeRoot.CompareTag("ActionRuleCube"))
+                && !isInstantiating && !isRemoving)
+            {
+                isRemoving = true;
+                Destroy(equivalenceInstantiated);
+                Destroy(sequenceInstantiated);
+                _combineRulesController.RemoveContainer(rulePhase);
+                _combineRulesController.RemoveContainer(rulePhase);
+                currentCube = null;
+                _combineRulesController.CalculateRuleText(cubeRoot, rulePhase, false, containerType, id);
+            }
+
+            StartCoroutine(ResetInstantiation());
+        }
+
+        private static bool TryGetCubeRoot(GameObject hit, out GameObject cubeRoot)
+        {
+            cubeRoot = null;
+            if (hit == null) return false;
+
+            var cubeController = hit.GetComponentInParent<CubeController>();
+            if (cubeController != null)
+            {
+                cubeRoot = cubeController.gameObject;
+                Debug.Log($"[CubeContainer] TryGetCubeRoot resolved {hit.name} -> {cubeRoot.name} (CubeController)");
+                return true;
+            }
+
+            if (hit.CompareTag("RuleCubes") || hit.CompareTag("ActionRuleCube"))
+            {
+                cubeRoot = hit;
+                Debug.Log($"[CubeContainer] TryGetCubeRoot resolved {hit.name} by tag");
+                return true;
+            }
+
+            Debug.Log($"[CubeContainer] TryGetCubeRoot failed for {hit.name}");
+            return false;
+        }
+
+        public bool TryAttachCube(GameObject cubeRoot)
+        {
+            if (cubeRoot == null || !enabled)
+            {
+                return false;
+            }
+
+            return TryAttachCubeRoot(cubeRoot);
+        }
+
+        private bool TryAttachCubeRoot(GameObject cubeRoot)
+        {
+            //if the cube is a action cube and the container is a when container, return and viceversa
+            if (cubeRoot.CompareTag("ActionRuleCube") && rulePhase == CombineRulesController.RulePhase.When)
+            {
+                return false;
+            }
+            
+            if (cubeRoot.CompareTag("RuleCubes") && rulePhase == CombineRulesController.RulePhase.Then)
+            {
+                return false;
+            }
+            
+            if(cubeRoot == currentCube)
+            {
+                // If the current cube is the same as the colliding cube, do nothing
+                return false;
+            }
+            
+            // Check if collision occurred with a RuleCube and not already instantiating
+            if ((cubeRoot.CompareTag("RuleCubes") || cubeRoot.CompareTag("ActionRuleCube")) && !isInstantiating)
+            {
+                Debug.Log($"[CubeContainer] Attaching cube {cubeRoot.name} to {name}");
+                isInstantiating = true;
+                _combineRulesController.DeactivateRuleDebugText();
+                PositionGameObjectInContainer(cubeRoot);
+                CreateSequenceContainer();
+                _combineRulesController.AddContainer(rulePhase, this.gameObject);
+
+                if (rulePhase != CombineRulesController.RulePhase.Then)
+                {
+                    CreateEquivalenceContainer();
+                    _combineRulesController.AddContainer(rulePhase, gameObject);
+                }
+                
+                currentCube = cubeRoot;
+
+                if (cubeRoot.TryGetComponent<ObjectManipulator>(out var manipulator))
+                {
+                    manipulator.enabled = true;
+                }
+                
+                //Update text
+                _combineRulesController.CalculateRuleText(cubeRoot, rulePhase, true, containerType, id );
+                StartCoroutine(ResetInstantiation());
+                return true;
+            }
+
+            return false;
         }
     }
 }

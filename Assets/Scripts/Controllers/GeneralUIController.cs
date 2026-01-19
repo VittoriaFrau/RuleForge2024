@@ -200,7 +200,14 @@ namespace UI
             existingRuleOptionsUI.SetActive(false);
             _combineRulesController.ActivateCombineRules(false);
             // we need to remove the last rule to make sure we are not duplicating it
-            activeRules.RemoveAt(activeRules.Count - 1);
+            if (activeRules.Count > 0)
+            {
+                activeRules.RemoveAt(activeRules.Count - 1);
+            }
+            else
+            {
+                Debug.LogWarning("[GeneralUIController] ContinueWithExistingRule called but no active rules to remove.");
+            }
             _combineRulesController.UnbindAllEvents();
         }
         

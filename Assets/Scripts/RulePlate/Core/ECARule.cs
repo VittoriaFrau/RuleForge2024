@@ -21,6 +21,13 @@ namespace RulePlate.Core
             get => actions;
             set => actions = value;
         }
+
+        List<ECAEvent> ifEvents;
+        public List<ECAEvent> IfEvents
+        {
+            get => ifEvents;
+            set => ifEvents = value;
+        }
         
         List<MeanwhileEvent> meanwhileEvents;
         public List<MeanwhileEvent> MeanwhileEvents
@@ -53,6 +60,14 @@ namespace RulePlate.Core
                 foreach (var e in events)
                 {
                     ruleString += e.ToString() + "\n";
+                }
+            }
+            if (ifEvents != null && ifEvents.Count > 0)
+            {
+                ruleString += "If: ";
+                foreach (var i in ifEvents)
+                {
+                    ruleString += i.ToString() + "\n";
                 }
             }
             if (meanwhileEvents != null && meanwhileEvents.Count > 0)

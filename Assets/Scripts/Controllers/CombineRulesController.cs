@@ -576,14 +576,10 @@ namespace UI
             allMeanwhileEvents.AddRange(meanwhileEventsSequential);
             allMeanwhileEvents.AddRange(meanwhileEventsEquivalence);
 
-            // Unisci THEN e IF in un'unica lista di azioni
-            List<ECAEvent> allActions = new List<ECAEvent>(thenEvents);
-            allActions.AddRange(ifEvents);
-
             ECARule rule;
             if (allMeanwhileEvents.Count > 0)
             {
-                rule = new ECARule(new List<ECAEvent>(whenEvents), allActions);
+                rule = new ECARule(new List<ECAEvent>(whenEvents), new List<ECAEvent>(thenEvents));
                 rule.MeanwhileEvents = allMeanwhileEvents;
             }
             else
@@ -595,8 +591,11 @@ namespace UI
                     allWhenEvents.Add(equivalenceEvents[0]);
                 }
 
-                rule = new ECARule(allWhenEvents, allActions);
+                rule = new ECARule(allWhenEvents, new List<ECAEvent>(thenEvents));
             }
+
+            rule.IfEvents = new List<ECAEvent>(ifEvents);
+            Debug.Log($"[CombineRules] Built rule: when={rule.Events?.Count ?? 0}, if={rule.IfEvents?.Count ?? 0}, then={rule.Actions?.Count ?? 0}");
             
             rule.MarkDynamicSubjects();
 
@@ -608,7 +607,9 @@ namespace UI
                 return;
 
             RuleEngine ruleEngine = RuleEngine.GetInstance();
-            eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), rule.Actions.ToArray(), ruleEngine);
+            var ifEvents = rule.IfEvents != null ? rule.IfEvents.ToArray() : Array.Empty<ECAEvent>();
+            eventSequenceTracker = new EventSequenceTracker(rule.Events.ToArray(), ifEvents, rule.Actions.ToArray(), ruleEngine);
+            Debug.Log($"[CombineRules] BindECARule with ifEvents={ifEvents.Length}, thenEvents={rule.Actions?.Count ?? 0}");
 
             // Bind normali ECAEvent (WHEN/EQUIVALENCE)
             if (rule.Events != null)
@@ -639,7 +640,7 @@ namespace UI
                         {
                             GameObject obj = mEvent.ObjectRef;
                             Debug.Log($"Binding meanwhile event: {mEvent} on GameObject: {obj.name}");
-                            eventSequenceTracker = new EventSequenceTracker(new[] { mEvent }, rule.Actions.ToArray(), ruleEngine);
+                            eventSequenceTracker = new EventSequenceTracker(new[] { mEvent }, ifEvents, rule.Actions.ToArray(), ruleEngine);
                             BindEvent(obj, mEvent, eventSequenceTracker, false, meanwhileRule);
                         }
                     }
@@ -812,6 +813,12 @@ namespace UI
         
         private void ExecuteMeanwhileAction()
         {
+            if (!EventSequenceTracker.AreIfConditionsMet(currentIfEvents))
+            {
+                GeneralUIController.Instance.SetDebugText("IF condition not satisfied. THEN skipped.");
+                Debug.Log("[CombineRules] IF condition not satisfied. THEN skipped.");
+                return;
+            }
 
             // Esegui gli eventi THEN collegati, o le azioni che hai previsto
             foreach (var thenEvent in currentThenEvents)
@@ -824,14 +831,85 @@ namespace UI
         {
             // Cache references to the current rule plate components
             removableBarrier = activeRulePlate.transform.Find("CubePlate/Barriers").gameObject;
-            whenText = activeRulePlate.transform.Find("RuleText/Action Button/Frontplate/AnimatedContent/WhenTextContainer/WhenText").GetComponent<TextMeshProUGUI>();
-            thenText = activeRulePlate.transform.Find("RuleText/Action Button/Frontplate/AnimatedContent/ThenTextContainer/ThenText").GetComponent<TextMeshProUGUI>();
+
+            // Ensure the IF text UI exists (older prefabs only have WHEN + THEN).
+            EnsureIfTextUIExists(activeRulePlate.transform);
+
+            whenText = activeRulePlate.transform
+                .Find("RuleText/Action Button/Frontplate/AnimatedContent/WhenTextContainer/WhenText")
+                .GetComponent<TextMeshProUGUI>();
+            ifText = activeRulePlate.transform
+                .Find("RuleText/Action Button/Frontplate/AnimatedContent/IfTextContainer/IfText")
+                .GetComponent<TextMeshProUGUI>();
+            thenText = activeRulePlate.transform
+                .Find("RuleText/Action Button/Frontplate/AnimatedContent/ThenTextContainer/ThenText")
+                .GetComponent<TextMeshProUGUI>();
+
             whenSequentialRow = activeRulePlate.transform.Find("RulePlate/When/Frontplate/SequentialRow").gameObject;
             whenEquivalenceRow = activeRulePlate.transform.Find("RulePlate/When/Frontplate/EquivalenceRow").gameObject;
+
+            // IF is optional in older prefabs; after EnsureIfTextUIExists it must exist.
+            ifSequentialRow = activeRulePlate.transform.Find("RulePlate/If/Frontplate/SequentialRow").gameObject;
+
             thenSequentialRow = activeRulePlate.transform.Find("RulePlate/Then/Frontplate/SequentialRow").gameObject;
             cubePlate = activeRulePlate.transform.Find("CubePlate").gameObject;
             cubeHelp = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/CubeHelp").gameObject;
             ruleDebugText = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/RuleDebugText").gameObject;
+        }
+
+        /// <summary>
+        /// Guarantees the presence of the IF section in the rule summary UI (RuleText panel).
+        /// This keeps the UI consistent with ECA semantics: WHEN / IF / THEN.
+        /// </summary>
+        private static void EnsureIfTextUIExists(Transform rulePlateRoot)
+        {
+            var animatedContent = rulePlateRoot.Find("RuleText/Action Button/Frontplate/AnimatedContent");
+            if (animatedContent == null)
+            {
+                Debug.LogWarning("AnimatedContent not found: cannot ensure IF text UI.");
+                return;
+            }
+
+            // Already present
+            if (animatedContent.Find("IfTextContainer") != null)
+                return;
+
+            var thenContainer = animatedContent.Find("ThenTextContainer");
+            if (thenContainer == null)
+            {
+                Debug.LogWarning("ThenTextContainer not found: cannot clone for IF text UI.");
+                return;
+            }
+
+            // Clone THEN container and adapt it to IF.
+            var ifContainer = Instantiate(thenContainer.gameObject, animatedContent).transform;
+            ifContainer.name = "IfTextContainer";
+            ifContainer.SetSiblingIndex(1); // WHEN (0) -> IF (1) -> THEN (2)
+
+            // Rename + retitle label
+            var label = ifContainer.Find("ThenLabel");
+            if (label != null)
+            {
+                label.name = "IfLabel";
+                var labelTmp = label.GetComponent<TextMeshProUGUI>();
+                if (labelTmp != null)
+                {
+                    labelTmp.text = labelTmp.text.Replace("THEN", "IF");
+                }
+            }
+
+            // Rename + retitle text
+            var thenText = ifContainer.Find("ThenText");
+            if (thenText != null)
+            {
+                thenText.name = "IfText";
+                thenText.tag = "RuleText";
+                var tmp = thenText.GetComponent<TextMeshProUGUI>();
+                if (tmp != null)
+                {
+                    tmp.text = "...";
+                }
+            }
         }
         
         private void BindEvent(GameObject target, ECAEvent eventToBind, EventSequenceTracker tracker,

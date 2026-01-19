@@ -8,6 +8,7 @@ using UI;
 using UI.RuleEditor;
 using UnityEngine;
 using UnityEngine.Diagnostics;
+using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using Utils = UI.Utils;
 
@@ -22,11 +23,73 @@ public class CubeController : MonoBehaviour
     private CombineRulesController _combineRulesController;
     private GameObject interactables;
     public int cubeID;
+    [SerializeField] private float snapDistance = 0.6f;
+    private Rigidbody _rigidbody;
+    private Collider[] _colliders;
+    private ObjectManipulator _manipulator;
     
     private void Start()
     {
         _combineRulesController = GameObject.FindGameObjectWithTag("EventHandler").GetComponent<CombineRulesController>();
         interactables = _combineRulesController.interactables;
+
+        _rigidbody = GetComponent<Rigidbody>();
+        _colliders = GetComponentsInChildren<Collider>();
+        _manipulator = GetComponent<ObjectManipulator>();
+
+        // Ensure all colliders are on the same layer as the cube root.
+        var cubeLayer = gameObject.layer;
+        foreach (var collider in _colliders)
+        {
+            if (collider != null)
+            {
+                collider.gameObject.layer = cubeLayer;
+            }
+        }
+
+        if (_manipulator != null)
+        {
+            _manipulator.selectEntered.AddListener(OnSelectEntered);
+            _manipulator.selectExited.AddListener(OnSelectExited);
+        }
+
+        LogPhysicsState("Start");
+    }
+
+    private void OnDestroy()
+    {
+        if (_manipulator != null)
+        {
+            _manipulator.selectEntered.RemoveListener(OnSelectEntered);
+            _manipulator.selectExited.RemoveListener(OnSelectExited);
+        }
+    }
+
+    private void OnSelectEntered(SelectEnterEventArgs _)
+    {
+        if (_rigidbody != null)
+        {
+            _rigidbody.isKinematic = true;
+            _rigidbody.useGravity = false;
+            _rigidbody.detectCollisions = true;
+        }
+        LogPhysicsState("SelectEntered");
+    }
+
+    private void OnSelectExited(SelectExitEventArgs _)
+    {
+        if (_rigidbody != null)
+        {
+            _rigidbody.isKinematic = false;
+            _rigidbody.useGravity = false;
+            _rigidbody.detectCollisions = true;
+            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+        }
+
+        Physics.SyncTransforms();
+        LogPhysicsState("SelectExited");
+        TrySnapToNearestContainer();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -167,6 +230,62 @@ public class CubeController : MonoBehaviour
         RenderTexture.active = null;
         RenderTexture.ReleaseTemporary(tempRT);
         return copyTexture;
+    }
+
+    private void LogPhysicsState(string label)
+    {
+        var rbState = _rigidbody != null
+            ? $"rb(kinematic={_rigidbody.isKinematic}, gravity={_rigidbody.useGravity}, detectCollisions={_rigidbody.detectCollisions})"
+            : "rb(null)";
+        var colliderState = _colliders != null && _colliders.Length > 0
+            ? string.Join(", ", _colliders.Select(c => $"{c.name}(enabled={c.enabled}, trigger={c.isTrigger}, layer={LayerMask.LayerToName(c.gameObject.layer)})"))
+            : "colliders(none)";
+        Debug.Log($"[CubeController] {label} {name} layer={LayerMask.LayerToName(gameObject.layer)} {rbState} {colliderState}");
+    }
+
+    private void TrySnapToNearestContainer()
+    {
+        var containers = FindObjectsOfType<CubeContainer>();
+        if (containers.Length == 0)
+        {
+            Debug.LogWarning("[CubeController] No CubeContainer found for snap.");
+            return;
+        }
+
+        CubeContainer best = null;
+        float bestSqrDistance = float.MaxValue;
+        var cubePosition = transform.position;
+
+        foreach (var container in containers)
+        {
+            var collider = container.GetComponent<Collider>();
+            if (collider == null || !collider.enabled)
+            {
+                continue;
+            }
+
+            var sqrDistance = collider.bounds.SqrDistance(cubePosition);
+            if (sqrDistance < bestSqrDistance)
+            {
+                bestSqrDistance = sqrDistance;
+                best = container;
+            }
+        }
+
+        if (best == null)
+        {
+            Debug.LogWarning("[CubeController] No valid CubeContainer collider found for snap.");
+            return;
+        }
+
+        if (bestSqrDistance > snapDistance * snapDistance)
+        {
+            Debug.Log($"[CubeController] Nearest container too far. sqrDist={bestSqrDistance:F3} threshold={snapDistance * snapDistance:F3}");
+            return;
+        }
+
+        Debug.Log($"[CubeController] Snap attempt to {best.name} (sqrDist={bestSqrDistance:F3})");
+        best.TryAttachCube(gameObject);
     }
     
 }
