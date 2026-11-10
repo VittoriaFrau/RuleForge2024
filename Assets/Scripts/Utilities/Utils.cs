@@ -769,6 +769,10 @@ namespace UI
                     labelTexts[1] = "says"; //3rd person for reading
                     labelTexts[2] = "\"" + e.EventStr + "\""; //keyword
                     break;
+                case InteractionCreationController.Modalities.Pose:
+                    labelTexts[1] = "";
+                    labelTexts[2] = e.EventStr; // e.g. "sits down"
+                    break;
                 case InteractionCreationController.Modalities.Proximity:
                     labelTexts[0] = e.Subject;
                     labelTexts[1] = "is near to"; //3rd person for reading

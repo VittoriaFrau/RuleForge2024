@@ -45,6 +45,8 @@ namespace UI
         private readonly Dictionary<(GameObject target, InteractionCreationController.Modalities modality), bool>
             continuousModalityState = new();
 
+        private readonly Dictionary<ECAEvent, Action<PoseType>> poseHandlers = new();
+
         public enum ContainerType
         {
             Equivalence,
@@ -757,6 +759,14 @@ namespace UI
 
         private bool IsContinuousStateActive(ECAEvent ecaEvent)
         {
+            // Pose is a continuous state too (e.g. "is sitting down"), but has no target GameObject,
+            // so it is checked against PoseDetector.CurrentPose instead of continuousModalityState.
+            if (ecaEvent.Modality == InteractionCreationController.Modalities.Pose)
+            {
+                var poseDetector = GeneralUIController.Instance.InteractionCreationController.poseDetector;
+                return poseDetector != null && PoseDetector.VerbPhraseFor(poseDetector.CurrentPose) == ecaEvent.EventStr;
+            }
+
             if (!IsContinuousModality(ecaEvent.Modality)) return false;
             return continuousModalityState.TryGetValue((ecaEvent.ObjectRef, ecaEvent.Modality), out var active) && active;
         }
@@ -947,7 +957,9 @@ namespace UI
             if (target == null)
             {
                 // target can be null in case of controller or speech modality, where the event is not bound to a specific GameObject
-                if (modality == InteractionCreationController.Modalities.Controller || modality == InteractionCreationController.Modalities.Speech)
+                if (modality == InteractionCreationController.Modalities.Controller
+                    || modality == InteractionCreationController.Modalities.Speech
+                    || modality == InteractionCreationController.Modalities.Pose)
                 {
                     target = this.gameObject; // Use the eventHandler itself
                 }
@@ -997,12 +1009,50 @@ namespace UI
                     BindTimerEvent(tracker);
                     break;
 
+                case InteractionCreationController.Modalities.Pose:
+                    BindPoseEvent(lastECAEvent, tracker);
+                    break;
+
                 default:
                     Debug.LogWarning($"Unknown modality: {lastECAEvent.Modality}");
                     break;
             }
         }
         
+        private void UnbindAllPoseEvents()
+        {
+            var poseDetector = GeneralUIController.Instance.InteractionCreationController.poseDetector;
+            if (poseDetector != null)
+            {
+                foreach (var handler in poseHandlers.Values)
+                {
+                    poseDetector.OnPoseEntered -= handler;
+                }
+            }
+            poseHandlers.Clear();
+        }
+
+        private void BindPoseEvent(ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
+        {
+            var poseDetector = GeneralUIController.Instance.InteractionCreationController.poseDetector;
+            if (poseDetector == null)
+            {
+                Debug.LogWarning("PoseDetector not assigned, cannot bind Pose event.");
+                return;
+            }
+
+            void Handler(PoseType pose)
+            {
+                if (PoseDetector.VerbPhraseFor(pose) == ecaEvent.EventStr)
+                {
+                    notifyTracker(ecaEvent);
+                }
+            }
+
+            poseDetector.OnPoseEntered += Handler;
+            poseHandlers[ecaEvent] = Handler;
+        }
+
         private void BindTimerEvent( Action<ECAEvent> notifyTracker)
         {
             float durationInSeconds = lastECAEvent.ObjectStr != null ? float.Parse(lastECAEvent.ObjectStr) : 0f;
@@ -1261,6 +1311,10 @@ namespace UI
                                 {
                                     listener.ClearListeners();
                                 }
+                                break;
+
+                            case InteractionCreationController.Modalities.Pose:
+                                UnbindAllPoseEvents();
                                 break;
                         }
                     }

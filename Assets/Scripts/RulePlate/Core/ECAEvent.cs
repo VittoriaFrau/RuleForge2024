@@ -198,6 +198,9 @@ namespace UI
                 case InteractionCreationController.Modalities.Speech:
                     return $"The user says {EventStr}";
 
+                case InteractionCreationController.Modalities.Pose:
+                    return $"The user {EventStr}";
+
                 case InteractionCreationController.Modalities.Controller when ObjectRef == null:
                     return "The user presses the trigger";
                 
@@ -247,6 +250,9 @@ namespace UI
                 case InteractionCreationController.Modalities.Speech:
                     Verb = "says";
                     ObjectStr = EventStr;
+                    break;
+                case InteractionCreationController.Modalities.Pose:
+                    Verb = EventStr; // e.g. "sits down", "raises the hands"
                     break;
                 case InteractionCreationController.Modalities.Timer:
                     Subject = ObjectRef.name;

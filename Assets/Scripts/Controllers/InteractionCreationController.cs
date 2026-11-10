@@ -31,7 +31,8 @@ namespace UI
             Speech,
             Proximity,
             Controller,
-            Timer
+            Timer,
+            Pose
         }
 
         private Modalities _modality;
@@ -117,6 +118,11 @@ namespace UI
 
         public GameObject addTimerButton;
 
+        // Pose modality: panel listing the poses PoseDetector can recognise. Wired to four
+        // buttons in the Inspector, each calling RecordPoseEvent with its pose phrase.
+        [Header("Pose Modality")] public GameObject posePanel;
+        public PoseDetector poseDetector;
+
         private void Start()
         {
             if (screenshotCamera != null)
@@ -179,6 +185,9 @@ namespace UI
                 case Modalities.Timer:
                     ActivateTimerModality();
                     break;
+                case Modalities.Pose:
+                    ActivatePoseModality();
+                    break;
             }
 
             //Se ho selezionato la modalità e sono in modalità registrazione, devo attivare i listener per registrare
@@ -205,7 +214,45 @@ namespace UI
             // Hide the reset timer button in the menu
             addTimerButton.SetActive(false);
             resetTimerButton.SetActive(false);
-            
+
+        }
+
+        private void ActivatePoseModality()
+        {
+            HideModalityBubble("Pose");
+
+            // Show the panel listing the four poses PoseDetector can recognise
+            if (posePanel != null) posePanel.SetActive(true);
+
+            GeneralUIController.Instance.SetDebugText("Choose the pose you want to use from the panel");
+        }
+
+        private void DeActivatePoseModality()
+        {
+            if (posePanel != null) posePanel.SetActive(false);
+        }
+
+        /// <summary>
+        /// Called by each pose button in posePanel (wired in the Inspector), one per recognisable
+        /// pose. Follows the same no-target-object pattern as OnTriggerPressed (Controller modality):
+        /// records the event immediately, with no intermediate recording state.
+        /// </summary>
+        public void RecordPoseEvent(string poseVerbPhrase)
+        {
+            if (!GeneralUIController.Instance.isRecording)
+            {
+                Debug.Log("Not recording, ignoring pose selection");
+                return;
+            }
+
+            GeneralUIController.Instance.SetDebugText("The user " + poseVerbPhrase);
+
+            var ecaEvent = new ECAEvent(null, Modalities.Pose, poseVerbPhrase,
+                Utils.LoadPNG("Assets/Resources/Icons/pose.png"), false);
+            if (!GeneralUIController.Instance.recordedEvents.Contains(ecaEvent))
+            {
+                GeneralUIController.Instance.recordedEvents.Add(ecaEvent);
+            }
         }
 
         public void AddTimer()
@@ -436,7 +483,7 @@ namespace UI
 
             GeneralUIController.Instance.SetDebugText("Selected modality: " + _modality
                                                                             + " use your modality to interact with any object in the scene");
-            if(_modality!= Modalities.Speech && _modality != Modalities.Controller && _modality != Modalities.Timer) _categoryController.ShowCategoryMenu();
+            if(_modality!= Modalities.Speech && _modality != Modalities.Controller && _modality != Modalities.Timer && _modality != Modalities.Pose) _categoryController.ShowCategoryMenu();
 
             if (_modality == Modalities.Timer)
             {
@@ -469,9 +516,12 @@ namespace UI
                 case Modalities.Timer:
                     DeActivateTimerModality();
                     break;
+                case Modalities.Pose:
+                    DeActivatePoseModality();
+                    break;
             }
 
-            
+
         }
 
         private void ActivateTouchModality()
@@ -838,6 +888,10 @@ namespace UI
                 case Modalities.Proximity:
                     GeneralUIController.Instance.SetDebugText(
                         "Recording started. Please, use the proximity cube as trigger");
+                    break;
+                case Modalities.Pose:
+                    GeneralUIController.Instance.SetDebugText(
+                        "Recording started. Please, select a pose from the panel");
                     break;
                 case Modalities.None:
                     Debug.Log("No modality selected");
