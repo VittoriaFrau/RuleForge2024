@@ -1,61 +1,52 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace UI.RuleEditor
 {
+    /// <summary>
+    /// A set of events belonging to a merged (parallel) cube. Thin Unity-facing wrapper around
+    /// <see cref="ParallelWindowTracker"/>, which holds the actual window logic.
+    /// </summary>
     public class MeanwhileEvent
     {
         public ECAEvent[] events;
-        public float timeWindow = 5.0f;
-        public float timer;
         public int CubeID;
-        private HashSet<ECAEvent> triggeredEvents = new HashSet<ECAEvent>();
 
-        public bool TimerRunning { get; private set; }        
-        public bool IsComplete => triggeredEvents.Count == events.Length;
+        private readonly ParallelWindowTracker tracker;
 
-        public MeanwhileEvent(ECAEvent[] events)
+        public bool IsComplete => tracker.IsComplete;
+
+        public MeanwhileEvent(ECAEvent[] events) : this(events, RuleTimingConfig.ParallelWindowSeconds)
+        {
+        }
+
+        public MeanwhileEvent(ECAEvent[] events, float windowSeconds)
         {
             this.events = events;
-            timer = 0f;
-            TimerRunning = false;
+            tracker = new ParallelWindowTracker(events, windowSeconds);
         }
 
         public void Reset()
         {
-            triggeredEvents.Clear();
-            timer = 0f;
-            TimerRunning = false;
-        }
-
-        public void RegisterTrigger(ECAEvent ecaEvent)
-        {
-            triggeredEvents.Add(ecaEvent);
+            tracker.Reset();
         }
 
         public bool HasTriggered(ECAEvent ecaEvent)
         {
-            return triggeredEvents.Contains(ecaEvent);
+            return tracker.HasTriggered(ecaEvent);
         }
-        
-        public void StartTimer()
+
+        /// <summary>
+        /// Registers that <paramref name="ecaEvent"/> fired now. Returns true if the window is
+        /// complete (every event of this merged cube has fired inside the current window).
+        /// </summary>
+        public bool RegisterTrigger(ECAEvent ecaEvent)
         {
-            timer = timeWindow;
-            TimerRunning = true;
+            return RegisterTrigger(ecaEvent, Time.time);
         }
-        
-        public void UpdateTimer(float deltaTime)
+
+        public bool RegisterTrigger(ECAEvent ecaEvent, float now)
         {
-            if (!TimerRunning) return;
-
-            timer -= deltaTime;
-
-            if (timer <= 0f)
-            {
-                Debug.Log("Meanwhile rule timer expired. Resetting rule.");
-                Reset();
-            }
+            return tracker.RegisterTrigger(ecaEvent, now);
         }
     }
-
 }

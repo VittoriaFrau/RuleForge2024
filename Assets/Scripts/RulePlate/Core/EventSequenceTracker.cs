@@ -13,6 +13,7 @@ namespace UI
         private readonly RuleEngine ruleEngine;
         private List<Action> oppositeActions;
         private bool hasCompleted = false;
+        private float? lastEventTime;
 
         public EventSequenceTracker(ECAEvent[] whenSequence, ECAEvent[] thenEvents, RuleEngine ruleEngine)
         {
@@ -24,16 +25,29 @@ namespace UI
 
         public void EventTriggered(ECAEvent triggeredEvent)
         {
+            EventTriggered(triggeredEvent, Time.time);
+        }
+
+        public void EventTriggered(ECAEvent triggeredEvent, float now)
+        {
             if (hasCompleted) return;
 
             if (sequence.Length == 0) return;
+
+            if (CurrentIndex > 0 &&
+                SequenceGapEvaluator.HasExceededGap(lastEventTime, now, RuleTimingConfig.SequenceMaxGapSeconds))
+            {
+                Debug.Log($"[Tracker] Gap since last event exceeded {RuleTimingConfig.SequenceMaxGapSeconds}s. Resetting sequence.");
+                CurrentIndex = 0;
+            }
 
             var expectedEvent = sequence[CurrentIndex];
 
             if (triggeredEvent == expectedEvent)
             {
                 Debug.Log($"[Tracker] Event {CurrentIndex} ({triggeredEvent.EventStr}) triggered correctly on {triggeredEvent.ObjectRef?.name ?? "null object"}");
-                
+
+                lastEventTime = now;
                 CurrentIndex++;
 
                 if (CurrentIndex >= sequence.Length)
@@ -46,6 +60,7 @@ namespace UI
             {
                 Debug.Log($"[Tracker] Unexpected event '{triggeredEvent.EventStr}'. Resetting sequence.");
                 CurrentIndex = 0;
+                lastEventTime = null;
             }
         }
 

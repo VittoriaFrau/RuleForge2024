@@ -39,6 +39,12 @@ namespace UI
         }
         private Dictionary<GameObject, HashSet<InteractionCreationController.Modalities>> gameObjectsWithBindings = new();
 
+        // Tracks whether a continuous-state modality (Laser/Touch/Headgaze/Proximity) is currently
+        // active on a target, so a merged cube can treat it as satisfied even if it entered that
+        // state before the parallel window of a sibling event opened (see IsContinuousStateActive).
+        private readonly Dictionary<(GameObject target, InteractionCreationController.Modalities modality), bool>
+            continuousModalityState = new();
+
         public enum ContainerType
         {
             Equivalence,
@@ -553,13 +559,13 @@ namespace UI
 
                     foreach (var mEvent in meanwhileRule.events)
                     {
-                        if (mEvent.Modality != InteractionCreationController.Modalities.Speech)
-                        {
-                            GameObject obj = mEvent.ObjectRef;
-                            Debug.Log($"Binding meanwhile event: {mEvent} on GameObject: {obj.name}");
-                            eventSequenceTracker = new EventSequenceTracker(new[] { mEvent }, rule.Actions.ToArray(), ruleEngine);
-                            BindEvent(obj, eventSequenceTracker, false, meanwhileRule);
-                        }
+                        // Real execution path for merged cubes (see BindMeanwhileEvent): BindEvent's
+                        // generic path returns early for every meanwhile event (the "//DEMO" guard
+                        // right at the top of BindEvent), so routing through it here would silently
+                        // bind nothing at all, for every modality, not just Speech. BindMeanwhileEvent
+                        // does the real binding instead, and also covers Speech sub-events, which the
+                        // old code excluded here and therefore could never satisfy a merged cube.
+                        BindMeanwhileEvent(mEvent, meanwhileRule);
                     }
                 }
             }
@@ -708,26 +714,53 @@ namespace UI
         
         private void OnMeanwhileEventTriggered(ECAEvent triggeredEvent, MeanwhileEvent @event)
         {
-            if (@event.HasTriggered(triggeredEvent))
-                return;
-
-            @event.RegisterTrigger(triggeredEvent);
+            bool complete = @event.RegisterTrigger(triggeredEvent, Time.time);
             Debug.Log($"Meanwhile event triggered: {triggeredEvent.EventStr}");
 
-            if (@event.IsComplete)
+            if (!complete)
+            {
+                // Continuous-state modalities (Laser/Touch/Headgaze; Proximity cannot reach this
+                // yet, see BindProximityEvent) count as satisfied if they are already active, even
+                // though they fired outside the current window (e.g. the user started pointing
+                // well before speaking). See IsContinuousStateActive.
+                foreach (var sibling in @event.events)
+                {
+                    if (complete) break;
+                    if (sibling == triggeredEvent || @event.HasTriggered(sibling)) continue;
+                    if (IsContinuousStateActive(sibling))
+                    {
+                        complete = @event.RegisterTrigger(sibling, Time.time);
+                    }
+                }
+            }
+
+            if (complete)
             {
                 Debug.Log("All Meanwhile events triggered within time window! Executing actions...");
                 ExecuteMeanwhileAction();
                 @event.Reset();
             }
-            else if (!@event.TimerRunning)
-            {
-                @event.StartTimer();
-                Debug.Log($"Started timer for MeanwhileEvent: {@event.timer}s");
-            }
         }
 
-        
+        private static bool IsContinuousModality(InteractionCreationController.Modalities modality)
+        {
+            return modality == InteractionCreationController.Modalities.Laser
+                   || modality == InteractionCreationController.Modalities.Touch
+                   || modality == InteractionCreationController.Modalities.Headgaze
+                   || modality == InteractionCreationController.Modalities.Proximity;
+        }
+
+        private void SetContinuousState(GameObject target, InteractionCreationController.Modalities modality, bool active)
+        {
+            continuousModalityState[(target, modality)] = active;
+        }
+
+        private bool IsContinuousStateActive(ECAEvent ecaEvent)
+        {
+            if (!IsContinuousModality(ecaEvent.Modality)) return false;
+            return continuousModalityState.TryGetValue((ecaEvent.ObjectRef, ecaEvent.Modality), out var active) && active;
+        }
+
         private void ExecuteMeanwhileAction()
         {
 
@@ -752,6 +785,79 @@ namespace UI
             ruleDebugText = activeRulePlate.transform.Find("HelpText/Action Button/Frontplate/RuleDebugText").gameObject;
         }
         
+        /// <summary>
+        /// Real binding path for a single event of a merged (parallel) cube. BindEvent's own
+        /// meanwhile-event branch is never reached (see the "//DEMO" early return right below, left
+        /// untouched on purpose), so this mirrors its target-resolution logic directly instead of
+        /// routing through it. Unlike the old (dead) code, this also binds Speech sub-events.
+        /// </summary>
+        private void BindMeanwhileEvent(ECAEvent mEvent, MeanwhileEvent meanwhileRule)
+        {
+            GameObject target = mEvent.ObjectRef;
+            Action<ECAEvent> localTracker = (evt) => OnMeanwhileEventTriggered(evt, meanwhileRule);
+
+            Debug.Log($"Binding meanwhile event: {mEvent} on GameObject: {(target != null ? target.name : "null")}");
+
+            // BindModalityEvent (and the category resolution below) reads the event to bind from
+            // this field, following the same convention as the "when/equivalence" loop above.
+            lastECAEvent = mEvent;
+
+            if (mEvent.ObjectCategory == CategoryController.CategoryObjectSelected.SingleObject
+                && mEvent.SubjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            {
+                BindModalityEvent(target, localTracker);
+            }
+            else if (mEvent.ObjectCategory == CategoryController.CategoryObjectSelected.Category
+                     && mEvent.SubjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            {
+                var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(target);
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+            }
+            else if (mEvent.SubjectCategory == CategoryController.CategoryObjectSelected.Category
+                     && mEvent.ObjectCategory == CategoryController.CategoryObjectSelected.SingleObject)
+            {
+                var lastEcaScriptCategoryOfTarget = Utils.GetECALastScriptFromECAObject(GameObject.Find(mEvent.Subject));
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTarget))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+            }
+            else if (mEvent.SubjectCategory == CategoryController.CategoryObjectSelected.Category
+                     && mEvent.ObjectCategory == CategoryController.CategoryObjectSelected.Category)
+            {
+                var lastEcaScriptCategoryOfTargetSubject = Utils.GetECALastScriptFromECAObject(GameObject.Find(mEvent.Subject));
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTargetSubject))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+
+                var lastEcaScriptCategoryOfTargetObject = Utils.GetECALastScriptFromECAObject(target);
+                foreach (var interactable in interactables.transform.GetComponentsInChildren<ObjectManipulator>())
+                {
+                    if (Utils.GetECALastScriptFromECAObject(interactable.gameObject).Equals(lastEcaScriptCategoryOfTargetObject))
+                    {
+                        BindModalityEvent(interactable.gameObject, localTracker);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Unknown event category: {mEvent.ObjectCategory}");
+            }
+        }
+
         private void BindEvent(GameObject target, EventSequenceTracker tracker,
             bool isEquivalence, MeanwhileEvent meanwhileEvent = null)
         {
@@ -917,6 +1023,11 @@ namespace UI
             string verb = ecaEvent.EventStr.ToLower();
             UnityAction touchAction = () => notifyTracker(ecaEvent);
 
+            // Touch/selection is a continuous state (held down), unlike the edge-triggered verb
+            // below: track it regardless of which verb this particular event records.
+            manipulator.selectEntered.AddListener(interactor => SetContinuousState(target, InteractionCreationController.Modalities.Touch, true));
+            manipulator.selectExited.AddListener(interactor => SetContinuousState(target, InteractionCreationController.Modalities.Touch, false));
+
             if (verb.Contains("clicks") || verb.Contains("is clicking"))
             {
                 manipulator.OnClicked.AddListener(() =>
@@ -990,6 +1101,13 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
 
+            // Laser/pointing is edge-triggered below (fires once on hover enter/exit), but it is a
+            // continuous state while the hover lasts: track it so a merged cube (e.g. "pointing and
+            // saying X") can still be satisfied if the user was already pointing when the sibling
+            // event arrives, even though hoverEntered already fired outside the parallel window.
+            manipulator.hoverEntered.AddListener(interactor => SetContinuousState(target, InteractionCreationController.Modalities.Laser, true));
+            manipulator.hoverExited.AddListener(interactor => SetContinuousState(target, InteractionCreationController.Modalities.Laser, false));
+
             if (verb.Contains("points") || verb.Contains("is pointing"))
             {
                 manipulator.hoverEntered.AddListener(interactor =>
@@ -1020,6 +1138,21 @@ namespace UI
 
             string verb = ecaEvent.EventStr.ToLower();
 
+            gazeInteractor.hoverEntered.AddListener(eventArgs =>
+            {
+                if (eventArgs.interactableObject.transform.gameObject == target)
+                {
+                    SetContinuousState(target, InteractionCreationController.Modalities.Headgaze, true);
+                }
+            });
+            gazeInteractor.hoverExited.AddListener(eventArgs =>
+            {
+                if (eventArgs.interactableObject.transform.gameObject == target)
+                {
+                    SetContinuousState(target, InteractionCreationController.Modalities.Headgaze, false);
+                }
+            });
+
             if (verb.Contains("looks") || verb.Contains("is looking"))
             {
                 gazeInteractor.hoverEntered.AddListener(eventArgs =>
@@ -1044,6 +1177,11 @@ namespace UI
             }
         }
 
+        // NOTE (Task 1 trace): the "//DEMO return" below means Proximity never calls notifyTracker
+        // today, in ANY rule (sequential, parallel or merged), not only here. Continuous-state
+        // tracking for Proximity (IsContinuousModality already includes it) cannot be wired until
+        // that pre-existing early return is removed by whoever owns that screenshot workflow; left
+        // untouched here per instructions not to rely on or remove //DEMO blocks.
         private void BindProximityEvent(GameObject target, ECAEvent ecaEvent, Action<ECAEvent> notifyTracker)
         {
             var collider = target.GetComponent<Collider>();
