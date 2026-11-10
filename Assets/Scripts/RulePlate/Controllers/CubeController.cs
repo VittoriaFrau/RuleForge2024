@@ -16,7 +16,10 @@ public class CubeController : MonoBehaviour
     private bool isAttached = false;
     private bool timerStarted = false;
     
-    public float minimumJoinTime = 2.0f; // Minimum time (in seconds) for the cubes to stay attached
+    // Minimum time (in seconds) the cubes must stay in contact before they merge (paper, Section 5.2.3).
+    // Prefabs serialize their own value for this field (see ModalityRuleCube/ActionRuleCube*.prefab);
+    // this default only applies to a CubeController created without going through those prefabs.
+    public float minimumJoinTime = RuleTimingConfig.MergeHoldSeconds;
     private float joinStartTime;
     public GameObject mergedCubePrefab;
     private CombineRulesController _combineRulesController;

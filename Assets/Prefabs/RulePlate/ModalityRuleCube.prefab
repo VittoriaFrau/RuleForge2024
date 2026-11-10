@@ -381,7 +381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7604b8bf92098df4588c4b323ed02d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minimumJoinTime: 2
+  minimumJoinTime: 3
   mergedCubePrefab: {fileID: 611475747482515778, guid: 5e2f63e0241d140bd8312d925f96474d, type: 3}
 --- !u!1 &2602508140187218318
 GameObject:

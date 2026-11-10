@@ -382,7 +382,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7604b8bf92098df4588c4b323ed02d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minimumJoinTime: 2
+  minimumJoinTime: 3
   mergedCubePrefab: {fileID: 611475747482515778, guid: 0e30ef0c5d556bb45a8e8f20417963cc, type: 3}
   cubeID: 0
 --- !u!1 &957134968325256339

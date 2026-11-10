@@ -12,7 +12,13 @@ using Utils = UI.Utils;
 public class MergedCubeController : MonoBehaviour
 {
     private static bool timerStarted = false;
-    public float minimumJoinTime = 2.0f; // Minimum time (in seconds) for the cubes to stay attached
+
+    // Detach countdown (separate from CubeController.minimumJoinTime, the merge hold time): how
+    // long the user must pull the two halves apart before they detach. Currently 2s, unchanged by
+    // the Task 3 merge-time update (paper only specifies the 3s merge hold, not a detach time).
+    // Note: this component is not attached to any prefab/scene today and DetachCubes has no
+    // caller (verified by searching the whole repo) - the detach flow appears unused/unfinished.
+    public float detachHoldSeconds = 2.0f;
     private float joinStartTime;
     
     private TextMeshProUGUI countdownText;
@@ -46,7 +52,7 @@ public class MergedCubeController : MonoBehaviour
                 StartCoroutine(StartCountdownDetaching());
             }
             
-            if (Time.time - joinStartTime >= minimumJoinTime)
+            if (Time.time - joinStartTime >= detachHoldSeconds)
             {
                 // Merge the cubes if the minimum join time has passed
                 Debug.Log("Detach cubes");
@@ -57,7 +63,7 @@ public class MergedCubeController : MonoBehaviour
     private IEnumerator StartCountdownDetaching()
     {
         timerStarted = true;
-        float countdownTime = minimumJoinTime;
+        float countdownTime = detachHoldSeconds;
         while (countdownTime > 0)
         {
             // Update the UI Text to show the countdown
